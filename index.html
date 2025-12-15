@@ -3,50 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Games Planet</title>
+<title>Games Planet – Arcade Accessories</title>
 
 <style>
+:root{
+  --bg:#0b0f14;
+  --card:#111827;
+  --neon:#00f7ff;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+}
+*{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:#0b0b0b;
-  color:#fff;
+  background:var(--bg);
+  color:var(--text);
 }
-h1{
-  text-align:center;
-  margin:15px 0 0;
-  color:#00ffd5;
-  font-size:32px;
-}
-h2{
-  text-align:center;
-  margin:5px 0 20px;
-  font-size:14px;
-  color:#aaa;
-}
-.container{padding:10px;}
 
+/* HEADER */
+.header{text-align:center;padding:15px 10px 5px;}
+.header h1{margin:0;font-size:34px;color:var(--neon);}
+.header p{margin:4px 0 15px;color:var(--muted);font-size:14px;}
+
+.container{max-width:900px;margin:auto;padding:10px;}
+
+/* PRODUCT CARD */
 .product{
-  background:#111;
-  border:1px solid #222;
-  border-radius:10px;
+  background:var(--card);
+  border:1px solid #1f2937;
+  border-radius:12px;
   padding:10px;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
-.image-slider{
+.image-row{
   display:flex;
   gap:8px;
   overflow-x:auto;
   margin-bottom:8px;
 }
-.image-slider img{
-  width:80px;
-  height:80px;
+.image-row img{
+  width:55px;
+  height:55px;
   object-fit:cover;
-  border-radius:6px;
-  border:1px solid #333;
+  border-radius:8px;
   cursor:pointer;
+  background:#fff;
 }
 
 .info{
@@ -54,61 +58,66 @@ h2{
   justify-content:space-between;
   align-items:center;
 }
-.info h3{
-  margin:0;
-  font-size:14px;
-}
-.info p{
-  margin:2px 0 0;
-  color:#00ffd5;
-  font-size:13px;
-}
+.info b{display:block;font-size:15px;}
+.price{color:var(--neon);font-size:14px;}
 
 .qty{
   display:flex;
   align-items:center;
-  gap:6px;
 }
 .qty button{
+  background:#000;
+  color:#fff;
+  border:1px solid var(--neon);
   width:30px;
   height:30px;
-  border:none;
-  border-radius:4px;
-  background:#00ffd5;
+  border-radius:8px;
   font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
 }
 .qty span{
-  min-width:20px;
+  width:32px;
   text-align:center;
+  font-size:15px;
 }
 
-#totalBar{
+/* PREVIEW */
+.preview{
+  margin:20px 0 100px;
+  background:var(--card);
+  border-radius:14px;
+  padding:15px;
+}
+.preview h3{margin-top:0;color:var(--neon);}
+
+/* FLOATING TOTAL */
+.floating-total{
   position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:rgba(0,0,0,0.85);
-  border-top:1px solid #00ffd5;
-  padding:10px;
+  bottom:0;left:0;width:100%;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(6px);
+  border-top:1px solid #1f2937;
+  padding:12px 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   z-index:999;
 }
-#totalText{
+.floating-total span{
   font-size:18px;
-  margin-bottom:6px;
-}
-#totalBar button{
-  width:100%;
-  padding:12px;
-  font-size:16px;
+  color:var(--neon);
   font-weight:bold;
-  background:#00ffd5;
+}
+.whatsapp{
+  padding:10px 16px;
+  font-size:16px;
+  background:#25d366;
   border:none;
-  cursor:pointer;
+  border-radius:10px;
+  color:#000;
+  font-weight:bold;
 }
 
-/* Image Modal */
+/* IMAGE MODAL */
 .modal{
   display:none;
   position:fixed;
@@ -121,7 +130,7 @@ h2{
 .modal img{
   max-width:90%;
   max-height:85%;
-  transition:transform 0.2s;
+  transition:transform .2s;
 }
 .close{
   position:absolute;
@@ -130,40 +139,46 @@ h2{
   font-size:28px;
   cursor:pointer;
 }
-.zoom-controls{
+.zoom{
   position:absolute;
   bottom:20px;
   display:flex;
   gap:10px;
 }
-.zoom-controls button{
+.zoom button{
   width:45px;
   height:45px;
   font-size:24px;
-  background:#00ffd5;
+  background:var(--neon);
   border:none;
   border-radius:50%;
-  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Games Planet</h1>
-<h2>Arcade Box Accessories</h2>
+<div class="header">
+  <h1>Games Planet</h1>
+  <p>Arcade box accessories</p>
+</div>
 
 <div class="container" id="products"></div>
 
-<div id="totalBar">
-  <div id="totalText">Total: ₹0</div>
-  <button onclick="orderWhatsApp()">Order on WhatsApp</button>
+<div class="preview">
+  <h3>Order Preview</h3>
+  <div id="orderList">No items selected</div>
 </div>
 
-<!-- Image Modal -->
+<div class="floating-total">
+  <span>Total: ₹<span id="total">0</span></span>
+  <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
+</div>
+
+<!-- IMAGE MODAL -->
 <div id="imgModal" class="modal">
   <span class="close" onclick="closeModal()">✕</span>
-  <div class="zoom-controls">
+  <div class="zoom">
     <button onclick="zoomIn()">+</button>
     <button onclick="zoomOut()">−</button>
   </div>
@@ -171,79 +186,80 @@ h2{
 </div>
 
 <script>
-const products = [
- {name:"Push Button", price:33, images:["push1.jpg"]},
- {name:"Push Button (Imported)", price:55, images:["push_imported.jpg"]},
- {name:"Rasila Handle (Without Switch)", price:220, images:["rasila_without.jpg"]},
- {name:"Rasila Handle (With Switch)", price:290, images:["rasila_with.jpg"]},
- {name:"MD Handle (With Switch)", price:780, images:["md_handle1.jpg","md_handle2.jpg"]},
- {name:"MD Switch Button", price:57, images:["md_switch.jpg"]},
- {name:"Black Switch Button", price:20, images:["black_switch.jpg"]},
- {name:"Coin Packet", price:220, images:["coin_packet.jpg"]},
- {name:"Remote Lead", price:99, images:["remote_lead.jpg"]},
- {name:"12 Core Wire (Per Meter)", price:50, images:["12_core_wire.jpg"]},
- {name:"Coin Drop Switch Button", price:40, images:["coin_drop_switch.jpg"]},
- {name:"Coin Acrylic Machine", price:220, images:["coin_machine1.jpg","coin_machine2.jpg"]},
- {name:"Remote Plate", price:200, images:["remote_plate.jpg"]},
- {name:"Old Rasila Push Button", price:13, images:["old_rasila_button.jpg"]},
- {name:"Crystal Plastic Push Button (Green)", price:19, images:["crystal_button.jpg"]}
+const products=[
+ {name:"Push Button",price:33,images:["push1.jpg","push2.jpg"]},
+ {name:"Push Button (Imported)",price:55,images:["push_imp.jpg"]},
+ {name:"Rasila Handle (Without Switch)",price:220,images:["rasila_wo.jpg"]},
+ {name:"Rasila Handle (With Switch)",price:290,images:["rasila_w.jpg"]},
+ {name:"MD Handle (With Switch)",price:780,images:["md1.jpg","md2.jpg"]},
+ {name:"MD Switch Button",price:57,images:["md_switch.jpg"]},
+ {name:"Black Switch Button",price:20,images:["black_switch.jpg"]},
+ {name:"Coin Packet",price:220,images:["coin_packet.jpg"]},
+ {name:"Remote Lead",price:99,images:["remote_lead.jpg"]},
+ {name:"12 Core Wire (Per Meter)",price:50,images:["12core.jpg"]},
+ {name:"Coin Drop Switch Button",price:40,images:["coin_drop.jpg"]},
+ {name:"Coin Acrylic Machine",price:220,images:["coin_machine1.jpg","coin_machine2.jpg"]},
+ {name:"Remote Plate",price:200,images:["remote_plate.jpg"]},
+ {name:"Old Rasila Push Button",price:13,images:["old_rasila.jpg"]},
+ {name:"Crystal Plastic Push Button (Green)",price:19,images:["crystal_green.jpg"]}
 ];
 
-const cart = {};
-const container = document.getElementById("products");
+const state={};
+const container=document.getElementById("products");
 
 products.forEach((p,i)=>{
-  cart[i]=0;
-  const imgs = p.images.map(img =>
-    `<img src="${img}" onclick="openModal(this.src)" onerror="this.style.display='none'">`
-  ).join("");
-
-  container.innerHTML += `
+  state[i]=0;
+  const imgs=p.images.map(img=>`<img src="${img}" onclick="openModal(this.src)">`).join("");
+  container.innerHTML+=`
     <div class="product">
-      <div class="image-slider">${imgs}</div>
+      <div class="image-row">${imgs}</div>
       <div class="info">
         <div>
-          <h3>${p.name}</h3>
-          <p>₹${p.price}</p>
+          <b>${p.name}</b>
+          <div class="price">₹${p.price}</div>
         </div>
         <div class="qty">
-          <button onclick="changeQty(${i},-1)">-</button>
+          <button onclick="updateQty(${i},-1)">−</button>
           <span id="q${i}">0</span>
-          <button onclick="changeQty(${i},1)">+</button>
+          <button onclick="updateQty(${i},1)">+</button>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
 });
 
-function changeQty(i,val){
-  cart[i]=Math.max(0,cart[i]+val);
-  document.getElementById("q"+i).innerText=cart[i];
-  updateTotal();
+function updateQty(i,v){
+  state[i]=Math.max(0,state[i]+v);
+  document.getElementById("q"+i).innerText=state[i];
+  renderPreview();
 }
 
-function updateTotal(){
-  let total=0;
+function renderPreview(){
+  let html="",total=0;
   products.forEach((p,i)=>{
-    total+=cart[i]*p.price;
+    if(state[i]>0){
+      const sub=p.price*state[i];
+      total+=sub;
+      html+=`${p.name} × ${state[i]} = ₹${sub}<br>`;
+    }
   });
-  document.getElementById("totalText").innerText="Total: ₹"+total;
+  document.getElementById("orderList").innerHTML=html||"No items selected";
+  document.getElementById("total").innerText=total;
 }
 
 function orderWhatsApp(){
-  let msg="*Games Planet Order*%0A%0A";
+  let msg="*Games Planet – Order Request*\n\n";
   let total=0;
   products.forEach((p,i)=>{
-    if(cart[i]>0){
-      msg+=`${p.name} × ${cart[i]} = ₹${cart[i]*p.price}%0A`;
-      total+=cart[i]*p.price;
+    if(state[i]>0){
+      msg+=`${p.name} × ${state[i]} = ₹${p.price*state[i]}\n`;
+      total+=p.price*state[i];
     }
   });
-  msg+=`%0A*Total: ₹${total}*`;
-  window.open("https://wa.me/919690483240?text="+msg,"_blank");
+  msg+=`\n*Total: ₹${total}*`;
+  window.open("https://wa.me/919690483240?text="+encodeURIComponent(msg),"_blank");
 }
 
-/* Modal Zoom */
+/* MODAL */
 let scale=1;
 const modal=document.getElementById("imgModal");
 const modalImg=document.getElementById("modalImg");
@@ -254,19 +270,9 @@ function openModal(src){
   scale=1;
   modalImg.style.transform=`scale(${scale})`;
 }
-function closeModal(){
-  modal.style.display="none";
-}
-function zoomIn(){
-  scale+=0.2;
-  modalImg.style.transform=`scale(${scale})`;
-}
-function zoomOut(){
-  if(scale>1){
-    scale-=0.2;
-    modalImg.style.transform=`scale(${scale})`;
-  }
-}
+function closeModal(){modal.style.display="none";}
+function zoomIn(){scale+=0.2;modalImg.style.transform=`scale(${scale})`;}
+function zoomOut(){if(scale>1){scale-=0.2;modalImg.style.transform=`scale(${scale})`;}}
 </script>
 
 </body>
