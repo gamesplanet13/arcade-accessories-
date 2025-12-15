@@ -8,28 +8,23 @@
 <style>
 body{
   margin:0;
-  font-family: Arial, sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
   background:#0b0b0b;
   color:#fff;
 }
-
 h1{
   text-align:center;
   margin:15px 0 0;
-  font-size:32px;
   color:#00ffd5;
+  font-size:32px;
 }
-
 h2{
   text-align:center;
   margin:5px 0 20px;
   font-size:14px;
   color:#aaa;
 }
-
-.container{
-  padding:10px;
-}
+.container{padding:10px;}
 
 .product{
   background:#111;
@@ -45,14 +40,13 @@ h2{
   overflow-x:auto;
   margin-bottom:8px;
 }
-
 .image-slider img{
   width:80px;
   height:80px;
   object-fit:cover;
   border-radius:6px;
-  cursor:pointer;
   border:1px solid #333;
+  cursor:pointer;
 }
 
 .info{
@@ -60,16 +54,14 @@ h2{
   justify-content:space-between;
   align-items:center;
 }
-
 .info h3{
-  font-size:14px;
   margin:0;
+  font-size:14px;
 }
-
 .info p{
   margin:2px 0 0;
-  font-size:13px;
   color:#00ffd5;
+  font-size:13px;
 }
 
 .qty{
@@ -77,28 +69,21 @@ h2{
   align-items:center;
   gap:6px;
 }
-
 .qty button{
   width:30px;
   height:30px;
-  background:#00ffd5;
   border:none;
   border-radius:4px;
+  background:#00ffd5;
   font-size:18px;
   font-weight:bold;
   cursor:pointer;
 }
-
 .qty span{
   min-width:20px;
   text-align:center;
 }
 
-#preview{
-  padding-bottom:120px;
-}
-
-/* Sticky total bar */
 #totalBar{
   position:fixed;
   bottom:0;
@@ -107,21 +92,23 @@ h2{
   background:rgba(0,0,0,0.85);
   border-top:1px solid #00ffd5;
   padding:10px;
-  z-index:1000;
+  z-index:999;
 }
-
+#totalText{
+  font-size:18px;
+  margin-bottom:6px;
+}
 #totalBar button{
   width:100%;
   padding:12px;
-  margin-top:8px;
-  background:#00ffd5;
-  border:none;
   font-size:16px;
   font-weight:bold;
+  background:#00ffd5;
+  border:none;
   cursor:pointer;
 }
 
-/* Modal */
+/* Image Modal */
 .modal{
   display:none;
   position:fixed;
@@ -131,13 +118,11 @@ h2{
   justify-content:center;
   align-items:center;
 }
-
 .modal img{
   max-width:90%;
   max-height:85%;
   transition:transform 0.2s;
 }
-
 .close{
   position:absolute;
   top:15px;
@@ -145,14 +130,12 @@ h2{
   font-size:28px;
   cursor:pointer;
 }
-
 .zoom-controls{
   position:absolute;
   bottom:20px;
   display:flex;
   gap:10px;
 }
-
 .zoom-controls button{
   width:45px;
   height:45px;
@@ -172,7 +155,6 @@ h2{
 
 <div class="container" id="products"></div>
 
-<!-- Sticky Total Bar -->
 <div id="totalBar">
   <div id="totalText">Total: ₹0</div>
   <button onclick="orderWhatsApp()">Order on WhatsApp</button>
@@ -190,35 +172,30 @@ h2{
 
 <script>
 const products = [
-  {
-    name:"MD Handle (With MD Switch)",
-    price:780,
-    images:["md1.jpg","md2.jpg","md3.jpg"]
-  },
-  {
-    name:"Rasila Handle (With Switch)",
-    price:290,
-    images:["rasila1.jpg","rasila2.jpg"]
-  },
-  {
-    name:"Coin Acrylic Machine",
-    price:220,
-    images:["coin1.jpg","coin2.jpg"]
-  },
-  {
-    name:"Push Button",
-    price:33,
-    images:["push1.jpg","push2.jpg"]
-  }
+ {name:"Push Button", price:33, images:["push1.jpg"]},
+ {name:"Push Button (Imported)", price:55, images:["push_imported.jpg"]},
+ {name:"Rasila Handle (Without Switch)", price:220, images:["rasila_without.jpg"]},
+ {name:"Rasila Handle (With Switch)", price:290, images:["rasila_with.jpg"]},
+ {name:"MD Handle (With Switch)", price:780, images:["md_handle1.jpg","md_handle2.jpg"]},
+ {name:"MD Switch Button", price:57, images:["md_switch.jpg"]},
+ {name:"Black Switch Button", price:20, images:["black_switch.jpg"]},
+ {name:"Coin Packet", price:220, images:["coin_packet.jpg"]},
+ {name:"Remote Lead", price:99, images:["remote_lead.jpg"]},
+ {name:"12 Core Wire (Per Meter)", price:50, images:["12_core_wire.jpg"]},
+ {name:"Coin Drop Switch Button", price:40, images:["coin_drop_switch.jpg"]},
+ {name:"Coin Acrylic Machine", price:220, images:["coin_machine1.jpg","coin_machine2.jpg"]},
+ {name:"Remote Plate", price:200, images:["remote_plate.jpg"]},
+ {name:"Old Rasila Push Button", price:13, images:["old_rasila_button.jpg"]},
+ {name:"Crystal Plastic Push Button (Green)", price:19, images:["crystal_button.jpg"]}
 ];
 
-let cart = {};
+const cart = {};
 const container = document.getElementById("products");
 
-products.forEach(p=>{
-  cart[p.name]=0;
-  const imgs = p.images.map(i =>
-    `<img src="${i}" onclick="openModal(this.src)">`
+products.forEach((p,i)=>{
+  cart[i]=0;
+  const imgs = p.images.map(img =>
+    `<img src="${img}" onclick="openModal(this.src)" onerror="this.style.display='none'">`
   ).join("");
 
   container.innerHTML += `
@@ -230,43 +207,43 @@ products.forEach(p=>{
           <p>₹${p.price}</p>
         </div>
         <div class="qty">
-          <button onclick="changeQty('${p.name}',-1)">-</button>
-          <span id="q-${p.name}">0</span>
-          <button onclick="changeQty('${p.name}',1)">+</button>
+          <button onclick="changeQty(${i},-1)">-</button>
+          <span id="q${i}">0</span>
+          <button onclick="changeQty(${i},1)">+</button>
         </div>
       </div>
     </div>
   `;
 });
 
-function changeQty(name,val){
-  cart[name]=Math.max(0,cart[name]+val);
-  document.getElementById("q-"+name).innerText=cart[name];
+function changeQty(i,val){
+  cart[i]=Math.max(0,cart[i]+val);
+  document.getElementById("q"+i).innerText=cart[i];
   updateTotal();
 }
 
 function updateTotal(){
   let total=0;
-  products.forEach(p=>{
-    total+=cart[p.name]*p.price;
+  products.forEach((p,i)=>{
+    total+=cart[i]*p.price;
   });
   document.getElementById("totalText").innerText="Total: ₹"+total;
 }
 
 function orderWhatsApp(){
-  let msg="*Games Planet Order*%0A";
+  let msg="*Games Planet Order*%0A%0A";
   let total=0;
-  products.forEach(p=>{
-    if(cart[p.name]>0){
-      msg+=`${p.name} × ${cart[p.name]} = ₹${cart[p.name]*p.price}%0A`;
-      total+=cart[p.name]*p.price;
+  products.forEach((p,i)=>{
+    if(cart[i]>0){
+      msg+=`${p.name} × ${cart[i]} = ₹${cart[i]*p.price}%0A`;
+      total+=cart[i]*p.price;
     }
   });
   msg+=`%0A*Total: ₹${total}*`;
-  window.open(`https://wa.me/919690483240?text=${msg}`,"_blank");
+  window.open("https://wa.me/919690483240?text="+msg,"_blank");
 }
 
-/* Modal & Zoom */
+/* Modal Zoom */
 let scale=1;
 const modal=document.getElementById("imgModal");
 const modalImg=document.getElementById("modalImg");
@@ -277,16 +254,13 @@ function openModal(src){
   scale=1;
   modalImg.style.transform=`scale(${scale})`;
 }
-
 function closeModal(){
   modal.style.display="none";
 }
-
 function zoomIn(){
   scale+=0.2;
   modalImg.style.transform=`scale(${scale})`;
 }
-
 function zoomOut(){
   if(scale>1){
     scale-=0.2;
