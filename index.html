@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Games Planet – Arcade Box Accessories</title>
+<title>Games Planet – Arcade Accessories</title>
 
 <style>
 :root{
@@ -14,36 +14,44 @@
   --muted:#9ca3af;
 }
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
+
+/* HEADER */
+.header{
+  text-align:center;
+  padding:15px 10px 5px;
+}
+.header h1{
+  margin:0;
+  font-size:34px;
+  color:var(--neon);
+}
+.header p{
+  margin:4px 0 15px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* CONTAINER */
 .container{
   max-width:900px;
   margin:auto;
-  padding:15px;
-}
-h1{
-  text-align:center;
-  font-size:32px;
-  margin:10px 0 0;
-  color:var(--neon);
-}
-.subtitle{
-  text-align:center;
-  font-size:14px;
-  color:var(--muted);
-  margin-bottom:20px;
+  padding:10px;
 }
 
+/* PRODUCT CARD */
 .product{
   display:flex;
   align-items:center;
   background:var(--card);
   border:1px solid #1f2937;
-  border-radius:10px;
+  border-radius:12px;
   padding:10px;
   margin-bottom:10px;
 }
@@ -51,16 +59,23 @@ h1{
   width:50px;
   height:50px;
   object-fit:cover;
-  border-radius:6px;
+  border-radius:8px;
   margin-right:10px;
   background:#fff;
 }
 .info{
   flex:1;
 }
-.info b{display:block}
-.price{color:var(--neon);font-size:14px}
+.info b{
+  display:block;
+  font-size:15px;
+}
+.price{
+  color:var(--neon);
+  font-size:14px;
+}
 
+/* QTY */
 .qty{
   display:flex;
   align-items:center;
@@ -69,87 +84,125 @@ h1{
   background:#000;
   color:#fff;
   border:1px solid var(--neon);
-  width:28px;
-  height:28px;
-  border-radius:6px;
+  width:30px;
+  height:30px;
+  border-radius:8px;
   font-size:18px;
 }
 .qty span{
-  width:30px;
+  width:32px;
   text-align:center;
+  font-size:15px;
 }
 
+/* ORDER PREVIEW */
 .preview{
-  margin-top:20px;
+  margin:20px 0 100px;
   background:var(--card);
-  border-radius:10px;
+  border-radius:14px;
   padding:15px;
 }
-.preview h3{margin-top:0;color:var(--neon)}
-.total{
-  font-size:18px;
-  margin-top:10px;
+.preview h3{
+  margin-top:0;
+  color:var(--neon);
+}
+.total-text{
   text-align:right;
+  font-size:18px;
   color:var(--neon);
 }
 
-.whatsapp{
+/* FLOATING TOTAL BAR */
+.floating-total{
+  position:fixed;
+  bottom:0;
+  left:0;
   width:100%;
-  margin-top:15px;
-  padding:15px;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(6px);
+  border-top:1px solid #1f2937;
+  padding:12px 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:999;
+}
+.floating-total span{
   font-size:18px;
+  color:var(--neon);
+  font-weight:bold;
+}
+.whatsapp{
+  padding:10px 16px;
+  font-size:16px;
   background:#25d366;
   border:none;
   border-radius:10px;
   color:#000;
   font-weight:bold;
 }
+
+/* SAFETY FOR LIGHT MODE */
+@media (prefers-color-scheme: light){
+  body{
+    background:#ffffff;
+    color:#000;
+  }
+  .product,.preview{
+    background:#f9fafb;
+    color:#000;
+  }
+}
 </style>
 </head>
 
 <body>
-<div class="container">
+
+<div class="header">
   <h1>Games Planet</h1>
-  <div class="subtitle">Arcade box accessories</div>
+  <p>Arcade box accessories</p>
+</div>
 
-  <div id="products"></div>
+<div class="container" id="products"></div>
 
-  <div class="preview">
-    <h3>Order Preview</h3>
-    <div id="orderList">No items selected</div>
-    <div class="total">Total: ₹<span id="total">0</span></div>
-    <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
-  </div>
+<div class="preview">
+  <h3>Order Preview</h3>
+  <div id="orderList">No items selected</div>
+</div>
+
+<!-- FLOATING TOTAL -->
+<div class="floating-total">
+  <span>Total: ₹<span id="total">0</span></span>
+  <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
 </div>
 
 <script>
 const products=[
- {name:"Push Button",price:33,img:"https://via.placeholder.com/50"},
- {name:"Push Button (Imported)",price:55,img:"https://via.placeholder.com/50"},
- {name:"Rasila Handle (Without Switch)",price:220,img:"https://via.placeholder.com/50"},
- {name:"Rasila Handle (With Switch)",price:290,img:"https://via.placeholder.com/50"},
- {name:"MD Handle (With Switch)",price:780,img:"https://via.placeholder.com/50"},
- {name:"MD Switch Button",price:57,img:"https://via.placeholder.com/50"},
- {name:"Black Switch Button",price:20,img:"https://via.placeholder.com/50"},
- {name:"Coin Packet",price:220,img:"https://via.placeholder.com/50"},
- {name:"Remote Lead",price:99,img:"https://via.placeholder.com/50"},
- {name:"12 Core Wire (Per Meter)",price:50,img:"https://via.placeholder.com/50"},
- {name:"Coin Drop Switch Button",price:40,img:"https://via.placeholder.com/50"},
- {name:"Coin Acrylic Machine",price:220,img:"https://via.placeholder.com/50"},
- {name:"Remote Plate",price:200,img:"https://via.placeholder.com/50"},
- {name:"Old Rasila Push Button",price:13,img:"https://via.placeholder.com/50"},
- {name:"Crystal Plastic Push Button (Green)",price:19,img:"https://via.placeholder.com/50"}
+ {name:"Push Button",price:33},
+ {name:"Push Button (Imported)",price:55},
+ {name:"Rasila Handle (Without Switch)",price:220},
+ {name:"Rasila Handle (With Switch)",price:290},
+ {name:"MD Handle (With Switch)",price:780},
+ {name:"MD Switch Button",price:57},
+ {name:"Black Switch Button",price:20},
+ {name:"Coin Packet",price:220},
+ {name:"Remote Lead",price:99},
+ {name:"12 Core Wire (Per Meter)",price:50},
+ {name:"Coin Drop Switch Button",price:40},
+ {name:"Coin Acrylic Machine",price:220},
+ {name:"Remote Plate",price:200},
+ {name:"Old Rasila Push Button",price:13},
+ {name:"Crystal Plastic Push Button (Green)",price:19}
 ];
 
 const state={};
-
 const container=document.getElementById("products");
 
 products.forEach((p,i)=>{
   state[i]=0;
   container.innerHTML+=`
   <div class="product">
-    <img src="${p.img}">
+    <img src="https://via.placeholder.com/50">
     <div class="info">
       <b>${p.name}</b>
       <div class="price">₹${p.price}</div>
@@ -182,17 +235,24 @@ function renderPreview(){
 }
 
 function orderWhatsApp(){
-  let msg="*Games Planet – Order Request*%0A%0A";
+  let msg="*Games Planet – Order Request*\n\n";
   let total=0;
+
   products.forEach((p,i)=>{
     if(state[i]>0){
-      msg+=`${p.name} × ${state[i]} = ₹${p.price*state[i]}%0A`;
+      msg+=`${p.name} × ${state[i]} = ₹${p.price*state[i]}\n`;
       total+=p.price*state[i];
     }
   });
-  msg+=`%0A*Total: ₹${total}*`;
-  window.open("https://wa.me/9690483240?text="+msg,"_blank");
+
+  msg+=`\n*Total: ₹${total}*`;
+
+  window.open(
+    "https://wa.me/919690483240?text="+encodeURIComponent(msg),
+    "_blank"
+  );
 }
 </script>
+
 </body>
 </html>
