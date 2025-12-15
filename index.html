@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games Planet – Arcade Box Accessories</title>
+
+<style>
+:root{
+  --bg:#0b0f14;
+  --card:#111827;
+  --neon:#00f7ff;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:15px;
+}
+h1{
+  text-align:center;
+  font-size:32px;
+  margin:10px 0 0;
+  color:var(--neon);
+}
+.subtitle{
+  text-align:center;
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+.product{
+  display:flex;
+  align-items:center;
+  background:var(--card);
+  border:1px solid #1f2937;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.product img{
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:6px;
+  margin-right:10px;
+  background:#fff;
+}
+.info{
+  flex:1;
+}
+.info b{display:block}
+.price{color:var(--neon);font-size:14px}
+
+.qty{
+  display:flex;
+  align-items:center;
+}
+.qty button{
+  background:#000;
+  color:#fff;
+  border:1px solid var(--neon);
+  width:28px;
+  height:28px;
+  border-radius:6px;
+  font-size:18px;
+}
+.qty span{
+  width:30px;
+  text-align:center;
+}
+
+.preview{
+  margin-top:20px;
+  background:var(--card);
+  border-radius:10px;
+  padding:15px;
+}
+.preview h3{margin-top:0;color:var(--neon)}
+.total{
+  font-size:18px;
+  margin-top:10px;
+  text-align:right;
+  color:var(--neon);
+}
+
+.whatsapp{
+  width:100%;
+  margin-top:15px;
+  padding:15px;
+  font-size:18px;
+  background:#25d366;
+  border:none;
+  border-radius:10px;
+  color:#000;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>Games Planet</h1>
+  <div class="subtitle">Arcade box accessories</div>
+
+  <div id="products"></div>
+
+  <div class="preview">
+    <h3>Order Preview</h3>
+    <div id="orderList">No items selected</div>
+    <div class="total">Total: ₹<span id="total">0</span></div>
+    <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
+  </div>
+</div>
+
+<script>
+const products=[
+ {name:"Push Button",price:33,img:"https://via.placeholder.com/50"},
+ {name:"Push Button (Imported)",price:55,img:"https://via.placeholder.com/50"},
+ {name:"Rasila Handle (Without Switch)",price:220,img:"https://via.placeholder.com/50"},
+ {name:"Rasila Handle (With Switch)",price:290,img:"https://via.placeholder.com/50"},
+ {name:"MD Handle (With Switch)",price:780,img:"https://via.placeholder.com/50"},
+ {name:"MD Switch Button",price:57,img:"https://via.placeholder.com/50"},
+ {name:"Black Switch Button",price:20,img:"https://via.placeholder.com/50"},
+ {name:"Coin Packet",price:220,img:"https://via.placeholder.com/50"},
+ {name:"Remote Lead",price:99,img:"https://via.placeholder.com/50"},
+ {name:"12 Core Wire (Per Meter)",price:50,img:"https://via.placeholder.com/50"},
+ {name:"Coin Drop Switch Button",price:40,img:"https://via.placeholder.com/50"},
+ {name:"Coin Acrylic Machine",price:220,img:"https://via.placeholder.com/50"},
+ {name:"Remote Plate",price:200,img:"https://via.placeholder.com/50"},
+ {name:"Old Rasila Push Button",price:13,img:"https://via.placeholder.com/50"},
+ {name:"Crystal Plastic Push Button (Green)",price:19,img:"https://via.placeholder.com/50"}
+];
+
+const state={};
+
+const container=document.getElementById("products");
+
+products.forEach((p,i)=>{
+  state[i]=0;
+  container.innerHTML+=`
+  <div class="product">
+    <img src="${p.img}">
+    <div class="info">
+      <b>${p.name}</b>
+      <div class="price">₹${p.price}</div>
+    </div>
+    <div class="qty">
+      <button onclick="updateQty(${i},-1)">−</button>
+      <span id="q${i}">0</span>
+      <button onclick="updateQty(${i},1)">+</button>
+    </div>
+  </div>`;
+});
+
+function updateQty(i,delta){
+  state[i]=Math.max(0,state[i]+delta);
+  document.getElementById("q"+i).innerText=state[i];
+  renderPreview();
+}
+
+function renderPreview(){
+  let html="",total=0;
+  products.forEach((p,i)=>{
+    if(state[i]>0){
+      const sub=p.price*state[i];
+      total+=sub;
+      html+=`${p.name} × ${state[i]} = ₹${sub}<br>`;
+    }
+  });
+  document.getElementById("orderList").innerHTML=html||"No items selected";
+  document.getElementById("total").innerText=total;
+}
+
+function orderWhatsApp(){
+  let msg="*Games Planet – Order Request*%0A%0A";
+  let total=0;
+  products.forEach((p,i)=>{
+    if(state[i]>0){
+      msg+=`${p.name} × ${state[i]} = ₹${p.price*state[i]}%0A`;
+      total+=p.price*state[i];
+    }
+  });
+  msg+=`%0A*Total: ₹${total}*`;
+  window.open("https://wa.me/9690483240?text="+msg,"_blank");
+}
+</script>
+</body>
+</html>
