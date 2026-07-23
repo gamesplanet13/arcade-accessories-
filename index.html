@@ -234,7 +234,7 @@ h2{
   scrollbar-width:thin;
 }
 .image-row img{
-  width:132px;height:132px;
+  width:94px;height:94px;
   object-fit:contain;
   image-rendering:auto;
   flex:0 0 auto;
@@ -245,6 +245,7 @@ h2{
   transition:transform .22s ease,box-shadow .22s ease;
 }
 .image-row img:hover{transform:scale(1.05);box-shadow:0 10px 22px rgba(0,0,0,.25)}
+.image-row.multi-image img{width:68px;height:68px;border-radius:10px}
 .product-features{
   margin:10px 0 0;
   padding:10px 12px;
@@ -256,7 +257,10 @@ h2{
   line-height:1.55;
 }
 .product-features div+div{margin-top:3px}
-@media(max-width:520px){.image-row img{width:112px;height:112px}}
+@media(max-width:520px){
+  .image-row img{width:86px;height:86px}
+  .image-row.multi-image img{width:62px;height:62px}
+}
 .info{
   display:flex;
   justify-content:space-between;
@@ -907,7 +911,7 @@ img,canvas{
     <span>Prime Trackon.in</span>
   </label>
 </div>
-<div id="batteryAirNotice" class="battery-air-notice">🔋 Battery item selected — Air and Prime delivery are unavailable. Surface Delivery has been applied automatically.</div>
+<div id="batteryAirNotice" class="battery-air-notice">🔋 Due battery Item selected no Air or Prime delivery available.</div>
 <div class="courier-label">
 🚚 Choose Your Preferred Courier Service
 </div>
@@ -1050,12 +1054,12 @@ price:32,
 weight:12,
 variants:["Red","Yellow"],
 variantImages:{
-  "Red":"images/pushbutton-red.jpeg",
-  "Yellow":"images/pushbutton-yellow.jpeg"
+  "Red":"images/jpeg/pushbutton-red.jpeg",
+  "Yellow":"images/jpeg/pushbutton-yellow.jpeg"
 },
 images:[
-  "images/pushbutton-red.jpeg",
-  "images/pushbutton-yellow.jpeg"
+  "images/jpeg/pushbutton-red.jpeg",
+  "images/jpeg/pushbutton-yellow.jpeg"
 ]
 },
 
@@ -1067,44 +1071,44 @@ price:46,
 weight:12,
 variants:["Ice Blue","Pink","Green","Yellow","Black"],
 variantImages:{
-  "Ice Blue":"images/imported-blue.jpeg",
-  "Pink":"images/imported-pink.jpeg",
-  "Green":"images/imported-green.jpeg",
-  "Yellow":"images/imported-yellow.jpeg",
-  "Black":"images/imported-black.jpeg"
+  "Ice Blue":"images/jpeg/imported-blue.jpeg",
+  "Pink":"images/jpeg/imported-pink.jpeg",
+  "Green":"images/jpeg/imported-green.jpeg",
+  "Yellow":"images/jpeg/imported-yellow.jpeg",
+  "Black":"images/jpeg/imported-black.jpeg"
 },
 images:[
-  "images/imported-blue.jpeg",
-  "images/imported-pink.jpeg",
-  "images/imported-green.jpeg",
-  "images/imported-yellow.jpeg",
-  "images/imported-black.jpeg"
+  "images/jpeg/imported-blue.jpeg",
+  "images/jpeg/imported-pink.jpeg",
+  "images/jpeg/imported-green.jpeg",
+  "images/jpeg/imported-yellow.jpeg",
+  "images/jpeg/imported-black.jpeg"
 ]
 },
 
 {name:"Old Rasila Push Button",category:"Arcade Box Accessories",price:13,weight:12,dimensions:[6,4,4],images:[
-"images/old-raisla-pursh-button.jpeg"
+"images/jpeg/old-raisla-pursh-button.jpeg"
 ]},
 
 {name:"MD Switch Button",category:"Arcade Box Accessories",price:50,weight:5,dimensions:[5,3,1],images:[
-"images/mdswitch.jpeg"
+"images/jpeg/mdswitch.jpeg"
 ]},
 
 {name:"Black Switch Button",category:"Arcade Box Accessories",price:15,weight:5,dimensions:[5,3,1],images:[
-"images/normal-switch-button.jpeg"
+"images/jpeg/normal-switch-button.jpeg"
 ]},
 
 {name:"Coin Drop Switch Button",category:"Arcade Box Accessories",price:45,weight:12,dimensions:[11,4,2],images:[
-"images/coindropswitch.jpeg"
+"images/jpeg/coindropswitch.jpeg"
 ]},
 
 {name:"Rasila Handle (Without Switch)",category:"Arcade Box Accessories",price:200,weight:280,dimensions:[14,11,8],images:[
-"images/rasila-handle.jpeg"
+"images/jpeg/rasila-handle.jpeg"
 ]},
 
 {name:"Rasila Handle (With Switch)",category:"Arcade Box Accessories",price:260,weight:300,dimensions:[14,11,8],images:[
-"images/rasila-handle.jpeg",
-"images/normal-switch-button.jpeg"
+"images/jpeg/rasila-handle.jpeg",
+"images/jpeg/normal-switch-button.jpeg"
 ]},
 
 {
@@ -1115,46 +1119,39 @@ weight:280,
 dimensions:[12,11,11],
 variants:["Black","Red"],
 variantImages:{
-  "Black":"images/madhandle.jpeg",
-  "Red":"images/md-handle-red-1.jpeg"
+  "Black":"images/jpeg/md-handle-black.jpeg",
+  "Red":"images/jpeg/md-handle-red.jpeg"
 },
 images:[
-"images/md-handle-red-1.jpeg",
-"images/madhandle.jpeg",
-"images/md-handle-black.jpeg",
-"images/md-handle-red.jpeg",
-"images/md-handle-bottom.jpeg",
-"images/md-handle-pamphlets.jpeg",
-"images/md-handle-with-md-switch.jpeg",
-"images/md-handle-with-switch.jpeg",
-"images/mx-handle-with-md-switch.jpeg"
+"images/jpeg/md-handle-red.jpeg",
+"images/jpeg/md-handle-black.jpeg"
 ]
 },
 
 {name:"Coin Packet",category:"Arcade Box Accessories",price:210,weight:620,dimensions:[12,12,3],images:[
-"images/coinpacket.jpeg"
+"images/jpeg/coin-packet.jpeg"
 ]},
 
 {name:"Coin Acrylic Machine",category:"Arcade Box Accessories",price:195,weight:120,dimensions:[13,15,8],images:[
-"images/ecrylic-coin-machine.jpeg"
+"images/jpeg/acrylic-coin-machine.jpeg"
 ]},
 
 {name:"Coin Acrylic Machine with Switch",category:"Arcade Box Accessories",price:240,weight:135,dimensions:[13,15,8],images:[
-"images/ecrylic-coin-machine.jpeg",
-"images/coindropswitch.jpeg"
+"images/jpeg/acrylic-coin-machine.jpeg",
+"images/jpeg/coindropswitch.jpeg"
 ]},
 
 {name:"Remote Plate",category:"Arcade Box Accessories",price:300,weight:15,dimensions:[10,10,2],images:[
-"images/ps2plate.jpeg"
+"images/jpeg/ps2plate.jpeg"
 ]},
 
 
 {name:"Remote Lead",category:"Arcade Box Accessories",price:100,weight:80,dimensions:[10,5,2],images:[
-"images/remote-lead.jpeg"
+"images/jpeg/remote-lead.jpeg"
 ]},
 
 {name:"12 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:60,weight:70,dimensions:[10,5,3],images:[
-"images/12-core-wire.jpeg"
+"images/jpeg/12-core-wire.jpeg"
 ]},
 
 {
@@ -1176,73 +1173,75 @@ description:[
 "Includes Power Adapter + Power Cable"
 ],
 images:[
-"images/ps2-slim-adapter.jpeg"
+"images/jpeg/ps2-slim-adapter.jpeg"
 ]},
 
 {name:"USB to PS2/PS3/PC Converter",category:"PS2",price:360,weight:100,dimensions:[15,6,2],images:[
-"images/usbtops2.jpeg"
+"images/jpeg/usbtops2.jpeg"
 ]},
 
-{name:"PS2 8MB FMCB Memory Card — PS2 Fat 3XXXX / 5XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/fmcbfat.jpeg"]},
-{name:"PS2 8MB FMCB Memory Card — PS2 Slim 7XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/fmcb7xxxx.jpeg"]},
-{name:"PS2 8MB FunTuna Memory Card — PS2 Slim 9XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/fmcb9xxxx.jpeg"]},
+{name:"PS2 8MB FMCB Memory Card — PS2 Fat 3XXXX / 5XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/jpeg/fmcb-fat.jpeg"]},
+{name:"PS2 8MB FMCB Memory Card — PS2 Slim 7XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/jpeg/fmcb-7xxxx.jpeg"]},
+{name:"PS2 8MB FunTuna Memory Card — PS2 Slim 9XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/jpeg/fmcb-9xxxx.jpeg"]},
 
 {name:"PS2 8MB Memory Card Blank",category:"PS2",price:369,weight:25,dimensions:[12,13,2],images:[
-"images/ps28mb.jpeg"
+"images/jpeg/ps28mb.jpeg"
 ]},
 
 {name:"32GB USB for PS2 with Arcade Games",category:"PS2",price:549,weight:5,dimensions:[5,3,2],images:[
-"images/32gbusb.jpeg"
+"images/jpeg/32gbusb.jpeg"
 ]},
 
-{name:"PS2 Slim Sticker/Skin",category:"PS2",price:60,weight:0,dimensions:[0,0,0],compatibility:"For PS2 Slim Console",images:["images/opl10.jpeg"]},
+{name:"PS2 Slim Sticker/Skin",category:"PS2",price:60,weight:0,dimensions:[0,0,0],compatibility:"For PS2 Slim Console",images:["images/jpeg/opl10.jpeg"]},
 
 {name:"Power Cable for PS2 / PS3 / PS4 / PS5",category:"Cables",price:129,weight:130,dimensions:[15,5,5],images:[
-"images/ps2pcable.jpeg"
+"images/jpeg/ps2pcable.jpeg"
 ]},
 
 {name:"HDMI Cable",category:"Cables",price:99,weight:99,dimensions:[10,10,3],images:[
-"images/hdmicable.jpeg"
+"images/jpeg/hdmicable.jpeg"
 ]},
 
 {name:"HDMI Converter for PS2",category:"PS2",price:319,weight:80,dimensions:[14,9,3],images:[
-"images/ps2hdmi.jpeg"
+"images/jpeg/ps2hdmi.jpeg"
 ]},
 
 {name:"AV Cable for PS2",category:"PS2",price:99,weight:70,dimensions:[15,4,3],images:[
-"images/ps2av.jpeg"
+"images/jpeg/ps2av.jpeg"
 ]},
 
 {name:"PS2 Wired Controller (Replica)",category:"PS2",price:375,weight:250,dimensions:[17,12,8],images:[
-"images/ps2wire.jpeg"
+"images/jpeg/ps2wire.jpeg"
 ]},
 
 {name:"PS2 Wireless Controller",category:"PS2",price:499,weight:250,dimensions:[8,13,17],images:[
-"images/ps2wireless.jpeg"
+"images/jpeg/ps2wireless.jpeg"
 ]},
 
 {name:"PS3 Controller (Replica)",category:"PS3",price:600,weight:250,dimensions:[22,15,9],containsBattery:true,images:[
-"images/ps3gamepad.jpeg"
+"images/jpeg/ps3gamepad.jpeg"
 ]},
 
 {name:"PS4 Controller Black (Replica)",category:"PS4",price:999,weight:450,dimensions:[15,20,8],containsBattery:true,images:[
-"images/ps4gamepad.jpeg"
+"images/jpeg/ps4gamepad.jpeg"
 ]},
 
 {name:"PS3 Controller Charging Cable",category:"PS3",price:119,weight:65,dimensions:[15,5,5],images:[
-"images/ps3usb.jpeg"
+"images/jpeg/ps3usb.jpeg"
 ]},
 
 {name:"PS4 Controller Charging Cable",category:"PS4",price:139,weight:65,dimensions:[15,5,5],images:[
-"images/ps4usb.jpeg"
+"images/jpeg/ps4usb.jpeg"
 ]},
 
 {name:"PS5 Controller Charging Cable (USB to C)",category:"PS5",price:149,weight:65,dimensions:[15,5,5],images:[
-"images/ps5usb.jpeg"
+"images/jpeg/ps5usb.jpeg"
 ]}
 ,
 
-{name:"PS5 Controller Charging Cable (C to C)",category:"PS5",price:199,weight:65,dimensions:[15,5,5],compatibility:"PS5 Controller / USB-C Devices",images:["images/ps5ctoc.jpeg"]}
+{name:"PS5 Controller Charging Cable (C to C)",category:"PS5",price:199,weight:65,dimensions:[15,5,5],compatibility:"PS5 Controller / USB-C Devices",images:[
+"images/jpeg/ps5-ctoc.jpeg"
+]}
 ,
 
 {
@@ -1253,84 +1252,76 @@ weight:3000,
 dimensions:[30,27,25],
 compatibility:"Multi-Platform Gaming",
 features:["Steering wheel with pedal set","180-degree steering rotation","Built-in vibration feedback","Entry-level multi-platform racing rig"],
-images:["images/pxnv3problack.jpeg","images/pxnv3pro.jpeg","images/pxnv3pron.jpeg"]
+images:["images/jpeg/pxn-v3-pro-black.jpeg","images/jpeg/pxn-v3-pro-orange.jpeg"]
 }
 ,
 
 {name:"Soldering Paste (Wel Fix)",category:"Electrical Items",price:10,weight:15,dimensions:[7,7,2],images:[
-"images/paste.jpeg",
-"images/20260409-213949.jpeg"
+"images/jpeg/paste.jpeg"
 ]},
 
 {name:"Solder Wire Small Pack",category:"Electrical Items",price:20,weight:5,dimensions:[7,7,1],images:[
-"images/solder.jpeg"
+"images/jpeg/solder.jpeg"
 ]},
 
 {name:"Solder Wire (Roll)",category:"Electrical Items",price:80,weight:22,dimensions:[5,5,5],images:[
-"images/solder-2.jpeg",
-"images/20260409-213939.jpeg"
+"images/jpeg/solder-2.jpeg"
 ]},
 
 {name:"Solder Wire (Boom)",category:"Electrical Items",price:180,weight:58,dimensions:[9,5,5],images:[
-"images/solder-2.jpeg",
-"images/20260409-214046.jpeg"
+"images/jpeg/solder-2-2.jpeg"
 ]},
 
 {name:"15W Soldering Iron (LED)",category:"Electrical Items",price:89,weight:60,dimensions:[21,4,4],images:[
-"images/iron-15wt.jpeg",
-"images/20260409-214435.jpeg"
+"images/jpeg/iron-15wt.jpeg"
 ]},
 
 {name:"25W Soldering Iron (Madhur)",category:"Electrical Items",price:290,weight:162,dimensions:[27,6,5],images:[
-"images/iron-30wt.jpeg",
-"images/20260409-214249.jpeg",
-"images/20260409-214254.jpeg"
+"images/jpeg/iron-30wt.jpeg"
 ]},
 
 {name:"25W Soldering Iron (Starmaxx)",category:"Electrical Items",price:140,weight:120,dimensions:[30,12,4],images:[
-"images/iron-25wt.jpeg",
-"images/20260409-214311.jpeg",
-"images/20260409-214344.jpeg"
+"images/jpeg/iron-25wt.jpeg"
 ]},
 
 {name:"Laptop Power Cable",category:"Cables",price:110,weight:185,dimensions:[23,7,5],images:[
-"images/laptopcable.jpeg"
+"images/jpeg/laptopcable.jpeg"
 ]},
 
 {name:"CPU Power Cable / PS4 Pro Power Cable",category:"Cables",price:110,weight:130,dimensions:[23,7,5],images:[
-"images/cpucable.jpeg"
+"images/jpeg/cpucable.jpeg"
 ]},
 
 {name:"Blow Torch Flame Lighter",category:"Electrical Items",price:250,weight:90,dimensions:[18,12,4],images:[
-"images/blowtorch.jpeg"
+"images/jpeg/blowtorch.jpeg"
 ]},
 
 {name:"Precision Screwdriver Kit",category:"Electrical Items",price:250,weight:170,dimensions:[13,8,4],images:[
-"images/screw-driver-kit.jpeg"
+"images/jpeg/screw-driver-kit.jpeg"
 ]}
 
 ,
 
 {name:"Matrix Modbo 5.0 Modchip",category:"PS2",price:549,weight:5,dimensions:[3,3,1],images:[
-"images/matrix5.jpeg"
+"images/jpeg/matrix5.jpeg"
 ]}
 ,
 {name:"AA/AAA 4-Slot Battery Charger",category:"Batteries and Charger",price:399,weight:140,dimensions:[13,7,7],images:[
-"images/cell-charger.jpeg"
+"images/jpeg/cell-charger.jpeg"
 ]},
 {name:"Simpex AA Rechargeable Cells (4 Pack)",category:"Batteries and Charger",price:550,weight:75,dimensions:[11,9,2],containsBattery:true,images:[
-"images/aa-simpex4cell.jpeg"
+"images/jpeg/aa-simpex4cell.jpeg"
 ]},
 {name:"Panasonic AAA Rechargeable Cells (2 Pack)",category:"Batteries and Charger",price:350,weight:25,dimensions:[12,10,2],containsBattery:true,images:[
-"images/aaapanasonic2cell.jpeg"
+"images/jpeg/aaapanasonic2cell.jpeg"
 ]},
 {name:"Panasonic AAA Rechargeable Cells (4 Pack)",category:"Batteries and Charger",price:0,priceLabel:"Ask Price",weight:50,dimensions:[12,10,2],containsBattery:true,images:[
-"images/aaapenasonic4cell.jpeg"
+"images/jpeg/aaapenasonic4cell.jpeg"
 ]}
 
 ,
 {name:"10 Socket Extension Board",category:"Electrical Items",price:170,weight:650,dimensions:[30,12,7],images:[
-"images/extension.jpeg"
+"images/jpeg/extension.jpeg"
 ]}
 
 ];
@@ -1351,9 +1342,9 @@ const ps2GameDrivePrices=[
 ];
 
 function ps2DriveImage(storage){
-  if(storage.includes("PD 3.0")) return "images/sandiscultra-1.jpeg";
-  if(storage.includes("PD 2.0")) return "images/usb-1.jpeg";
-  return "images/usbhdd-1.jpeg";
+  if(storage.includes("PD 3.0")) return "images/jpeg/sandiscultra-1.jpeg";
+  if(storage.includes("PD 2.0")) return "images/jpeg/usb-1.jpeg";
+  return "images/jpeg/usbhdd-1.jpeg";
 }
 function ps2DriveWeight(storage){
   if(storage.includes("PD")) return 10;
@@ -1436,7 +1427,7 @@ categoryOrder.forEach(cat=>{
     <span>⚖️ Weight: <b>${p.weight} g</b></span>
     ${p.packLabel?`<span>🎮 <b>${p.packLabel}</b></span>`:""}
   </div>
-  <div class="image-row">${imgs}</div>
+  <div class="image-row ${p.images.length>1?'multi-image':''}">${imgs}</div>
   ${p.features?`<div class="product-features">${p.features.map(f=>`<div>✓ ${f}</div>`).join("")}</div>`:""}
   ${productActionLinks(p)}
   <div class="info">
@@ -1650,11 +1641,18 @@ function render(){
 
 
 
+function toTransparentPngAsset(src){
+  if(!src) return "";
+  return src
+    .replace(/^images\/jpeg\//,"images/png/")
+    .replace(/\.jpeg(?:\?.*)?$/i,".png");
+}
+
 function getProductImageForVariant(product, variant){
-  if(product && product.variantImages && variant && product.variantImages[variant]){
-    return product.variantImages[variant];
-  }
-  return (product && product.images && product.images[0]) || "";
+  const src=(product && product.variantImages && variant && product.variantImages[variant])
+    ? product.variantImages[variant]
+    : ((product && product.images && product.images[0]) || "");
+  return toTransparentPngAsset(src);
 }
 
 let combinedPosterRenderToken=0;
@@ -3024,6 +3022,20 @@ function setupPacking3DInteraction(){
   },{passive:false});
 }
 
+let packing3DAutoTimer=0;
+let packing3DAutoRendering=false;
+function startPacking3DAutoRotate(){
+  if(packing3DAutoTimer) return;
+  packing3DAutoTimer=window.setInterval(async()=>{
+    if(document.hidden || packing3DView.dragging || packing3DView.activePointers.size || packing3DAutoRendering) return;
+    if(!getSelectedPhysicalItems().length) return;
+    packing3DView.yaw+=0.014;
+    packing3DAutoRendering=true;
+    try{await generatePackingGuide();}
+    finally{packing3DAutoRendering=false;}
+  },120);
+}
+
 
 /* Original product image textures inside interactive 3D box */
 const packingTextureCache=new Map();
@@ -3066,16 +3078,33 @@ function drawImageTriangle(ctx,img,p0,p1,p2,t0,t1,t2){
   ctx.restore();
 }
 
+const containedTextureCache=new WeakMap();
+function getContainedTexture(img){
+  if(!img) return null;
+  if(containedTextureCache.has(img)) return containedTextureCache.get(img);
+  const size=640;
+  const texture=document.createElement("canvas");
+  texture.width=size;texture.height=size;
+  const tctx=texture.getContext("2d");
+  tctx.clearRect(0,0,size,size);
+  const scale=Math.min((size*.90)/img.width,(size*.90)/img.height);
+  const w=img.width*scale,h=img.height*scale;
+  tctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+  containedTextureCache.set(img,texture);
+  return texture;
+}
+
 function drawImageOnQuad(ctx,img,q0,q1,q2,q3){
   if(!img) return;
-  const iw=img.width, ih=img.height;
+  const fitted=getContainedTexture(img);
+  const iw=fitted.width, ih=fitted.height;
   drawImageTriangle(
-    ctx,img,
+    ctx,fitted,
     q0,q1,q2,
     {x:0,y:0},{x:iw,y:0},{x:iw,y:ih}
   );
   drawImageTriangle(
-    ctx,img,
+    ctx,fitted,
     q0,q2,q3,
     {x:0,y:0},{x:iw,y:ih},{x:0,y:ih}
   );
@@ -3114,7 +3143,7 @@ function getSelectedPhysicalItems(){
     if(p.variants){
       p.variants.forEach(v=>{
         const qty=state['v_'+i+'_'+v]||0;
-        const image=(p.variantImages&&p.variantImages[v]) || (p.images&&p.images[0]) || "";
+        const image=toTransparentPngAsset((p.variantImages&&p.variantImages[v]) || (p.images&&p.images[0]) || "");
         for(let n=0;n<qty;n++){
           items.push({
             name:`${p.name} - ${v}`,
@@ -3126,7 +3155,7 @@ function getSelectedPhysicalItems(){
       });
     }else{
       const qty=state[i]||0;
-      const image=(p.images&&p.images[0])||"";
+      const image=toTransparentPngAsset((p.images&&p.images[0])||"");
       for(let n=0;n<qty;n++){
         items.push({
           name:p.name,
@@ -3341,6 +3370,7 @@ function initializePage(){
   try{
     render();
     setupPacking3DInteraction();
+    startPacking3DAutoRotate();
   }catch(error){
     console.error("Page initialization error:", error);
     alert("Page initialization error: "+(error?.message || "Unknown error"));
