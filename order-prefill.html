@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manual Order Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{font-family:Arial;background:#f2f4f8;padding:15px}
+.container{max-width:580px;margin:auto;background:#fff;padding:20px;border-radius:12px}
+h1{text-align:center;color:#0d6efd;margin-bottom:5px}
+h2{text-align:center;font-size:14px;color:#555}
+input,select,textarea{
+  width:100%;padding:12px;margin:6px 0;
+  border:1px solid #ccc;border-radius:6px;font-size:15px
+}
+textarea{resize:none}
+.box{border:1px dashed #ccc;padding:10px;border-radius:6px;margin-top:10px}
+.radio{display:flex;justify-content:space-around}
+.note{font-size:12px;color:#c00}
+button{
+  width:100%;padding:14px;margin-top:15px;
+  background:#28a745;color:#fff;border:none;
+  border-radius:6px;font-size:16px
+}
+#deliveryEstimate{white-space:pre-line;color:green;font-size:14px;margin-top:6px}
+#miniPreview{display:none;font-size:14px;margin-top:8px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>Manual Order Page</h1>
+<h2>Fill details carefully</h2>
+
+<input id="name" placeholder="Name">
+<input id="mobile" placeholder="Mobile">
+<input id="altmobile" placeholder="Alt Mobile">
+<input id="email" placeholder="Email">
+
+<textarea id="address" placeholder="Full Address"></textarea>
+<input id="landmark" placeholder="Landmark">
+
+<input id="pincode" placeholder="Pincode">
+<input id="state" placeholder="State" readonly>
+<input id="city" placeholder="District/City" readonly>
+
+<select id="postoffice">
+  <option value="">Select Post Office</option>
+</select>
+
+<div id="deliveryEstimate"></div>
+
+<div id="miniPreview">
+  <div>⏳ Prepaid ETA: <span id="preEta"></span></div>
+  <div>📅 Prepaid Delivery: <span id="preRange"></span></div>
+</div>
+
+<input type="hidden" id="distance">
+<input type="hidden" id="etaText">
+<input type="hidden" id="dateRange">
+
+<div class="box">
+<b>Order Type</b>
+<div class="radio">
+<label><input type="radio" name="otype" value="Prepaid" checked> Prepaid</label>
+
+</div>
+</div>
+
+<div class="box">
+<b>Product Details</b>
+
+<input id="manualProduct" value="Arcade Accessories" readonly>
+
+
+
+
+</div>
+
+
+
+
+
+
+<input id="amountPaid" readonly placeholder="Amount Paid">
+
+<button onclick="sendOrder()">Submit Order on WhatsApp</button>
+
+</div>
+
+<script>
+
+/* ===== ORDER ID ===== */
+function orderID(){
+  const d=new Date();
+  return d.getDate().toString().padStart(2,'0')+
+  (d.getMonth()+1).toString().padStart(2,'0')+
+  d.getFullYear()+
+  d.getHours().toString().padStart(2,'0')+
+  d.getMinutes().toString().padStart(2,'0')+
+  d.getSeconds().toString().padStart(2,'0')+"00";
+}
+</script>
+
+<!-- ===== ETA / PINCODE SYSTEM (UNCHANGED – TERA CODE) ===== -->
+<script>
+let pincodeLatLng={};
+fetch('pincode_data.json').then(r=>r.json()).then(j=>pincodeLatLng=j);
+  let pincodeDB={};
+
+fetch("pincode_database.json")
+.then(r=>r.json())
+.then(data=>{
+   pincodeDB=data;
+});
+
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function etaByDist(d){
+  if(d<=30)return"1 day";
+  if(d<=60)return"1-2 days";
+  if(d<=100)return"2-3 days";
+  if(d<=200)return"3-4 days";
+  if(d<=500)return"4-5 days";
+  if(d<=1000)return"4-6 days";
+  if(d<=1500)return"5–7 days";
+  if(d<=2000)return"6–8 days";
+  if(d<=3000)return"6–10 days";
+  return"8–12 days";
+}
+
+function parseEta(eta){
+  const n=(eta.match(/\d+/g)||[]).map(Number);
+  if(n.length===1) return {min:n[0],max:n[0]};
+  return {min:Math.min(...n),max:Math.max(...n)};
+}
+
+function dayStartOffset(){
+  const n=new Date();
+  return (n.getDay()>=1 && n.getDay()<=5 && n.getHours()>=19)?1:0;
+}
+
+function formatDateRange(min,max){
+  const o=dayStartOffset();
+  const s=new Date(),e=new Date();
+  s.setDate(s.getDate()+min+o);
+  e.setDate(e.getDate()+max+o);
+  const opt={weekday:"long",day:"2-digit",month:"long",year:"numeric"};
+  return `${s.toLocaleDateString("en-IN",opt)} – ${e.toLocaleDateString("en-IN",opt)}`;
+}
+const distance = document.getElementById("distance");
+const etaText = document.getElementById("etaText");
+const dateRange = document.getElementById("dateRange");
+
+const preEta = document.getElementById("preEta");
+const codEta = document.getElementById("codEta");
+const codRange = document.getElementById("codRange");
+
+const state = document.getElementById("state");
+const city = document.getElementById("city");
+
+const miniPreview = document.getElementById("miniPreview");
+const deliveryEstimate =
+document.getElementById("deliveryEstimate");
+document.getElementById("pincode").addEventListener("input",function(){
+  const pin=this.value.trim();
+  if(pin.length===6){
+  const db1 = pincodeDB[pin];
+const db2 = pincodeLatLng[pin];
+
+if(db2){
+
+   state.value = db2.state || "";
+   city.value = db2.city || "";
+
+   postoffice.innerHTML='<option value="">Select Post Office</option>';
+   (db2.postoffices || []).forEach(po=>{
+      const opt=document.createElement('option');
+      opt.value=po;
+      opt.textContent=po;
+      postoffice.appendChild(opt);
+   });
+
+}
+else if(db1){
+
+   state.value = db1.state || "";
+   city.value = "";
+
+   postoffice.innerHTML='<option value="">Select Post Office</option>';
+   (db1.postoffices || []).forEach(po=>{
+      const opt=document.createElement('option');
+      opt.value=po;
+      opt.textContent=po;
+      postoffice.appendChild(opt);
+   });
+
+}
+else{
+
+   state.value = "";
+   city.value = "";
+   postoffice.innerHTML='<option value="">Select Post Office</option>';
+
+}
+
+        if(pincodeLatLng[pin]){
+          const baseLat=28.8,baseLng=79.0;
+          const {lat,lng}=pincodeLatLng[pin];
+          const d=Math.round(haversine(baseLat,baseLng,lat,lng));
+          const eta=etaByDist(d);
+          const pre=parseEta(eta);
+          const prepaidRange=formatDateRange(pre.min,pre.max);
+          const cod={min:pre.min+2,max:pre.max+3};
+
+          distance.value=d+" km";
+          etaText.value=eta;
+          dateRange.value=prepaidRange;
+
+          preEta.textContent=eta;
+          document.getElementById("preRange").textContent=prepaidRange;
+          codEta.textContent=`${cod.min}–${cod.max} days`;
+          codRange.textContent=formatDateRange(cod.min,cod.max);
+
+          deliveryEstimate.innerText =
+`📏 Distance: ${d} km
+⏳ Prepaid ETA: ${eta}
+📅 Prepaid Delivery: ${prepaidRange}`;
+
+miniPreview.style.display="block";
+        }
+else{
+
+  distance.value="N/A";
+  etaText.value="5-8 days";
+  dateRange.value="Standard Delivery";
+
+  deliveryEstimate.innerText=
+  "⏳ Standard ETA: 5-8 days";
+
+  miniPreview.style.display="block";
+}
+
+}
+});
+</script>
+
+<script>
+
+/* ===== SEND WHATSAPP ===== */
+function sendOrder(){
+const msg=`🟢 Prepaid Order
+
+Order ID: ${orderID()}
+Name: ${document.getElementById("name").value}
+Mobile: ${document.getElementById("mobile").value}
+Alt Mobile: ${document.getElementById("altmobile").value}
+Email: ${document.getElementById("email").value}
+Address: ${document.getElementById("address").value}
+Landmark: ${document.getElementById("landmark").value}
+Pincode: ${document.getElementById("pincode").value}
+State: ${document.getElementById("state").value}
+District/City: ${document.getElementById("city").value}
+Post Office: ${document.getElementById("postoffice").value}
+
+Product: Arcade Accessories
+Amount Paid: ₹${document.getElementById("amountPaid").value||0}
+
+📏 Distance: ${document.getElementById("distance").value}
+⏳ ETA: ${document.getElementById("etaText").value}
+📅 Estimated Delivery: ${document.getElementById("dateRange").value}`;
+
+window.open("https://wa.me/917983624797?text="+encodeURIComponent(msg));
+}
+</script>
+
+
+<script>
+const params=new URLSearchParams(window.location.search);
+document.getElementById("manualProduct").value="Arcade Accessories";
+document.getElementById("amountPaid").value=params.get("grandTotal")||0;
+</script>
+</body>
+</html>

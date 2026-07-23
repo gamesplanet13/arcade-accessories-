@@ -1,0 +1,3482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="same-origin">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>Games Planet – Arcade Accessories & PS2 USB Game Drives</title>
+
+
+<style>
+:root{
+  --bg:#07111f;
+  --bg2:#0b1728;
+  --panel:rgba(15,27,46,.82);
+  --panel-strong:#101d31;
+  --border:rgba(255,255,255,.10);
+  --border-strong:rgba(255,255,255,.16);
+  --text:#f8fafc;
+  --muted:#9fb0c7;
+  --cyan:#22d3ee;
+  --blue:#3b82f6;
+  --violet:#8b5cf6;
+  --green:#22c55e;
+  --yellow:#facc15;
+  --red:#ef4444;
+  --shadow:0 18px 45px rgba(0,0,0,.30);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  padding-bottom:120px;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 0 0,rgba(34,211,238,.14),transparent 28%),
+    radial-gradient(circle at 100% 0,rgba(139,92,246,.16),transparent 30%),
+    linear-gradient(145deg,var(--bg),var(--bg2));
+  min-height:100vh;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:28px 28px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 85%);
+}
+.gpz-ticker{
+  position:sticky;
+  top:0;
+  z-index:30000;
+  height:34px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  border-bottom:1px solid rgba(34,211,238,.35);
+  background:#020617;
+  color:#fff;
+  box-shadow:0 5px 18px rgba(0,0,0,.35);
+}
+.gpz-ticker-track{
+  display:inline-block;
+  width:max-content;
+  padding-left:100vw;
+  white-space:nowrap;
+  font-size:13px;
+  font-weight:800;
+  color:#e0f2fe;
+  animation:gpzTickerMove 38s linear infinite;
+  will-change:transform;
+}
+@keyframes gpzTickerMove{
+  from{transform:translateX(0)}
+  to{transform:translateX(-100%)}
+}
+@media(prefers-reduced-motion:reduce){.gpz-ticker-track{animation-duration:70s}}
+button,select{font:inherit}
+.header{
+  max-width:1100px;
+  margin:auto;
+  padding:26px 16px 12px;
+}
+.hero{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(17,31,52,.94),rgba(10,23,40,.90));
+  border-radius:28px;
+  padding:30px 24px;
+  box-shadow:var(--shadow);
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  width:220px;height:220px;
+  border-radius:50%;
+  right:-80px;top:-90px;
+  background:radial-gradient(circle,rgba(34,211,238,.28),transparent 68%);
+}
+.brand-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(34,211,238,.10);
+  border:1px solid rgba(34,211,238,.25);
+  color:#bff7ff;
+  font-weight:800;
+  font-size:12px;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+}
+.header h1{
+  margin:12px 0 6px;
+  font-size:clamp(34px,7vw,58px);
+  line-height:1;
+  letter-spacing:-2px;
+  background:linear-gradient(90deg,#fff 0%,#67e8f9 38%,#a78bfa 82%);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+.hero-sub{
+  margin:0;
+  max-width:650px;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.7;
+}
+.trust-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:18px;
+}
+.trust-chip{
+  padding:8px 11px;
+  border-radius:11px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  color:#dbeafe;
+  font-size:12px;
+  font-weight:700;
+}
+.notice{
+  max-width:1068px;
+  margin:14px auto 18px;
+  padding:0 16px;
+}
+.notice-inner{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:14px;
+  align-items:center;
+  border:1px solid rgba(248,113,113,.28);
+  background:linear-gradient(135deg,rgba(127,29,29,.72),rgba(69,10,10,.70));
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 12px 28px rgba(0,0,0,.22);
+}
+.notice-icon{
+  width:48px;height:48px;
+  display:grid;place-items:center;
+  border-radius:14px;
+  background:rgba(255,255,255,.08);
+  font-size:24px;
+}
+.notice-title{font-weight:900;font-size:16px;margin-bottom:3px}
+.notice-text{color:#fecaca;font-size:13px;line-height:1.6}
+.container{max-width:1068px;margin:auto;padding:0 16px 18px}
+h2{
+  position:sticky;
+  top:8px;
+  z-index:20;
+  margin:24px 0 12px;
+  padding:12px 14px;
+  border-radius:15px;
+  border:1px solid rgba(34,211,238,.16);
+  background:rgba(7,17,31,.90);
+  backdrop-filter:blur(14px);
+  color:#bff7ff!important;
+  font-size:18px;
+  letter-spacing:.2px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+.product{
+  background:linear-gradient(145deg,rgba(17,30,50,.88),rgba(10,22,38,.88));
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:15px;
+  margin-bottom:13px;
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.product:hover{
+  transform:translateY(-3px);
+  border-color:rgba(34,211,238,.30);
+  box-shadow:0 18px 34px rgba(0,0,0,.25);
+}
+.product-title{
+  display:block;
+  margin:0 0 12px;
+  font-size:16px;
+  line-height:1.45;
+  font-weight:900;
+  color:#fff;
+}
+
+.product-specs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 14px;
+  margin:-4px 0 12px;
+  color:#cbd5e1;
+  font-size:13px;
+}
+.product-specs span{
+  padding:7px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.image-row{
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  scrollbar-width:thin;
+}
+.image-row img{
+  width:132px;height:132px;
+  object-fit:contain;
+  image-rendering:auto;
+  flex:0 0 auto;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.12);
+  cursor:pointer;
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+.image-row img:hover{transform:scale(1.05);box-shadow:0 10px 22px rgba(0,0,0,.25)}
+.product-features{
+  margin:10px 0 0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(0,247,255,.06);
+  border:1px solid rgba(0,247,255,.15);
+  color:#dbeafe;
+  font-size:13px;
+  line-height:1.55;
+}
+.product-features div+div{margin-top:3px}
+@media(max-width:520px){.image-row img{width:112px;height:112px}}
+.info{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:14px;
+  margin-top:13px;
+}
+.info>div:first-child{flex:1;min-width:0}
+.price{
+  display:inline-flex;
+  align-items:center;
+  min-height:34px;
+  background:linear-gradient(90deg,var(--violet),var(--blue),var(--cyan));
+  padding:7px 12px;
+  border-radius:999px;
+  font-weight:900;
+  color:#fff;
+  box-shadow:0 8px 18px rgba(59,130,246,.22);
+}
+.product small{display:inline-block;color:var(--muted);margin-top:7px}
+.product-extra-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:12px 0 2px}
+.game-action-btn{display:flex;align-items:center;justify-content:center;min-height:44px;padding:9px 11px;border-radius:12px;text-align:center;text-decoration:none;font-size:13px;font-weight:900;border:1px solid rgba(255,255,255,.12);transition:transform .18s ease,box-shadow .18s ease}
+.game-action-btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.22)}
+.top-games-btn{background:linear-gradient(135deg,#dc2626,#f97316);color:#fff}
+.optional-games-btn{background:linear-gradient(135deg,#ca8a04,#eab308);color:#111827}
+#optionalGameModal{display:none;position:fixed;inset:0;z-index:1000000;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px}
+#optionalGameModal.show{display:flex}
+.optional-modal-box{position:relative;width:min(520px,100%);background:#111827;color:#fff;border:2px solid #eab308;border-radius:20px;padding:26px 18px 18px;text-align:center;box-shadow:0 28px 90px rgba(0,0,0,.55)}
+.optional-modal-box h3{margin:4px 30px 10px;color:#fde047;font-size:22px}
+.optional-modal-box p{margin:0;color:#e2e8f0;line-height:1.6;font-weight:700}
+.optional-modal-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:9px;margin-top:18px}
+.optional-modal-actions button{min-height:45px;border-radius:11px;font-weight:900;cursor:pointer;padding:9px}
+.optional-modal-close{background:#fff;color:#111827;border:0}
+.optional-modal-continue{background:linear-gradient(135deg,#ca8a04,#facc15);color:#111827;border:0}
+@media(max-width:520px){.optional-modal-actions{grid-template-columns:1fr}}
+.qty{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+  min-width:112px;
+  justify-content:flex-end;
+}
+.qty button{
+  width:40px;height:40px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:12px;
+  background:linear-gradient(145deg,#6d28d9,#4f46e5);
+  color:#fff;
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 7px 18px rgba(79,70,229,.24);
+}
+.qty button:active{transform:scale(.95)}
+.qty span{
+  min-width:26px;
+  text-align:center;
+  font-weight:900;
+  color:#fff;
+}
+.preview{
+  max-width:1068px;
+  margin:8px auto 26px;
+  padding:0 16px;
+}
+.preview-card{
+  background:linear-gradient(145deg,rgba(17,30,50,.95),rgba(8,20,35,.95));
+  border:1px solid var(--border-strong);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+.preview h3{margin:0 0 12px;font-size:22px}
+#orderList{
+  padding:14px;
+  border-radius:15px;
+  background:rgba(255,255,255,.035);
+  border:1px dashed rgba(255,255,255,.12);
+  color:#dbeafe;
+  line-height:1.55;
+}
+.courier-box{
+  margin:14px 0;
+  padding:14px;
+  border-radius:15px;
+  background:rgba(34,211,238,.055);
+  border:1px solid rgba(34,211,238,.13);
+}
+.courier-label{margin-bottom:8px;font-weight:900;color:#67e8f9}
+.delivery-speed-title{margin-bottom:9px;font-weight:900;color:#facc15}
+.delivery-speed-options{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:12px;
+}
+.speed-option{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:54px;
+  padding:9px 10px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  background:#0b1728;
+  cursor:pointer;
+  font-weight:800;
+}
+.speed-option:has(input:checked){border-color:#22d3ee;background:rgba(34,211,238,.13);box-shadow:0 0 0 2px rgba(34,211,238,.09)}
+.speed-option input{width:18px;height:18px;accent-color:#22d3ee;flex:0 0 auto}
+.speed-option small{display:block;color:#a5f3fc;font-size:11px;margin-top:2px}
+.speed-option.hidden-by-battery{display:none}
+.battery-air-notice{
+  display:none;
+  margin:0 0 12px;
+  padding:10px 12px;
+  border-radius:11px;
+  border:1px solid rgba(250,204,21,.35);
+  background:rgba(250,204,21,.10);
+  color:#fef08a;
+  font-weight:800;
+  line-height:1.4;
+}
+.battery-air-notice.show{display:block}
+@media(max-width:650px){.delivery-speed-options{grid-template-columns:1fr}.speed-option{min-height:46px}}
+select{
+  width:100%;
+  padding:12px 13px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  background:#0b1728;
+  color:#fff;
+  outline:none;
+}
+.actions{
+  display:grid;
+  grid-template-columns:1.3fr 1fr auto;
+  gap:10px;
+  margin:14px 0;
+}
+.whatsapp,.details,.reset{
+  min-height:46px;
+  padding:11px 14px;
+  border-radius:13px;
+  font-weight:900;
+  border:0;
+  cursor:pointer;
+}
+.whatsapp{background:linear-gradient(90deg,#16a34a,#22c55e);color:#04140a}
+.details{background:linear-gradient(90deg,#f59e0b,#facc15);color:#241600}
+.reset{background:linear-gradient(90deg,#b91c1c,#ef4444);color:#fff}
+.total-grid{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:14px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--border);
+}
+.total-grid b{line-height:1.9}
+#upiQr{
+  width:104px;height:104px;
+  padding:6px;
+  border-radius:14px!important;
+  background:#fff;
+  box-shadow:0 12px 26px rgba(0,0,0,.28);
+}
+.floatingSummary{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:12px;
+  width:min(1040px,calc(100% - 20px));
+  padding:13px 16px;
+  z-index:999;
+  background:rgba(8,20,35,.94);
+  border:1px solid rgba(34,211,238,.22);
+  border-radius:16px;
+  backdrop-filter:blur(16px);
+  box-shadow:0 18px 45px rgba(0,0,0,.40);
+  text-align:center;
+  font-weight:900;
+  color:#e0f2fe;
+}
+#imgModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.94);
+  z-index:99999;
+  justify-content:center;
+  align-items:center;
+  padding:18px;
+}
+#modalImg{
+  max-width:95vw;
+  max-height:90vh;
+  border-radius:18px;
+  object-fit:contain;
+  box-shadow:0 0 35px rgba(0,0,0,.68);
+}
+.close-btn{
+  position:fixed;
+  top:16px;right:18px;
+  width:48px;height:48px;
+  border-radius:50%;
+  background:linear-gradient(145deg,#b91c1c,#ef4444);
+  color:#fff;
+  font-size:30px;
+  font-weight:900;
+  line-height:46px;
+  text-align:center;
+  cursor:pointer;
+  z-index:100000;
+  box-shadow:0 10px 25px rgba(0,0,0,.35);
+}
+.footer-card{
+  max-width:1068px;
+  margin:26px auto;
+  padding:0 16px;
+}
+.footer-inner{
+  padding:22px;
+  border-radius:22px;
+  background:linear-gradient(145deg,rgba(17,30,50,.94),rgba(8,20,35,.94));
+  border:1px solid var(--border);
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.footer-inner a{color:#67e8f9}
+.policy-btn{
+  padding:13px 19px;
+  border:none;
+  border-radius:13px;
+  background:linear-gradient(90deg,#b91c1c,#ef4444);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(239,68,68,.18);
+}
+@media(max-width:680px){
+  body{padding-bottom:136px}
+  .header{padding-top:14px}
+  .hero{padding:22px 18px;border-radius:22px}
+  .header h1{letter-spacing:-1.2px}
+  .notice-inner{grid-template-columns:1fr;text-align:center}
+  .notice-icon{margin:auto}
+  .product{padding:13px}
+  .image-row img{width:78px;height:78px}
+  .info{align-items:flex-start}
+  .actions{grid-template-columns:1fr}
+  .reset{width:100%}
+  .total-grid{grid-template-columns:1fr auto}
+  .floatingSummary{
+    font-size:12px;
+    line-height:1.45;
+    padding:11px 10px;
+  }
+}
+
+/* Combined selected-products poster */
+.combined-poster-wrap{
+  max-width:1068px;
+  margin:10px auto 28px;
+  padding:0 16px;
+}
+.combined-poster-card{
+  background:linear-gradient(145deg,rgba(17,30,50,.95),rgba(8,20,35,.95));
+  border:1px solid var(--border-strong);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+.combined-poster-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.combined-poster-head h3{margin:0;font-size:22px}
+.combined-poster-actions{display:flex;gap:9px;flex-wrap:wrap}
+.poster-btn{
+  min-height:42px;
+  padding:10px 14px;
+  border:0;
+  border-radius:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.poster-download{background:linear-gradient(90deg,#2563eb,#22d3ee);color:#04131b}
+.poster-refresh{background:linear-gradient(90deg,#7c3aed,#a78bfa);color:#fff}
+.poster-stage{
+  width:100%;
+  overflow:auto;
+  border-radius:18px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+}
+#combinedPoster{
+  display:block;
+  width:100%;
+  height:auto;
+  background:#fff;
+}
+
+.box-summary{
+  margin:0 0 12px;
+  padding:14px;
+  border-radius:15px;
+  background:rgba(34,211,238,.055);
+  border:1px solid rgba(34,211,238,.13);
+  color:#dbeafe;
+  line-height:1.7;
+}
+
+
+#boxPlannerCanvas{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:520px;
+  object-fit:contain;
+  background:#fff;
+}
+#boxPlannerSection .poster-stage{
+  overflow:hidden;
+}
+@media(max-width:680px){
+  #boxPlannerCanvas{
+    width:100%;
+    height:auto;
+    max-height:260px;
+  }
+  #boxPlannerSection .combined-poster-card{
+    padding:12px;
+  }
+  #boxPlannerSection .combined-poster-head h3{
+    font-size:18px;
+  }
+  #boxPlannerSection .box-summary{
+    font-size:12px;
+    line-height:1.55;
+    padding:10px;
+  }
+  #boxPlannerSection .poster-note{
+    font-size:11px;
+  }
+}
+
+.poster-note{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.55}
+@media(max-width:680px){
+  .combined-poster-head{align-items:flex-start;flex-direction:column}
+  .combined-poster-actions{width:100%}
+  .poster-btn{flex:1}
+}
+
+
+
+#combinedPosterSection{
+  margin-top:34px;
+}
+#boxPlannerSection{
+  margin-top:18px;
+  margin-bottom:130px;
+}
+
+
+/* Responsive desktop split view */
+.desktop-layout{
+  width:min(1880px,calc(100% - 24px));
+  margin:0 auto;
+}
+.desktop-left,.desktop-right{min-width:0}
+
+@media(min-width:900px){
+  .header,.notice{max-width:1880px}
+  .desktop-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(430px,540px);
+    gap:18px;
+    align-items:start;
+  }
+  .desktop-left .container,
+  .desktop-left .preview,
+  .desktop-left .footer-card{
+    width:100%;
+    max-width:none;
+    margin-left:0;
+    margin-right:0;
+  }
+  .desktop-right{
+    position:sticky;
+    top:10px;
+    align-self:start;
+    max-height:calc(100vh - 20px);
+    overflow-y:auto;
+    padding-right:4px;
+    scrollbar-width:thin;
+  }
+  .desktop-right .combined-poster-wrap{
+    width:100%;
+    max-width:none;
+    margin:0 0 14px;
+    padding:0;
+  }
+  .desktop-right .combined-poster-card{
+    padding:12px;
+    border-radius:18px;
+  }
+  .desktop-right .combined-poster-head{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+  }
+  .desktop-right .combined-poster-head h3{font-size:18px}
+  .desktop-right .combined-poster-actions{width:100%}
+  .desktop-right .poster-btn{
+    flex:1;
+    min-height:38px;
+    padding:8px 10px;
+    font-size:12px;
+  }
+  .desktop-right #combinedPoster,
+  .desktop-right #boxPlannerCanvas{
+    width:100%;
+    height:auto;
+    max-height:310px;
+    object-fit:contain;
+  }
+  .desktop-right .box-summary{
+    padding:10px;
+    font-size:12px;
+    line-height:1.55;
+  }
+  .desktop-right .poster-note{
+    font-size:11px;
+    line-height:1.45;
+  }
+  #combinedPosterSection,#boxPlannerSection{
+    margin-top:0;
+    margin-bottom:14px;
+  }
+}
+
+@media(max-width:899px){
+  .desktop-layout{display:block;width:100%}
+  .desktop-right{position:static;max-height:none;overflow:visible}
+  .desktop-right .combined-poster-wrap{
+    max-width:1068px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+}
+
+
+#packingGuideCanvas{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:560px;
+  object-fit:contain;
+  background:#fff;
+}
+@media(min-width:900px){
+  .desktop-right #packingGuideCanvas{
+    width:100%;
+    height:auto;
+    max-height:330px;
+    object-fit:contain;
+  }
+}
+@media(max-width:899px){
+  #packingGuideCanvas{
+    max-height:300px;
+  }
+}
+
+
+/* Improved 3D packing guide */
+#packingGuideCanvas{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:620px;
+  object-fit:contain;
+  background:#f8fafc;
+}
+@media(min-width:900px){
+  .desktop-right #packingGuideCanvas{
+    max-height:390px;
+  }
+}
+@media(max-width:899px){
+  #packingGuideCanvas{
+    max-height:340px;
+  }
+}
+
+
+/* Games Planet basic anti-copy protection */
+html,body{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+input,textarea,select{
+  -webkit-user-select:text;
+  user-select:text;
+}
+img,canvas{
+  -webkit-user-drag:none;
+  user-drag:none;
+}
+#securityOverlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:2147483647;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(2,6,23,.98);
+  color:#fff;
+  text-align:center;
+}
+#securityOverlay .security-box{
+  width:min(620px,100%);
+  padding:28px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:22px;
+  background:#0f172a;
+  box-shadow:0 25px 70px rgba(0,0,0,.55);
+}
+#securityOverlay button{
+  padding:11px 18px;
+  border:0;
+  border-radius:10px;
+  background:#22c55e;
+  color:#04140a;
+  font-weight:900;
+  cursor:pointer;
+}
+@media print{
+  body *{visibility:hidden!important}
+  body:before{
+    content:"Printing is disabled on this page.";
+    visibility:visible!important;
+    position:fixed;
+    inset:0;
+    display:grid;
+    place-items:center;
+    background:#fff;
+    color:#111;
+    font:700 28px Arial,sans-serif;
+  }
+}
+
+
+/* Interactive 3D packing canvas */
+#packingGuideCanvas{
+  touch-action:none;
+  cursor:grab;
+}
+#packingGuideCanvas.is-dragging{
+  cursor:grabbing;
+}
+.packing-3d-help{
+  margin-top:8px;
+  padding:9px 11px;
+  border-radius:10px;
+  background:rgba(59,130,246,.08);
+  border:1px solid rgba(59,130,246,.18);
+  color:#bfdbfe;
+  font-size:11px;
+  line-height:1.5;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="gpz-ticker" aria-label="Games Planet services">
+  <div class="gpz-ticker-track">🎮 आपका Games Planet में स्वागत है। हमारे पास Classic Retro Gaming Consoles, Arcade Machines, Commercial &amp; Non-Commercial Game Boxes, Coin Machines, Parts, Spare Parts, Repair Services, New &amp; Used PlayStation Consoles, Game Sticks, Controllers और Gaming Accessories उपलब्ध हैं। अधिक जानकारी के लिए हमारी WhatsApp Profile Catalog देखें या हमसे संपर्क करें।</div>
+</div>
+
+<div id="securityOverlay">
+  <div class="security-box">
+    <h2>🔒 Protected Games Planet Page</h2>
+    <p>This page is protected against unauthorized copying and source reuse.</p>
+    <button type="button" onclick="document.getElementById('securityOverlay').style.display='none'">Continue</button>
+  </div>
+</div>
+
+
+
+<div class="header">
+  <div class="hero">
+    <div class="brand-pill">🎮 Premium Gaming Accessories</div>
+    <h1>Games Planet</h1>
+    <p class="hero-sub">Arcade parts, console accessories, cables and repair tools — selected for gaming shops, technicians and arcade builders.</p>
+    <div class="trust-row">
+      <span class="trust-chip">✅ Checked Products</span>
+      <span class="trust-chip">📦 Secure Packing</span>
+      <span class="trust-chip">💳 Prepaid Orders</span>
+      <span class="trust-chip">💬 WhatsApp Support</span>
+    </div>
+  </div>
+</div>
+
+<div class="notice">
+  <div class="notice-inner">
+    <div class="notice-icon">🚫</div>
+    <div>
+      <div class="notice-title">Cash on Delivery is not available</div>
+      <div class="notice-text">Full advance payment is accepted. Please select products, choose courier service and continue through WhatsApp or the details form.</div>
+    </div>
+  </div>
+</div>
+
+
+<div class="desktop-layout">
+<main class="desktop-left">
+<div class="container" id="products"></div>
+
+<div class="preview"><div class="preview-card">
+ <h3>Order Preview</h3>
+ <div id="orderList">No items selected</div>
+
+ <div class="courier-box">
+<div class="delivery-speed-title">⚡ Choose Delivery Speed</div>
+<div class="delivery-speed-options" id="deliverySpeedOptions">
+  <label class="speed-option" id="speedSurfaceOption">
+    <input type="radio" name="deliverySpeed" value="surface" checked onchange="onDeliverySpeedChange()">
+    <span>Surface Delivery</span>
+  </label>
+  <label class="speed-option" id="speedAirOption">
+    <input type="radio" name="deliverySpeed" value="air" onchange="onDeliverySpeedChange()">
+    <span>By Air Delivery</span>
+  </label>
+  <label class="speed-option" id="speedPrimeOption">
+    <input type="radio" name="deliverySpeed" value="prime" onchange="onDeliverySpeedChange()">
+    <span>Prime Trackon.in</span>
+  </label>
+</div>
+<div id="batteryAirNotice" class="battery-air-notice">🔋 Battery item selected — Air and Prime delivery are unavailable. Surface Delivery has been applied automatically.</div>
+<div class="courier-label">
+🚚 Choose Your Preferred Courier Service
+</div>
+<select id="courier" onchange="render()" style="padding:8px;border-radius:8px">
+<option value="Trackon.in" selected>Trackon.in</option>
+<option value="Delhivery.com">Delhivery.com</option>
+<option value="BlueDart">BlueDart</option>
+<option value="Ecom Express">Ecom Express</option>
+<option value="Speed Post">Speed Post</option>
+<option value="Shreemaruti.com">Shreemaruti.com</option>
+<option value="Dtdc.in">Dtdc.in</option>
+</select>
+</div>
+<div class="actions">
+  <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
+  <button class="details" onclick="goDetails()">Fill Your Details</button>
+  <button class="reset" onclick="clearCart()">Reset Cart</button>
+ </div>
+
+ <div class="total-grid">
+<div>
+  <b>Total Amount: ₹<span id="total">0</span></b><br>
+  <b>Total Weight: <span id="totalWeight">0</span> g</b><br>
+  <b>Delivery Speed: <span id="deliverySpeedLabel">Surface Delivery</span></b><br>
+  <b>Chargeable Courier Weight: <span id="courierWeightKg">0</span> kg</b><br>
+  <b>Courier Charges: ₹<span id="courierCharge">0</span></b><br>
+  <b>Total With Courier: ₹<span id="grandTotal">0</span></b>
+</div>
+<div>
+  <img id="upiQr" width="90" height="90" style="border-radius:8px;background:#fff">
+</div>
+</div>
+</div></div>
+
+<div id="imgModal">
+ <div class="close-btn" onclick="closeImg()">×</div>
+ <img id="modalImg">
+</div>
+
+
+<div class="floatingSummary" id="floatingSummary">
+Products: 0 | Amount: ₹0 | Weight: 0g | Courier: ₹0 | Total: ₹0
+</div>
+
+<script>
+
+(function(){
+  "use strict";
+
+  const allowedHosts=[
+    "gamesplanet13.github.io",
+    "localhost",
+    "127.0.0.1",
+    ""
+  ];
+
+  function showSecurity(message){
+    const overlay=document.getElementById("securityOverlay");
+    if(!overlay) return;
+    const p=overlay.querySelector("p");
+    if(p) p.textContent=message;
+    overlay.style.display="flex";
+  }
+
+  if(!allowedHosts.includes(location.hostname)){
+    document.addEventListener("DOMContentLoaded",function(){
+      document.body.innerHTML=
+        '<div style="position:fixed;inset:0;display:grid;place-items:center;background:#020617;color:#fff;font:700 22px Arial;text-align:center;padding:30px">'+
+        '🔒 Unauthorized copy detected.<br><br>This page can only run on the official Games Planet domain.'+
+        '</div>';
+    });
+    throw new Error("Unauthorized host");
+  }
+
+  document.addEventListener("contextmenu",function(e){
+    e.preventDefault();
+  },true);
+
+  document.addEventListener("copy",function(e){
+    e.preventDefault();
+    showSecurity("Copying content from this page is disabled.");
+  },true);
+
+  document.addEventListener("cut",function(e){
+    e.preventDefault();
+  },true);
+
+  document.addEventListener("dragstart",function(e){
+    e.preventDefault();
+  },true);
+
+  document.addEventListener("selectstart",function(e){
+    const tag=(e.target && e.target.tagName || "").toLowerCase();
+    if(!["input","textarea","select"].includes(tag)){
+      e.preventDefault();
+    }
+  },true);
+
+  document.addEventListener("keydown",function(e){
+    const key=(e.key||"").toLowerCase();
+    const blocked=
+      key==="f12" ||
+      (e.ctrlKey && ["u","s","p","c","a"].includes(key)) ||
+      (e.ctrlKey && e.shiftKey && ["i","j","c"].includes(key));
+
+    if(blocked){
+      e.preventDefault();
+      e.stopPropagation();
+      showSecurity("This shortcut is disabled on the protected Games Planet page.");
+      return false;
+    }
+  },true);
+
+  let devtoolsOpen=false;
+  setInterval(function(){
+    const widthGap=Math.abs(window.outerWidth-window.innerWidth);
+    const heightGap=Math.abs(window.outerHeight-window.innerHeight);
+    const detected=widthGap>220 || heightGap>220;
+
+    if(detected && !devtoolsOpen){
+      devtoolsOpen=true;
+      showSecurity("Developer tools access is restricted on this page.");
+    }else if(!detected){
+      devtoolsOpen=false;
+    }
+  },1200);
+
+  setInterval(function(){
+    try{console.clear();}catch(_){}
+  },2500);
+})();
+
+const products=[
+
+{
+name:"Push Button",
+dimensions:[4,4,4],
+category:"Arcade Box Accessories",
+price:32,
+weight:12,
+variants:["Red","Yellow"],
+variantImages:{
+  "Red":"images/pushbutton-red.jpeg",
+  "Yellow":"images/pushbutton-yellow.jpeg"
+},
+images:[
+  "images/pushbutton-red.jpeg",
+  "images/pushbutton-yellow.jpeg"
+]
+},
+
+{
+name:"Push Button (Imported)",
+dimensions:[5,4,4],
+category:"Arcade Box Accessories",
+price:46,
+weight:12,
+variants:["Ice Blue","Pink","Green","Yellow","Black"],
+variantImages:{
+  "Ice Blue":"images/imported-blue.jpeg",
+  "Pink":"images/imported-pink.jpeg",
+  "Green":"images/imported-green.jpeg",
+  "Yellow":"images/imported-yellow.jpeg",
+  "Black":"images/imported-black.jpeg"
+},
+images:[
+  "images/imported-blue.jpeg",
+  "images/imported-pink.jpeg",
+  "images/imported-green.jpeg",
+  "images/imported-yellow.jpeg",
+  "images/imported-black.jpeg"
+]
+},
+
+{name:"Old Rasila Push Button",category:"Arcade Box Accessories",price:13,weight:12,dimensions:[6,4,4],images:[
+"images/old-raisla-pursh-button.jpeg"
+]},
+
+{name:"MD Switch Button",category:"Arcade Box Accessories",price:50,weight:5,dimensions:[5,3,1],images:[
+"images/mdswitch.jpeg"
+]},
+
+{name:"Black Switch Button",category:"Arcade Box Accessories",price:15,weight:5,dimensions:[5,3,1],images:[
+"images/normal-switch-button.jpeg"
+]},
+
+{name:"Coin Drop Switch Button",category:"Arcade Box Accessories",price:45,weight:12,dimensions:[11,4,2],images:[
+"images/coindropswitch.jpeg"
+]},
+
+{name:"Rasila Handle (Without Switch)",category:"Arcade Box Accessories",price:200,weight:280,dimensions:[14,11,8],images:[
+"images/rasila-handle.jpeg"
+]},
+
+{name:"Rasila Handle (With Switch)",category:"Arcade Box Accessories",price:260,weight:300,dimensions:[14,11,8],images:[
+"images/rasila-handle.jpeg",
+"images/normal-switch-button.jpeg"
+]},
+
+{
+name:"MD Handle (With Switch)",
+category:"Arcade Box Accessories",
+price:585,
+weight:280,
+dimensions:[12,11,11],
+variants:["Black","Red"],
+variantImages:{
+  "Black":"images/madhandle.jpeg",
+  "Red":"images/md-handle-red-1.jpeg"
+},
+images:[
+"images/md-handle-red-1.jpeg",
+"images/madhandle.jpeg",
+"images/md-handle-black.jpeg",
+"images/md-handle-red.jpeg",
+"images/md-handle-bottom.jpeg",
+"images/md-handle-pamphlets.jpeg",
+"images/md-handle-with-md-switch.jpeg",
+"images/md-handle-with-switch.jpeg",
+"images/mx-handle-with-md-switch.jpeg"
+]
+},
+
+{name:"Coin Packet",category:"Arcade Box Accessories",price:210,weight:620,dimensions:[12,12,3],images:[
+"images/coinpacket.jpeg"
+]},
+
+{name:"Coin Acrylic Machine",category:"Arcade Box Accessories",price:195,weight:120,dimensions:[13,15,8],images:[
+"images/ecrylic-coin-machine.jpeg"
+]},
+
+{name:"Coin Acrylic Machine with Switch",category:"Arcade Box Accessories",price:240,weight:135,dimensions:[13,15,8],images:[
+"images/ecrylic-coin-machine.jpeg",
+"images/coindropswitch.jpeg"
+]},
+
+{name:"Remote Plate",category:"Arcade Box Accessories",price:300,weight:15,dimensions:[10,10,2],images:[
+"images/ps2plate.jpeg"
+]},
+
+
+{name:"Remote Lead",category:"Arcade Box Accessories",price:100,weight:80,dimensions:[10,5,2],images:[
+"images/remote-lead.jpeg"
+]},
+
+{name:"12 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:60,weight:70,dimensions:[10,5,3],images:[
+"images/12-core-wire.jpeg"
+]},
+
+{
+name:"PS2 Slim Power Adapter with Power Cable",
+category:"PS2",
+price:599,
+weight:340,
+dimensions:[20,15,7],
+compatibility:"Compatible with All PS2 Slim Models",
+description:[
+"Compatible with All PS2 Slim Models",
+"SCPH-70000 Series",
+"SCPH-75000 Series",
+"SCPH-77000 Series",
+"SCPH-79000 Series",
+"SCPH-90000 Series",
+"Output: 8.5V ⎓ 5.65A",
+"Input: 100-265V AC, 50-60Hz",
+"Includes Power Adapter + Power Cable"
+],
+images:[
+"images/ps2-slim-adapter.jpeg"
+]},
+
+{name:"USB to PS2/PS3/PC Converter",category:"PS2",price:360,weight:100,dimensions:[15,6,2],images:[
+"images/usbtops2.jpeg"
+]},
+
+{name:"PS2 8MB FMCB Memory Card — PS2 Fat 3XXXX / 5XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/fmcbfat.jpeg"]},
+{name:"PS2 8MB FMCB Memory Card — PS2 Slim 7XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/fmcb7xxxx.jpeg"]},
+{name:"PS2 8MB FunTuna Memory Card — PS2 Slim 9XXXX",category:"PS2",price:600,weight:25,dimensions:[12,13,2],images:["images/fmcb9xxxx.jpeg"]},
+
+{name:"PS2 8MB Memory Card Blank",category:"PS2",price:369,weight:25,dimensions:[12,13,2],images:[
+"images/ps28mb.jpeg"
+]},
+
+{name:"32GB USB for PS2 with Arcade Games",category:"PS2",price:549,weight:5,dimensions:[5,3,2],images:[
+"images/32gbusb.jpeg"
+]},
+
+{name:"PS2 Slim Sticker/Skin",category:"PS2",price:60,weight:0,dimensions:[0,0,0],compatibility:"For PS2 Slim Console",images:["images/opl10.jpeg"]},
+
+{name:"Power Cable for PS2 / PS3 / PS4 / PS5",category:"Cables",price:129,weight:130,dimensions:[15,5,5],images:[
+"images/ps2pcable.jpeg"
+]},
+
+{name:"HDMI Cable",category:"Cables",price:99,weight:99,dimensions:[10,10,3],images:[
+"images/hdmicable.jpeg"
+]},
+
+{name:"HDMI Converter for PS2",category:"PS2",price:319,weight:80,dimensions:[14,9,3],images:[
+"images/ps2hdmi.jpeg"
+]},
+
+{name:"AV Cable for PS2",category:"PS2",price:99,weight:70,dimensions:[15,4,3],images:[
+"images/ps2av.jpeg"
+]},
+
+{name:"PS2 Wired Controller (Replica)",category:"PS2",price:375,weight:250,dimensions:[17,12,8],images:[
+"images/ps2wire.jpeg"
+]},
+
+{name:"PS2 Wireless Controller",category:"PS2",price:499,weight:250,dimensions:[8,13,17],images:[
+"images/ps2wireless.jpeg"
+]},
+
+{name:"PS3 Controller (Replica)",category:"PS3",price:600,weight:250,dimensions:[22,15,9],containsBattery:true,images:[
+"images/ps3gamepad.jpeg"
+]},
+
+{name:"PS4 Controller Black (Replica)",category:"PS4",price:999,weight:450,dimensions:[15,20,8],containsBattery:true,images:[
+"images/ps4gamepad.jpeg"
+]},
+
+{name:"PS3 Controller Charging Cable",category:"PS3",price:119,weight:65,dimensions:[15,5,5],images:[
+"images/ps3usb.jpeg"
+]},
+
+{name:"PS4 Controller Charging Cable",category:"PS4",price:139,weight:65,dimensions:[15,5,5],images:[
+"images/ps4usb.jpeg"
+]},
+
+{name:"PS5 Controller Charging Cable (USB to C)",category:"PS5",price:149,weight:65,dimensions:[15,5,5],images:[
+"images/ps5usb.jpeg"
+]}
+,
+
+{name:"PS5 Controller Charging Cable (C to C)",category:"PS5",price:199,weight:65,dimensions:[15,5,5],compatibility:"PS5 Controller / USB-C Devices",images:["images/ps5ctoc.jpeg"]}
+,
+
+{
+name:"PXN V3 Pro Steering Wheel and Pedal Set",
+category:"Gaming Accessories",
+price:4999,
+weight:3000,
+dimensions:[30,27,25],
+compatibility:"Multi-Platform Gaming",
+features:["Steering wheel with pedal set","180-degree steering rotation","Built-in vibration feedback","Entry-level multi-platform racing rig"],
+images:["images/pxnv3problack.jpeg","images/pxnv3pro.jpeg","images/pxnv3pron.jpeg"]
+}
+,
+
+{name:"Soldering Paste (Wel Fix)",category:"Electrical Items",price:10,weight:15,dimensions:[7,7,2],images:[
+"images/paste.jpeg",
+"images/20260409-213949.jpeg"
+]},
+
+{name:"Solder Wire Small Pack",category:"Electrical Items",price:20,weight:5,dimensions:[7,7,1],images:[
+"images/solder.jpeg"
+]},
+
+{name:"Solder Wire (Roll)",category:"Electrical Items",price:80,weight:22,dimensions:[5,5,5],images:[
+"images/solder-2.jpeg",
+"images/20260409-213939.jpeg"
+]},
+
+{name:"Solder Wire (Boom)",category:"Electrical Items",price:180,weight:58,dimensions:[9,5,5],images:[
+"images/solder-2.jpeg",
+"images/20260409-214046.jpeg"
+]},
+
+{name:"15W Soldering Iron (LED)",category:"Electrical Items",price:89,weight:60,dimensions:[21,4,4],images:[
+"images/iron-15wt.jpeg",
+"images/20260409-214435.jpeg"
+]},
+
+{name:"25W Soldering Iron (Madhur)",category:"Electrical Items",price:290,weight:162,dimensions:[27,6,5],images:[
+"images/iron-30wt.jpeg",
+"images/20260409-214249.jpeg",
+"images/20260409-214254.jpeg"
+]},
+
+{name:"25W Soldering Iron (Starmaxx)",category:"Electrical Items",price:140,weight:120,dimensions:[30,12,4],images:[
+"images/iron-25wt.jpeg",
+"images/20260409-214311.jpeg",
+"images/20260409-214344.jpeg"
+]},
+
+{name:"Laptop Power Cable",category:"Cables",price:110,weight:185,dimensions:[23,7,5],images:[
+"images/laptopcable.jpeg"
+]},
+
+{name:"CPU Power Cable / PS4 Pro Power Cable",category:"Cables",price:110,weight:130,dimensions:[23,7,5],images:[
+"images/cpucable.jpeg"
+]},
+
+{name:"Blow Torch Flame Lighter",category:"Electrical Items",price:250,weight:90,dimensions:[18,12,4],images:[
+"images/blowtorch.jpeg"
+]},
+
+{name:"Precision Screwdriver Kit",category:"Electrical Items",price:250,weight:170,dimensions:[13,8,4],images:[
+"images/screw-driver-kit.jpeg"
+]}
+
+,
+
+{name:"Matrix Modbo 5.0 Modchip",category:"PS2",price:549,weight:5,dimensions:[3,3,1],images:[
+"images/matrix5.jpeg"
+]}
+,
+{name:"AA/AAA 4-Slot Battery Charger",category:"Batteries and Charger",price:399,weight:140,dimensions:[13,7,7],images:[
+"images/cell-charger.jpeg"
+]},
+{name:"Simpex AA Rechargeable Cells (4 Pack)",category:"Batteries and Charger",price:550,weight:75,dimensions:[11,9,2],containsBattery:true,images:[
+"images/aa-simpex4cell.jpeg"
+]},
+{name:"Panasonic AAA Rechargeable Cells (2 Pack)",category:"Batteries and Charger",price:350,weight:25,dimensions:[12,10,2],containsBattery:true,images:[
+"images/aaapanasonic2cell.jpeg"
+]},
+{name:"Panasonic AAA Rechargeable Cells (4 Pack)",category:"Batteries and Charger",price:0,priceLabel:"Ask Price",weight:50,dimensions:[12,10,2],containsBattery:true,images:[
+"images/aaapenasonic4cell.jpeg"
+]}
+
+,
+{name:"10 Socket Extension Board",category:"Electrical Items",price:170,weight:650,dimensions:[30,12,7],images:[
+"images/extension.jpeg"
+]}
+
+];
+
+// PS2 FMCB-page prices below are product-only prices.
+// ₹99 prepaid courier included on the FMCB page has been removed here,
+// because this catalog calculates courier separately from selected weight.
+const PS2_TOP_GAMES_VIDEO="https://youtu.be/xGR0vUM1-Jw";
+const PS2_OPTIONAL_SELECTOR="https://gamesplanet13.github.io/ps2gameselector/";
+const ps2GameDrivePrices=[
+  {storage:"64GB PD 2.0",count:21,usbTop:1101,usbOptional:1151},
+  {storage:"64GB PD 3.0",count:21,usbTop:1501,usbOptional:1551},
+  {storage:"128GB PD 3.0",count:41,usbTop:2751,usbOptional:2851},
+  {storage:"128GB SSD",count:41,usbTop:3701,usbOptional:3801},
+  {storage:"256GB SSD",count:71,usbTop:5201,usbOptional:5401},
+  {storage:"500GB HDD",count:175,usbTop:7001,usbOptional:7401},
+  {storage:"500GB SSD",count:175,usbTop:11001,usbOptional:11401}
+];
+
+function ps2DriveImage(storage){
+  if(storage.includes("PD 3.0")) return "images/sandiscultra-1.jpeg";
+  if(storage.includes("PD 2.0")) return "images/usb-1.jpeg";
+  return "images/usbhdd-1.jpeg";
+}
+function ps2DriveWeight(storage){
+  if(storage.includes("PD")) return 10;
+  if(storage.includes("HDD")) return 250;
+  if(storage.startsWith("500GB")) return 100;
+  return 80;
+}
+function ps2DriveDimensions(storage){
+  if(storage.includes("PD")) return [5,3,2];
+  if(storage.includes("HDD")) return [13,9,3];
+  return [13,9,2];
+}
+
+ps2GameDrivePrices.forEach(d=>{
+  const image=ps2DriveImage(d.storage);
+  const weight=ps2DriveWeight(d.storage);
+  const dimensions=ps2DriveDimensions(d.storage);
+  products.push({
+    name:`${d.storage} USB for PS2 — Top ${d.count} Games`,
+    category:"PS2 Game Drives — USB Only",price:d.usbTop,weight,dimensions,
+    packLabel:`Top ${d.count} Games`,gameCount:d.count,
+    topGamesVideo:PS2_TOP_GAMES_VIDEO,images:[image]
+  });
+  products.push({
+    name:`${d.storage} USB for PS2 — Optional Games`,
+    category:"PS2 Game Drives — USB Only",price:d.usbOptional,weight,dimensions,
+    packLabel:"Optional Games",
+    optionalSelector:PS2_OPTIONAL_SELECTOR,images:[image]
+  });
+});
+
+const colorDots={
+"Red":"#FF0000","Yellow":"#FFD700","Ice Blue":"#00CFFF",
+"Pink":"#FF69B4","Green":"#00CC44","Black":"#000000",
+"White":"#FFFFFF","Blue":"#0066FF","Orange":"#FF7A00","Purple":"#8A2BE2"
+};
+const state = JSON.parse(localStorage.getItem("gp_cart") || "{}");
+const container=document.getElementById("products");
+
+function productActionLinks(p){
+ const actions=[];
+ if(p.topGamesVideo){
+   actions.push(`<a class="game-action-btn top-games-btn" href="${p.topGamesVideo}" target="_blank" rel="noopener">🎮 Top ${p.gameCount} Games List Video</a>`);
+ }
+ if(p.optionalSelector){
+   actions.push(`<a class="game-action-btn optional-games-btn" href="${p.optionalSelector}" onclick="openOptionalGameSelector(event,this.href)">🟨 Optional Games Selector</a>`);
+ }
+ return actions.length?`<div class="product-extra-actions">${actions.join("")}</div>`:"";
+}
+
+const categoryOrder=[
+"Arcade Box Accessories",
+"Gaming Accessories",
+"PS2",
+"PS2 Game Drives — USB Only",
+"PS3",
+"PS4",
+"PS5",
+"Cables",
+"Electrical Items",
+"Batteries and Charger"
+];
+
+categoryOrder.forEach(cat=>{
+ const catProducts=products.filter(p=>p.category===cat);
+ if(!catProducts.length) return;
+
+ container.innerHTML += `<h2 style="color:#00f7ff;margin:15px 5px 10px">${cat}</h2>`;
+
+ catProducts.forEach((p)=>{
+ const i=products.indexOf(p);
+ if(state[i]===undefined) state[i]=0;
+
+ const imgs=p.images.map(img=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name}" onclick="openImg('${img}')">`).join("");
+ container.innerHTML+=`
+ <div class="product">
+  <b class="product-title">${p.name}</b>
+  <div class="product-specs">
+    <span>📏 Size: <b>${p.dimensions ? p.dimensions.join(" × ")+" cm" : "Not set"}</b></span>
+    <span>⚖️ Weight: <b>${p.weight} g</b></span>
+    ${p.packLabel?`<span>🎮 <b>${p.packLabel}</b></span>`:""}
+  </div>
+  <div class="image-row">${imgs}</div>
+  ${p.features?`<div class="product-features">${p.features.map(f=>`<div>✓ ${f}</div>`).join("")}</div>`:""}
+  ${productActionLinks(p)}
+  <div class="info">
+   <div>
+    <div class="price">${p.priceLabel || ("₹"+p.price)}</div>
+    <small>${p.weight} g / piece${p.compatibility?'<br><b>Compatibility:</b> '+p.compatibility:''}</small>
+   </div>
+   ${p.variants?`<div style="min-width:220px">${p.variants.map(v=>`<div style="display:flex;justify-content:space-between;align-items:center;margin:3px 0"><small><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999;margin-right:6px;vertical-align:middle"></span>${v}</small><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><span id="vq${i}_${v.replace(/\s+/g,'_')}">${state['v_'+i+'_'+v]||0}</span><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`).join('')}</div>`:`<div class="qty">
+    <button onclick="updateQty(${i},-1)">−</button>
+    <span id="q${i}">${state[i]}</span>
+    <button onclick="updateQty(${i},1)">+</button>
+   </div>`}
+  </div>
+ </div>`;
+});
+});
+
+
+function clearCart(){
+ if(!confirm("Reset all selected products?")) return;
+
+ localStorage.removeItem("gp_cart");
+ Object.keys(state).forEach(k=>state[k]=0);
+
+ products.forEach((p,i)=>{
+   const el=document.getElementById("q"+i);
+   if(el) el.innerText="0";
+
+   if(p.variants){
+      p.variants.forEach(v=>{
+         state['v_'+i+'_'+v]=0;
+         const vel=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));
+         if(vel) vel.innerText='0';
+      });
+   }
+ });
+
+ render();
+}
+
+function openImg(src){
+ const modal=document.getElementById("imgModal");
+ document.getElementById("modalImg").src=src;
+ modal.style.display="flex";
+ document.body.style.overflow="hidden";
+ history.pushState({imgOpen:true},"");
+}
+function closeImg(){
+ document.getElementById("imgModal").style.display="none";
+ document.body.style.overflow="";
+}
+document.getElementById("imgModal").addEventListener("click",function(e){
+ if(e.target===this){ history.back(); }
+});
+
+window.addEventListener("popstate",function(){
+ const modal=document.getElementById("imgModal");
+ if(modal.style.display==="flex"){
+   closeImg();
+ }
+});
+
+function updateQty(i,v){
+ state[i]=Math.max(0,(state[i]||0)+v);
+ localStorage.setItem("gp_cart", JSON.stringify(state));
+ document.getElementById("q"+i).innerText=state[i];
+ render();
+}
+
+
+function updateVariantQty(i,v,val){
+ const k='v_'+i+'_'+v;
+ state[k]=Math.max(0,(state[k]||0)+val);
+ localStorage.setItem("gp_cart", JSON.stringify(state));
+ const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));
+ if(el) el.innerText=state[k];
+ render();
+}
+
+const DELIVERY_SPEEDS={
+ surface:{label:"Surface Delivery",multiplier:1,couriers:["Trackon.in","Delhivery.com","BlueDart","Ecom Express","Speed Post","Shreemaruti.com","Dtdc.in"]},
+ air:{label:"By Air Delivery",multiplier:1.5,couriers:["Trackon.in","Shreemaruti.com"]},
+ prime:{label:"Prime Trackon.in",multiplier:2,couriers:["Trackon.in"]}
+};
+
+function hasSelectedBatteryItem(){
+ return products.some((p,i)=>{
+   if(!p.containsBattery) return false;
+   if((state[i]||0)>0) return true;
+   return p.variants && p.variants.some(v=>(state['v_'+i+'_'+v]||0)>0);
+ });
+}
+
+function getDeliverySpeed(){
+ return document.querySelector('input[name="deliverySpeed"]:checked')?.value || "surface";
+}
+
+function syncDeliveryControls(){
+ const batterySelected=hasSelectedBatteryItem();
+ const airOption=document.getElementById("speedAirOption");
+ const primeOption=document.getElementById("speedPrimeOption");
+ const notice=document.getElementById("batteryAirNotice");
+ if(airOption) airOption.classList.toggle("hidden-by-battery",batterySelected);
+ if(primeOption) primeOption.classList.toggle("hidden-by-battery",batterySelected);
+ if(notice) notice.classList.toggle("show",batterySelected);
+
+ if(batterySelected && getDeliverySpeed()!=="surface"){
+   const surfaceRadio=document.querySelector('input[name="deliverySpeed"][value="surface"]');
+   if(surfaceRadio) surfaceRadio.checked=true;
+ }
+
+ const speed=getDeliverySpeed();
+ const allowed=DELIVERY_SPEEDS[speed].couriers;
+ const select=document.getElementById("courier");
+ if(select){
+   const previous=select.value;
+   select.innerHTML=allowed.map(c=>`<option value="${c}">${c}</option>`).join("");
+   select.value=allowed.includes(previous)?previous:allowed[0];
+ }
+ return speed;
+}
+
+function onDeliverySpeedChange(){
+ syncDeliveryControls();
+ render();
+}
+
+function courierBaseRate(courier){
+ if(courier==="Delhivery.com" || courier==="BlueDart" || courier==="Ecom Express") return 300;
+ if(courier==="Speed Post") return 150;
+ return 100;
+}
+
+function getCourierCalculation(chargeableKg){
+ const speed=syncDeliveryControls();
+ const courier=document.getElementById("courier")?.value || "Trackon.in";
+ const meta=DELIVERY_SPEEDS[speed];
+ const courierCharge=Math.round(chargeableKg*courierBaseRate(courier)*meta.multiplier);
+ return {speed,courier,courierCharge,label:meta.label};
+}
+
+function render(){
+ let html="", total=0, totalWeight=0;
+
+ products.forEach((p,i)=>{
+  if(p.variants){
+    p.variants.forEach(v=>{
+      const q=state['v_'+i+'_'+v]||0;
+      if(q>0){
+        const sp=p.price*q, sw=p.weight*q;
+        total+=sp; totalWeight+=sw;
+        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${p.price} × ${q} = ₹${sp}<br>${p.weight}g × ${q} = ${sw}g</div>`;
+      }
+    });
+  }
+  if(state[i]>0){
+   const qty=state[i];
+   const sp=p.price*qty;
+   const sw=p.weight*qty;
+   total+=sp; totalWeight+=sw;
+   html+=`
+   <div style="border-bottom:1px dashed #444;margin-bottom:8px">
+    <b>${p.name}</b><br>
+    ₹${p.price} × ${qty} = ₹${sp}<br>
+    ${p.weight}g × ${qty} = ${sw}g
+   </div>`;
+  }
+ });
+
+ document.getElementById("orderList").innerHTML=html||"No items selected";
+ 
+ document.getElementById("total").innerText=total;
+ document.getElementById("totalWeight").innerText=totalWeight;
+
+ let itemCount=0;
+
+ products.forEach((p,i)=>{
+   if(p.variants){
+      p.variants.forEach(v=>{
+         itemCount += state['v_'+i+'_'+v] || 0;
+      });
+   }
+   itemCount += state[i] || 0;
+ });
+
+ const packedWeight = totalWeight + (itemCount>0 ? Math.ceil(totalWeight/1000)*100 : 0);
+ const chargeableKg = itemCount>0 ? Math.ceil(packedWeight/1000) : 0;
+ const delivery=getCourierCalculation(chargeableKg);
+ const courierCharge=delivery.courierCharge;
+ const grandTotal = total + courierCharge;
+ document.getElementById("courierCharge").innerText=courierCharge;
+ document.getElementById("grandTotal").innerText=grandTotal;
+ const courierKgEl=document.getElementById("courierWeightKg");
+ if(courierKgEl) courierKgEl.innerText=chargeableKg;
+ const deliverySpeedLabel=document.getElementById("deliverySpeedLabel");
+ if(deliverySpeedLabel) deliverySpeedLabel.innerText=delivery.label;
+
+ document.getElementById("floatingSummary").innerHTML =
+ `Products: ${itemCount} | Amount: ₹${total} | ${delivery.label} | Courier Weight: ${chargeableKg}kg | Courier: ₹${courierCharge} | Total: ₹${grandTotal}`;
+
+ const upi='upi://pay?pa=paytmqr68kzsc@ptys&pn=Surender%20Kaur&am='+grandTotal+'&cu=INR';
+ const qr=document.getElementById('upiQr');
+ if(qr){
+   qr.src='https://api.qrserver.com/v1/create-qr-code/?size=90x90&data='+encodeURIComponent(upi);
+ }
+
+ generateCombinedPoster();
+ generateBoxPlanner();
+ generatePackingGuide();
+}
+
+
+
+function getProductImageForVariant(product, variant){
+  if(product && product.variantImages && variant && product.variantImages[variant]){
+    return product.variantImages[variant];
+  }
+  return (product && product.images && product.images[0]) || "";
+}
+
+let combinedPosterRenderToken=0;
+
+function getSelectedPosterItems(){
+  const selected=[];
+
+  products.forEach((p,i)=>{
+    if(p.variants){
+      p.variants.forEach(v=>{
+        const qty=state['v_'+i+'_'+v]||0;
+        if(qty>0){
+          selected.push({
+            name:p.name,
+            variant:v,
+            qty,
+            image:getProductImageForVariant(p,v),
+            fallbackImage:(p.images&&p.images[0])||"",
+            isWire:/12\s*Core\s*Wire/i.test(p.name),
+            repeatImage:false
+          });
+        }
+      });
+    }
+
+    const qty=state[i]||0;
+    if(qty>0){
+      selected.push({
+        name:p.name,
+        variant:"",
+        qty,
+        image:getProductImageForVariant(p,""),
+        fallbackImage:(p.images&&p.images[0])||"",
+        isWire:/12\s*Core\s*Wire/i.test(p.name),
+        repeatImage:false
+      });
+    }
+  });
+
+  return selected;
+}
+function loadPosterImage(src,fallbackSrc=""){
+  return new Promise(resolve=>{
+    if(!src){ resolve(null); return; }
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>{
+      if(fallbackSrc && fallbackSrc!==src){
+        const fallback=new Image();
+        fallback.onload=()=>resolve(fallback);
+        fallback.onerror=()=>resolve(null);
+        fallback.src=fallbackSrc;
+      }else{
+        resolve(null);
+      }
+    };
+    img.src=src;
+  });
+}
+
+function roundedRect(ctx,x,y,w,h,r,fill,stroke){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}
+}
+
+function fitText(ctx,text,maxWidth,startSize,minSize=24,weight=900){
+  let size=startSize;
+  while(size>minSize){
+    ctx.font=`${weight} ${size}px Arial, sans-serif`;
+    if(ctx.measureText(text).width<=maxWidth) break;
+    size-=2;
+  }
+  return size;
+}
+
+function drawContain(ctx,img,x,y,w,h){
+  if(!img) return;
+  const scale=Math.min(w/img.width,h/img.height);
+  const dw=img.width*scale, dh=img.height*scale;
+  ctx.drawImage(img,x+(w-dw)/2,y+(h-dh)/2,dw,dh);
+}
+
+async function generateCombinedPoster(){
+  const canvas=document.getElementById("combinedPoster");
+  if(!canvas) return;
+
+  const ctx=canvas.getContext("2d");
+  const selected=getSelectedPosterItems();
+  const token=++combinedPosterRenderToken;
+
+  if(!selected.length){
+    canvas.width=1400;
+    canvas.height=680;
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    roundedRect(ctx,120,55,1160,105,24,"#d90000");
+    ctx.fillStyle="#fff";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.font="900 54px Arial, sans-serif";
+    ctx.fillText("SELECT PRODUCTS TO CREATE KIT PICTURE",700,108);
+
+    ctx.fillStyle="#222";
+    ctx.font="700 30px Arial, sans-serif";
+    ctx.fillText("Selected products will appear here automatically.",700,300);
+
+    roundedRect(ctx,170,385,1060,145,22,"#f4f4f4","#d1d1d1");
+    ctx.fillStyle="#666";
+    ctx.font="700 27px Arial, sans-serif";
+    ctx.fillText("GAMES PLANET ZONE • WhatsApp 7983624797",700,458);
+    return;
+  }
+
+  // Imported buttons are repeated visually according to exact selected quantity.
+  const visuals=selected.map(item=>({...item,isRepeatedButton:false}));
+
+  const count=visuals.length;
+  const cols=count<=1?1:count<=4?2:count<=9?3:count<=16?4:5;
+  const width=1600;
+  const side=50;
+  const gap=22;
+  const headerH=135;
+  const footerH=205;
+  const cardW=Math.floor((width-side*2-gap*(cols-1))/cols);
+  const cardH=cols===1?640:cols===2?500:cols===3?410:cols===4?340:285;
+  const rows=Math.ceil(count/cols);
+  const height=headerH+35+rows*cardH+(rows-1)*gap+footerH+55;
+
+  canvas.width=width;
+  canvas.height=height;
+  ctx.fillStyle="#fff";
+  ctx.fillRect(0,0,width,height);
+
+  roundedRect(ctx,210,17,1180,98,22,"#d80000","#b00000");
+  ctx.fillStyle="#fff";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.font=`900 ${fitText(ctx,"CUSTOM ARCADE ACCESSORIES KIT",1060,60,38)}px Arial, sans-serif`;
+  ctx.fillText("CUSTOM ARCADE ACCESSORIES KIT",800,66);
+
+  const imgs=await Promise.all(visuals.map(v=>loadPosterImage(v.image,v.fallbackImage)));
+  if(token!==combinedPosterRenderToken) return;
+
+  visuals.forEach((item,index)=>{
+    const row=Math.floor(index/cols);
+    const col=index%cols;
+    const inThisRow=Math.min(cols,count-row*cols);
+    const rowWidth=inThisRow*cardW+(inThisRow-1)*gap;
+    const startX=(width-rowWidth)/2;
+    const x=startX+col*(cardW+gap);
+    const y=headerH+28+row*(cardH+gap);
+
+    roundedRect(ctx,x,y,cardW,cardH,20,"#fff","#c9c9c9");
+
+    const title=item.variant?`${item.name} - ${item.variant}`:item.name;
+    ctx.fillStyle="#111";
+    ctx.textAlign="center";
+    ctx.textBaseline="top";
+    ctx.font=`900 ${fitText(ctx,title,cardW-28,cols<=2?38:30,19)}px Arial, sans-serif`;
+    ctx.fillText(title,x+cardW/2,y+14);
+
+    const titleH=cols<=2?70:55;
+    const badgeH=46;
+    const imageTop=y+titleH;
+    const imageH=cardH-titleH-badgeH-26;
+    drawContain(ctx,imgs[index],x+14,imageTop,cardW-28,imageH);
+
+    let label;
+    if(item.isWire){
+      label=`TOTAL LENGTH: ${item.qty} METER${item.qty===1?"":"S"}`;
+    }else{
+      label=`QTY: ${item.qty}`;
+    }
+
+    ctx.font="900 24px Arial, sans-serif";
+    const badgeW=Math.min(cardW-20,Math.max(125,ctx.measureText(label).width+42));
+    const badgeY=y+cardH-badgeH-10;
+    roundedRect(ctx,x+(cardW-badgeW)/2,badgeY,badgeW,badgeH,12,"#e00000","#b50000");
+    ctx.fillStyle="#fff";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.font=`900 ${fitText(ctx,label,badgeW-20,24,17)}px Arial, sans-serif`;
+    ctx.fillText(label,x+cardW/2,badgeY+badgeH/2);
+  });
+
+  const footerY=height-footerH-24;
+  roundedRect(ctx,140,footerY,1320,footerH,22,"#fff","#222");
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+
+  ctx.font="900 56px Arial, sans-serif";
+  ctx.fillStyle="#e00000";
+  ctx.fillText("GAMES",420,footerY+57);
+  ctx.fillStyle="#1438d0";
+  ctx.fillText("PLANET",720,footerY+57);
+  ctx.fillStyle="#111";
+  ctx.fillText("ZONE",1045,footerY+57);
+
+  ctx.font="700 24px Arial, sans-serif";
+  ctx.fillStyle="#111";
+  ctx.fillText("Laptops • Gaming Consoles • Accessories • Sales • Service • Repair",800,footerY+102);
+
+  ctx.font="900 30px Arial, sans-serif";
+  ctx.fillText("YOUTUBE.COM/@GAMESPLANET13",800,footerY+143);
+
+  ctx.font="900 35px Arial, sans-serif";
+  ctx.fillText("WhatsApp: 7983624797",800,footerY+178);
+}
+function downloadCombinedPoster(){
+  const items=getSelectedPosterItems();
+  if(!items.length){alert('Please select products first');return;}
+  generateCombinedPoster().then(()=>{
+    const canvas=document.getElementById('combinedPoster');
+    const a=document.createElement('a');
+    a.download='Games_Planet_Selected_Products_Kit.png';
+    a.href=canvas.toDataURL('image/png',1.0);
+    a.click();
+  });
+}
+
+
+function orderWhatsApp(){
+ let lines=[],total=0,totalWeight=0,n=1;
+
+ products.forEach((p,i)=>{
+  if(p.variants){
+    p.variants.forEach(v=>{
+      const q=state['v_'+i+'_'+v]||0;
+      if(q>0){
+        const sp=p.price*q, sw=p.weight*q;
+        total+=sp;
+        totalWeight+=sw;
+        lines.push(`${n}) ${p.name} - ${v} x${q} = ₹${sp} (${sw}g)`);
+        n++;
+      }
+    });
+  }
+  if(state[i]>0){
+   const qty=state[i];
+   const price=p.price*qty;
+   const weight=p.weight*qty;
+   total+=price;
+   totalWeight+=weight;
+   lines.push(`${n}) ${p.name} x${qty} = ₹${price} (${weight}g)`);
+   n++;
+  }
+ });
+
+ if(!lines.length){alert("Please select products first");return;}
+
+ const packedWeight = totalWeight + (totalWeight>0 ? Math.ceil(totalWeight/1000)*100 : 0);
+ const chargeableKg = packedWeight>0 ? Math.ceil(packedWeight/1000) : 0;
+ const delivery=getCourierCalculation(chargeableKg);
+ const courier=delivery.courier;
+ const courierCharge=delivery.courierCharge;
+ const grandTotal = total + courierCharge;
+ const fillLink = window.location.origin + window.location.pathname.replace("index","order-prefill") + `?grandTotal=${grandTotal}`;
+
+ let msg=`🟢 Prepaid Order
+
+📦 Product Summary
+
+${lines.join('\n')}
+
+⚡ Delivery Speed: ${delivery.label}
+
+🚚 Courier: ${courier}
+
+⚖️ Chargeable Courier Weight: ${chargeableKg} kg
+
+🚚 Courier Charges: ₹${courierCharge}
+
+🧾 Grand Total: ₹${grandTotal}
+
+━━━━━━━━━━━━━━
+
+📝 Fill Your Details
+
+https://gamesplanet13.github.io/arcade-accessories-/order-prefill.html?grandTotal=${grandTotal}`;
+
+ window.open("https://wa.me/917983624797?text="+encodeURIComponent(msg));
+}
+
+/* 🔹 FULL SYNC TO ORDER PREFILL PAGE */
+
+function goDetails(){
+ let total=0,totalWeight=0;
+
+ products.forEach((p,i)=>{
+  if(p.variants){
+    p.variants.forEach(v=>{
+      const q=state['v_'+i+'_'+v]||0;
+      if(q>0){
+        total+=p.price*q;
+        totalWeight+=p.weight*q;
+      }
+    });
+  }
+  if(state[i]>0){
+    total+=p.price*state[i];
+    totalWeight+=p.weight*state[i];
+  }
+ });
+
+ if(total<=0){alert("Please select products first");return;}
+
+ const packedWeight = totalWeight + (totalWeight>0 ? Math.ceil(totalWeight/1000)*100 : 0);
+
+ const chargeableKg = packedWeight>0 ? Math.ceil(packedWeight/1000) : 0;
+ const delivery=getCourierCalculation(chargeableKg);
+ const courierCharge=delivery.courierCharge;
+
+ const grandTotal = total + courierCharge;
+
+ window.location.href=`order-prefill.html?grandTotal=${grandTotal}&deliverySpeed=${encodeURIComponent(delivery.label)}&courier=${encodeURIComponent(delivery.courier)}&courierCharge=${courierCharge}`;
+}
+
+
+
+const STANDARD_BOXES = [
+  [10,10,10],[13,13,13],[15,12,10],[15,15,15],[20,15,10],[20,15,15],
+  [20,20,15],[20,20,20],[25,15,15],[25,20,15],[25,20,20],[25,25,20],
+  [30,20,15],[30,20,20],[30,25,20],[30,25,25],[30,30,20],[30,30,30],
+  [35,25,20],[35,30,25],[35,30,30],[40,30,20],[40,30,25],[40,30,30],
+  [40,35,30],[45,35,30],[45,40,35],[50,40,30],[50,40,40],[50,50,40],
+  [60,40,40],[60,50,40],[60,50,50],[70,50,50],[70,60,50],[80,60,60]
+];
+
+function permutations3(d){
+  const [a,b,c]=d;
+  return [[a,b,c],[a,c,b],[b,a,c],[b,c,a],[c,a,b],[c,b,a]];
+}
+function canFitItemInBox(itemDims, boxDims){
+  return permutations3(itemDims).some(p=>p[0]<=boxDims[0] && p[1]<=boxDims[1] && p[2]<=boxDims[2]);
+}
+function getSelectedPhysicalItems(){
+  const items=[];
+  products.forEach((p,i)=>{
+    let qty=state[i]||0;
+    if(p.variants){
+      qty=0;
+      p.variants.forEach(v=>qty += state['v_'+i+'_'+v]||0);
+    }
+    if(qty>0 && p.dimensions){
+      for(let n=0;n<qty;n++){
+        items.push({name:p.name,dims:[...p.dimensions],weight:p.weight});
+      }
+    }
+  });
+  return items;
+}
+function packagingWeightForBox(box){
+  const volume=box[0]*box[1]*box[2];
+  if(volume<=2200) return 100;
+  if(volume<=6000) return 150;
+  if(volume<=15000) return 250;
+  if(volume<=30000) return 400;
+  if(volume<=60000) return 600;
+  return 900;
+}
+
+function paddedItemDims(item){
+  const longest=Math.max(...item.dims);
+  const pad=longest<=6 ? 0.8 : longest<=15 ? 1.2 : 1.8;
+  return item.dims.map(v=>v+pad);
+}
+
+function packItemsInBox(items, outerBox){
+  // Keep 1 cm safety space on every wall (2 cm total per side).
+  const inner=outerBox.map(v=>Math.max(0,v-2));
+  const sorted=items
+    .map(it=>({name:it.name,dims:paddedItemDims(it),weight:it.weight}))
+    .sort((a,b)=>(b.dims[0]*b.dims[1]*b.dims[2])-(a.dims[0]*a.dims[1]*a.dims[2]));
+
+  let spaces=[{x:0,y:0,z:0,w:inner[0],h:inner[2],d:inner[1]}];
+
+  for(const item of sorted){
+    let best=null;
+
+    spaces.forEach((space,si)=>{
+      permutations3(item.dims).forEach(o=>{
+        const [w,d,h]=o;
+        if(w<=space.w && d<=space.d && h<=space.h){
+          const waste=(space.w*space.d*space.h)-(w*d*h);
+          const score=waste + (space.w-w)*2 + (space.d-d)*2 + (space.h-h);
+          if(!best || score<best.score){
+            best={si,w,d,h,score};
+          }
+        }
+      });
+    });
+
+    if(!best) return false;
+
+    const s=spaces.splice(best.si,1)[0];
+    const {w,d,h}=best;
+
+    // Three non-overlapping free spaces after placement.
+    const right={x:s.x+w,y:s.y,z:s.z,w:s.w-w,h:s.h,d:s.d};
+    const front={x:s.x,y:s.y,z:s.z+d,w:w,h:s.h,d:s.d-d};
+    const top={x:s.x,y:s.y+h,z:s.z,w:w,h:s.h-h,d:d};
+
+    [right,front,top].forEach(sp=>{
+      if(sp.w>0.5 && sp.d>0.5 && sp.h>0.5) spaces.push(sp);
+    });
+
+    // Prefer tighter spaces first for the next item.
+    spaces.sort((a,b)=>(a.w*a.d*a.h)-(b.w*b.d*b.h));
+  }
+  return true;
+}
+
+function calculateRecommendedBox(){
+  const items=getSelectedPhysicalItems();
+  if(!items.length) return null;
+
+  const totalItemVolume=items.reduce((s,it)=>s+it.dims[0]*it.dims[1]*it.dims[2],0);
+  const totalWeight=items.reduce((s,it)=>s+it.weight,0);
+
+  // Conservative usable-space target. This intentionally leaves room
+  // for bubble wrap, thermocol, irregular shapes and handling.
+  const fillRatio = items.length<=2 ? 0.38 : items.length<=8 ? 0.44 : 0.50;
+  const requiredOuterVolume = totalItemVolume/fillRatio;
+
+  let selectedBox=null;
+  const sortedBoxes=[...STANDARD_BOXES].sort((a,b)=>(a[0]*a[1]*a[2])-(b[0]*b[1]*b[2]));
+
+  for(const box of sortedBoxes){
+    const volume=box[0]*box[1]*box[2];
+    if(volume<requiredOuterVolume) continue;
+
+    const orientations=permutations3(box);
+    const fits=orientations.some(oriented=>packItemsInBox(items,oriented));
+    if(fits){
+      selectedBox=[...box].sort((a,b)=>b-a);
+      break;
+    }
+  }
+
+  if(!selectedBox){
+    const maxItem=[0,0,0];
+    items.forEach(it=>{
+      const s=[...paddedItemDims(it)].sort((a,b)=>b-a);
+      maxItem[0]=Math.max(maxItem[0],s[0]);
+      maxItem[1]=Math.max(maxItem[1],s[1]);
+      maxItem[2]=Math.max(maxItem[2],s[2]);
+    });
+
+    const cube=Math.cbrt(requiredOuterVolume);
+    selectedBox=[
+      Math.ceil(Math.max(maxItem[0]+4,cube*1.25)/5)*5,
+      Math.ceil(Math.max(maxItem[1]+4,cube)/5)*5,
+      Math.ceil(Math.max(maxItem[2]+4,cube*0.9)/5)*5
+    ].sort((a,b)=>b-a);
+  }
+
+  const packWeight=packagingWeightForBox(selectedBox);
+  const packedWeight=totalWeight+packWeight;
+  const volumetricKg=(selectedBox[0]*selectedBox[1]*selectedBox[2])/5000;
+  const actualKg=packedWeight/1000;
+  const chargeableKg=Math.ceil(Math.max(actualKg,volumetricKg));
+
+  return {
+    items,totalItemVolume,totalWeight,selectedBox,
+    packWeight,packedWeight,volumetricKg,actualKg,chargeableKg
+  };
+}
+
+
+
+function findPlacementWithFallback(items, preferredBox){
+  const candidates=[];
+
+  function addBox(box){
+    const key=box.join("x");
+    if(!candidates.some(b=>b.join("x")===key)) candidates.push([...box]);
+  }
+
+  if(preferredBox) addBox(preferredBox);
+
+  [...STANDARD_BOXES]
+    .sort((a,b)=>(a[0]*a[1]*a[2])-(b[0]*b[1]*b[2]))
+    .forEach(box=>{
+      if(!preferredBox || (box[0]*box[1]*box[2]) >= (preferredBox[0]*preferredBox[1]*preferredBox[2])){
+        addBox(box);
+      }
+    });
+
+  for(const box of candidates){
+    for(const oriented of permutations3(box)){
+      const placement=getPackingPlacements(items,oriented);
+      if(placement){
+        return {
+          selectedBox:[...oriented],
+          placement
+        };
+      }
+    }
+  }
+
+  // Custom box fallback: enlarge gradually until the placement succeeds.
+  const totalVolume=items.reduce((sum,it)=>sum+it.dims[0]*it.dims[1]*it.dims[2],0);
+  const longest=Math.max(...items.flatMap(it=>it.dims));
+  let base=Math.ceil(Math.max(longest+8,Math.cbrt(totalVolume/0.42))/5)*5;
+
+  for(let step=0;step<20;step++){
+    const custom=[
+      base+step*5,
+      Math.ceil((base*0.9+step*4)/5)*5,
+      Math.ceil((base*0.75+step*3)/5)*5
+    ];
+
+    for(const oriented of permutations3(custom)){
+      const placement=getPackingPlacements(items,oriented);
+      if(placement){
+        return {
+          selectedBox:[...oriented],
+          placement
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+function getFinalPackingSolution(){
+  const base=calculateRecommendedBox();
+  if(!base) return null;
+
+  const solved=findPlacementWithFallback(base.items,base.selectedBox);
+  if(!solved) return {...base,placement:null};
+
+  const selectedBox=solved.selectedBox;
+  const packWeight=packagingWeightForBox(selectedBox);
+  const packedWeight=base.totalWeight+packWeight;
+  const volumetricKg=(selectedBox[0]*selectedBox[1]*selectedBox[2])/5000;
+  const actualKg=packedWeight/1000;
+  const chargeableKg=Math.ceil(Math.max(actualKg,volumetricKg));
+
+  return {
+    ...base,
+    selectedBox,
+    packWeight,
+    packedWeight,
+    volumetricKg,
+    actualKg,
+    chargeableKg,
+    placement:solved.placement
+  };
+}
+
+function drawArrow(ctx,x1,y1,x2,y2,label){
+  ctx.strokeStyle="#111";
+  ctx.fillStyle="#111";
+  ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const ang=Math.atan2(y2-y1,x2-x1);
+  const ah=16;
+  [[x1,y1,ang+Math.PI],[x2,y2,ang]].forEach(([x,y,a])=>{
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x-ah*Math.cos(a-Math.PI/6),y-ah*Math.sin(a-Math.PI/6));
+    ctx.lineTo(x-ah*Math.cos(a+Math.PI/6),y-ah*Math.sin(a+Math.PI/6));
+    ctx.closePath();ctx.fill();
+  });
+  ctx.font="900 30px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  const mx=(x1+x2)/2,my=(y1+y2)/2;
+  ctx.fillStyle="#fff";
+  ctx.fillRect(mx-85,my-22,170,44);
+  ctx.fillStyle="#111";
+  ctx.fillText(label,mx,my);
+}
+
+function generateBoxPlanner(){
+  const canvas=document.getElementById("boxPlannerCanvas");
+  const summary=document.getElementById("boxPlannerSummary");
+  if(!canvas||!summary) return;
+  const ctx=canvas.getContext("2d");
+  canvas.width=1600;canvas.height=900;
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,1600,900);
+  const data=getFinalPackingSolution();
+
+  if(!data){
+    summary.innerHTML="Select products to calculate the recommended box.";
+    ctx.fillStyle="#d80000";
+    roundedRect(ctx,190,60,1220,105,24,"#d80000");
+    ctx.fillStyle="#fff";ctx.font="900 54px Arial";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("SELECT PRODUCTS FOR BOX ESTIMATE",800,112);
+    ctx.fillStyle="#333";ctx.font="700 32px Arial";
+    ctx.fillText("A scaled box picture will appear here.",800,420);
+    return;
+  }
+
+  const [L,W,H]=data.selectedBox;
+  summary.innerHTML=
+    `<b>Recommended Box:</b> ${L} × ${W} × ${H} cm &nbsp; | &nbsp; `+
+    `<b>Product Weight:</b> ${data.totalWeight} g &nbsp; | &nbsp; `+
+    `<b>Estimated Packing:</b> ${data.packWeight} g &nbsp; | &nbsp; `+
+    `<b>Packed Weight:</b> ${data.packedWeight} g &nbsp; | &nbsp; `+
+    `<b>Volumetric:</b> ${data.volumetricKg.toFixed(2)} kg &nbsp; | &nbsp; `+
+    `<b>Chargeable:</b> ${data.chargeableKg} kg`;
+
+  roundedRect(ctx,220,25,1160,92,22,"#d80000");
+  ctx.fillStyle="#fff";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font="900 52px Arial";
+  ctx.fillText("SMART PACKING BOX RECOMMENDATION",800,71);
+
+  const bx=420, by=245, bw=650, bh=360, dx=170, dy=-105;
+  ctx.fillStyle="#d6a15e";ctx.strokeStyle="#7a4a16";ctx.lineWidth=5;
+  ctx.beginPath();
+  ctx.moveTo(bx,by);ctx.lineTo(bx+bw,by);ctx.lineTo(bx+bw,by+bh);ctx.lineTo(bx,by+bh);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle="#e6ba7b";
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+dx,by+dy);ctx.lineTo(bx+bw+dx,by+dy);ctx.lineTo(bx+bw,by);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle="#bd7d38";
+  ctx.beginPath();ctx.moveTo(bx+bw,by);ctx.lineTo(bx+bw+dx,by+dy);ctx.lineTo(bx+bw+dx,by+bh+dy);ctx.lineTo(bx+bw,by+bh);ctx.closePath();ctx.fill();ctx.stroke();
+
+  ctx.fillStyle="rgba(255,255,255,.9)";
+  roundedRect(ctx,530,360,430,120,18,"rgba(255,255,255,.9)","#7a4a16");
+  ctx.fillStyle="#111";ctx.font="900 42px Arial";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText(`${L} × ${W} × ${H} cm`,745,415);
+  ctx.font="700 24px Arial";ctx.fillText("Recommended Outer Box Size",745,458);
+
+  drawArrow(ctx,bx,by+bh+85,bx+bw,by+bh+85,`Length ${L} cm`);
+  drawArrow(ctx,bx-80,by,bx-80,by+bh,`Height ${H} cm`);
+  drawArrow(ctx,bx+bw+25,by-20,bx+bw+dx+25,by+dy-20,`Width ${W} cm`);
+
+  ctx.fillStyle="#111";ctx.textAlign="left";ctx.textBaseline="top";
+  ctx.font="900 30px Arial";ctx.fillText("Packing Details",90,700);
+  ctx.font="700 25px Arial";
+  ctx.fillText(`Products selected: ${data.items.length}`,90,748);
+  ctx.fillText(`Product weight: ${data.totalWeight} g`,90,786);
+  ctx.fillText(`Estimated packing material: ${data.packWeight} g`,90,824);
+
+  ctx.fillText(`Packed weight: ${data.packedWeight} g`,860,748);
+  ctx.fillText(`Volumetric weight: ${data.volumetricKg.toFixed(2)} kg`,860,786);
+  ctx.fillText(`Chargeable courier weight: ${data.chargeableKg} kg`,860,824);
+}
+
+function downloadBoxPlanner(){
+  const data=getFinalPackingSolution();
+  if(!data){alert("Please select products first");return;}
+  generateBoxPlanner();
+  const canvas=document.getElementById("boxPlannerCanvas");
+  const a=document.createElement("a");
+  a.download="Games_Planet_Recommended_Box.png";
+  a.href=canvas.toDataURL("image/png",1.0);
+  a.click();
+}
+
+
+function getPackingPlacements(items, outerBox){
+  const inner=outerBox.map(v=>Math.max(0,v-2));
+  const sorted=items
+    .map((it,index)=>({
+      id:index,
+      name:it.name,
+      dims:paddedItemDims(it),
+      originalDims:[...it.dims],
+      weight:it.weight
+    }))
+    .sort((a,b)=>(b.dims[0]*b.dims[1]*b.dims[2])-(a.dims[0]*a.dims[1]*a.dims[2]));
+
+  let spaces=[{x:0,y:0,z:0,w:inner[0],h:inner[2],d:inner[1]}];
+  const placements=[];
+
+  for(const item of sorted){
+    let best=null;
+
+    spaces.forEach((space,si)=>{
+      permutations3(item.dims).forEach(o=>{
+        const [w,d,h]=o;
+        if(w<=space.w && d<=space.d && h<=space.h){
+          const waste=(space.w*space.d*space.h)-(w*d*h);
+          const score=waste + (space.w-w)*2 + (space.d-d)*2 + (space.h-h);
+          if(!best || score<best.score){
+            best={si,w,d,h,score};
+          }
+        }
+      });
+    });
+
+    if(!best) return null;
+
+    const s=spaces.splice(best.si,1)[0];
+    const placement={
+      name:item.name,
+      originalDims:item.originalDims,
+      x:s.x,y:s.y,z:s.z,
+      w:best.w,d:best.d,h:best.h
+    };
+    placements.push(placement);
+
+    const right={x:s.x+best.w,y:s.y,z:s.z,w:s.w-best.w,h:s.h,d:s.d};
+    const front={x:s.x,y:s.y,z:s.z+best.d,w:best.w,h:s.h,d:s.d-best.d};
+    const top={x:s.x,y:s.y+best.h,z:s.z,w:best.w,h:s.h-best.h,d:best.d};
+
+    [right,front,top].forEach(sp=>{
+      if(sp.w>0.5 && sp.d>0.5 && sp.h>0.5) spaces.push(sp);
+    });
+
+    spaces.sort((a,b)=>(a.w*a.d*a.h)-(b.w*b.d*b.h));
+  }
+
+  return {placements,inner};
+}
+
+function shortProductName(name){
+  return name
+    .replace(" (With Switch)","")
+    .replace(" (Without Switch)","")
+    .replace(" Controller"," Ctrl")
+    .replace("Rechargeable","Recharge.")
+    .replace("Power Cable","Cable");
+}
+
+function drawPlacementRect(ctx,p,box,area,mode,index){
+  const palette=["#fde68a","#bfdbfe","#bbf7d0","#fecaca","#ddd6fe","#fed7aa","#a7f3d0","#fbcfe8","#bae6fd","#e9d5ff"];
+  const fill=palette[index%palette.length];
+
+  let x,y,w,h;
+  if(mode==="top"){
+    x=area.x+(p.x/box[0])*area.w;
+    y=area.y+(p.z/box[1])*area.h;
+    w=(p.w/box[0])*area.w;
+    h=(p.d/box[1])*area.h;
+  }else{
+    x=area.x+(p.x/box[0])*area.w;
+    y=area.y+area.h-((p.y+p.h)/box[2])*area.h;
+    w=(p.w/box[0])*area.w;
+    h=(p.h/box[2])*area.h;
+  }
+
+  ctx.fillStyle=fill;
+  ctx.strokeStyle="#111";
+  ctx.lineWidth=2;
+  ctx.fillRect(x,y,w,h);
+  ctx.strokeRect(x,y,w,h);
+
+  const label=shortProductName(p.name);
+  const minSide=Math.min(w,h);
+  ctx.fillStyle="#111";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.font=`700 ${Math.max(12,Math.min(24,minSide/3))}px Arial`;
+  const display=w>80 && h>35 ? label : String(index+1);
+  ctx.fillText(display,x+w/2,y+h/2);
+}
+
+function generatePackingGuide(){
+  const canvas=document.getElementById("packingGuideCanvas");
+  const summary=document.getElementById("packingGuideSummary");
+  if(!canvas||!summary) return;
+
+  const ctx=canvas.getContext("2d");
+  canvas.width=1600;
+  canvas.height=1000;
+  ctx.fillStyle="#fff";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const boxData=calculateRecommendedBox();
+  if(!boxData){
+    summary.innerHTML="Select products to generate the packing arrangement.";
+    roundedRect(ctx,180,55,1240,100,24,"#d80000");
+    ctx.fillStyle="#fff";
+    ctx.font="900 52px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText("SELECT PRODUCTS FOR PACKING GUIDE",800,105);
+    ctx.fillStyle="#333";
+    ctx.font="700 30px Arial";
+    ctx.fillText("Top and side placement views will appear here.",800,470);
+    return;
+  }
+
+  const result=getPackingPlacements(boxData.items,boxData.selectedBox);
+  const [L,W,H]=boxData.selectedBox;
+
+  if(!result){
+    summary.innerHTML=`Recommended Box: <b>${L} × ${W} × ${H} cm</b> — placement preview could not be generated.`;
+    return;
+  }
+
+  summary.innerHTML=
+    `<b>Box:</b> ${L} × ${W} × ${H} cm &nbsp; | &nbsp; `+
+    `<b>Items:</b> ${result.placements.length} &nbsp; | &nbsp; `+
+    `<b>Method:</b> Largest items first, smaller items in remaining spaces`;
+
+  roundedRect(ctx,210,20,1180,90,22,"#d80000");
+  ctx.fillStyle="#fff";
+  ctx.font="900 48px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText("BOX PACKING PLACEMENT GUIDE",800,65);
+
+  const topArea={x:90,y:190,w:650,h:420};
+  const sideArea={x:860,y:190,w:650,h:420};
+
+  ctx.fillStyle="#111";
+  ctx.font="900 30px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(`TOP VIEW — ${L} × ${W} cm`,topArea.x+topArea.w/2,155);
+  ctx.fillText(`SIDE VIEW — ${L} × ${H} cm`,sideArea.x+sideArea.w/2,155);
+
+  ctx.strokeStyle="#111";
+  ctx.lineWidth=5;
+  ctx.strokeRect(topArea.x,topArea.y,topArea.w,topArea.h);
+  ctx.strokeRect(sideArea.x,sideArea.y,sideArea.w,sideArea.h);
+
+  result.placements.forEach((p,i)=>{
+    drawPlacementRect(ctx,p,result.inner,topArea,"top",i);
+    drawPlacementRect(ctx,p,result.inner,sideArea,"side",i);
+  });
+
+  ctx.fillStyle="#111";
+  ctx.textAlign="left";
+  ctx.font="900 28px Arial";
+  ctx.fillText("Placement Order / Legend",90,670);
+
+  ctx.font="700 21px Arial";
+  const maxLegend=12;
+  result.placements.slice(0,maxLegend).forEach((p,i)=>{
+    const col=i<6?0:1;
+    const row=i%6;
+    const x=90+col*720;
+    const y=715+row*40;
+    ctx.fillText(`${i+1}. ${shortProductName(p.name)} — ${p.originalDims.join("×")} cm`,x,y);
+  });
+
+  if(result.placements.length>maxLegend){
+    ctx.font="700 20px Arial";
+    ctx.fillText(`+ ${result.placements.length-maxLegend} more item(s) placed in remaining spaces`,90,965);
+  }
+
+  ctx.font="700 22px Arial";
+  ctx.fillStyle="#7f1d1d";
+  ctx.fillText("Packing tip: Heavy items at the bottom, fragile items on top, fill empty gaps with bubble wrap/thermocol.",90,930);
+}
+
+function downloadPackingGuide(){
+  const data=calculateRecommendedBox();
+  if(!data){alert("Please select products first");return;}
+  generatePackingGuide();
+  const canvas=document.getElementById("packingGuideCanvas");
+  const a=document.createElement("a");
+  a.download="Games_Planet_Box_Packing_Guide.png";
+  a.href=canvas.toDataURL("image/png",1.0);
+  a.click();
+}
+
+
+function isoProject3D(x,y,z,originX,originY,sx,sy,sz){
+  return {
+    x: originX + (x-y)*sx,
+    y: originY + (x+y)*sy - z*sz
+  };
+}
+
+function drawPoly3D(ctx,pts,fill,stroke="#111",lineWidth=2){
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x,pts[0].y);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.stroke();}
+}
+
+function drawIsoCuboid(ctx,p,originX,originY,sx,sy,sz,index,label){
+  const colors=[
+    ["#fde68a","#fcd34d","#f59e0b"],
+    ["#bfdbfe","#93c5fd","#60a5fa"],
+    ["#bbf7d0","#86efac","#4ade80"],
+    ["#fecaca","#fca5a5","#f87171"],
+    ["#ddd6fe","#c4b5fd","#a78bfa"],
+    ["#fed7aa","#fdba74","#fb923c"],
+    ["#a7f3d0","#6ee7b7","#34d399"],
+    ["#fbcfe8","#f9a8d4","#f472b6"],
+    ["#bae6fd","#7dd3fc","#38bdf8"],
+    ["#e9d5ff","#d8b4fe","#c084fc"]
+  ][index%10];
+
+  const x=p.x+1,y=p.z+1,z=p.y+1;
+  const w=Math.max(.6,p.w-1.1),d=Math.max(.6,p.d-1.1),h=Math.max(.6,p.h-1.1);
+
+  const A=isoProject3D(x,y,z,originX,originY,sx,sy,sz);
+  const B=isoProject3D(x+w,y,z,originX,originY,sx,sy,sz);
+  const C=isoProject3D(x+w,y+d,z,originX,originY,sx,sy,sz);
+  const D=isoProject3D(x,y+d,z,originX,originY,sx,sy,sz);
+  const At=isoProject3D(x,y,z+h,originX,originY,sx,sy,sz);
+  const Bt=isoProject3D(x+w,y,z+h,originX,originY,sx,sy,sz);
+  const Ct=isoProject3D(x+w,y+d,z+h,originX,originY,sx,sy,sz);
+  const Dt=isoProject3D(x,y+d,z+h,originX,originY,sx,sy,sz);
+
+  drawPoly3D(ctx,[A,B,Bt,At],colors[1],"#1f2937",2);
+  drawPoly3D(ctx,[B,C,Ct,Bt],colors[2],"#1f2937",2);
+  drawPoly3D(ctx,[At,Bt,Ct,Dt],colors[0],"#1f2937",2);
+
+  const center={
+    x:(At.x+Bt.x+Ct.x+Dt.x)/4,
+    y:(At.y+Bt.y+Ct.y+Dt.y)/4
+  };
+  const short=shortProductName(label);
+  ctx.fillStyle="#111827";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  const fs=Math.max(13,Math.min(25,Math.min(w*sx,d*sx)/4));
+  ctx.font=`900 ${fs}px Arial`;
+  const text = (w*sx>100 && d*sx>70) ? short : String(index+1);
+  ctx.fillText(text,center.x,center.y);
+}
+
+function drawCushionDots(ctx,poly){
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(poly[0].x,poly[0].y);
+  for(let i=1;i<poly.length;i++) ctx.lineTo(poly[i].x,poly[i].y);
+  ctx.closePath();
+  ctx.clip();
+
+  ctx.fillStyle="#fef3c7";
+  ctx.fillRect(0,0,1600,1100);
+  ctx.fillStyle="rgba(245,158,11,.25)";
+  for(let y=0;y<1100;y+=24){
+    for(let x=0;x<1600;x+=24){
+      ctx.beginPath();
+      ctx.arc(x+(y/24%2)*12,y,3,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function generatePackingGuide(){
+  const canvas=document.getElementById("packingGuideCanvas");
+  const summary=document.getElementById("packingGuideSummary");
+  if(!canvas||!summary) return;
+
+  const ctx=canvas.getContext("2d");
+  canvas.width=1600;
+  canvas.height=1050;
+  ctx.fillStyle="#f8fafc";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const boxData=getFinalPackingSolution();
+  if(!boxData){
+    summary.innerHTML="Select products to generate the packing arrangement.";
+    roundedRect(ctx,180,50,1240,100,24,"#d80000");
+    ctx.fillStyle="#fff";
+    ctx.font="900 52px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText("SELECT PRODUCTS FOR 3D PACKING GUIDE",800,100);
+    ctx.fillStyle="#334155";
+    ctx.font="700 30px Arial";
+    ctx.fillText("The open carton and product placement will appear here.",800,480);
+    return;
+  }
+
+  const result=boxData.placement;
+  const [L,W,H]=boxData.selectedBox;
+
+  if(!result){
+    summary.innerHTML=`A safe custom box could not be calculated for the current selection. Please reduce quantity or split the order into two boxes.`;
+    ctx.fillStyle="#7f1d1d";
+    ctx.font="900 38px Arial";
+    ctx.textAlign="center";
+    ctx.fillText("PACKING GUIDE UNAVAILABLE",800,480);
+    return;
+  }
+
+  summary.innerHTML=
+    `<b>Box:</b> ${L} × ${W} × ${H} cm &nbsp; | &nbsp; `+
+    `<b>Items:</b> ${result.placements.length} &nbsp; | &nbsp; `+
+    `<b>Method:</b> Heavy/big items at bottom, small items in gaps`;
+
+  roundedRect(ctx,210,18,1180,88,22,"#d80000");
+  ctx.fillStyle="#fff";
+  ctx.font="900 48px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText("OPEN CARTON — 3D PACKING PLACEMENT",800,62);
+
+  const maxDim=Math.max(L,W,H);
+  const sx=520/(L+W);
+  const sy=sx*0.48;
+  const sz=Math.min(12,400/H);
+  const originX=800;
+  const originY=600;
+
+  const floor=[
+    isoProject3D(0,0,0,originX,originY,sx,sy,sz),
+    isoProject3D(L,0,0,originX,originY,sx,sy,sz),
+    isoProject3D(L,W,0,originX,originY,sx,sy,sz),
+    isoProject3D(0,W,0,originX,originY,sx,sy,sz)
+  ];
+  drawCushionDots(ctx,floor);
+
+  // Back and side walls.
+  const wallBack=[
+    isoProject3D(0,W,0,originX,originY,sx,sy,sz),
+    isoProject3D(L,W,0,originX,originY,sx,sy,sz),
+    isoProject3D(L,W,H,originX,originY,sx,sy,sz),
+    isoProject3D(0,W,H,originX,originY,sx,sy,sz)
+  ];
+  const wallLeft=[
+    isoProject3D(0,0,0,originX,originY,sx,sy,sz),
+    isoProject3D(0,W,0,originX,originY,sx,sy,sz),
+    isoProject3D(0,W,H,originX,originY,sx,sy,sz),
+    isoProject3D(0,0,H,originX,originY,sx,sy,sz)
+  ];
+  drawPoly3D(ctx,wallBack,"rgba(214,161,94,.50)","#7a4a16",4);
+  drawPoly3D(ctx,wallLeft,"rgba(189,125,56,.45)","#7a4a16",4);
+
+  // Open flaps.
+  const topBack0=isoProject3D(0,W,H,originX,originY,sx,sy,sz);
+  const topBack1=isoProject3D(L,W,H,originX,originY,sx,sy,sz);
+  const flapDepth=Math.min(W*.45,8);
+  const f0=isoProject3D(0,W+flapDepth,H,originX,originY,sx,sy,sz);
+  const f1=isoProject3D(L,W+flapDepth,H,originX,originY,sx,sy,sz);
+  drawPoly3D(ctx,[topBack0,topBack1,f1,f0],"rgba(230,186,123,.72)","#7a4a16",4);
+
+  const leftTop0=isoProject3D(0,0,H,originX,originY,sx,sy,sz);
+  const leftTop1=isoProject3D(0,W,H,originX,originY,sx,sy,sz);
+  const lf0=isoProject3D(-flapDepth,0,H,originX,originY,sx,sy,sz);
+  const lf1=isoProject3D(-flapDepth,W,H,originX,originY,sx,sy,sz);
+  drawPoly3D(ctx,[leftTop0,leftTop1,lf1,lf0],"rgba(214,161,94,.72)","#7a4a16",4);
+
+  // Draw products from back/bottom to front/top.
+  const ordered=[...result.placements].sort((a,b)=>(a.y+a.z)-(b.y+b.z));
+  ordered.forEach((p,i)=>drawIsoCuboid(ctx,p,originX,originY,sx,sy,sz,i,p.name));
+
+  // Front edges to make carton clearer.
+  const frontBottomL=isoProject3D(0,0,0,originX,originY,sx,sy,sz);
+  const frontBottomR=isoProject3D(L,0,0,originX,originY,sx,sy,sz);
+  const frontTopL=isoProject3D(0,0,H,originX,originY,sx,sy,sz);
+  const frontTopR=isoProject3D(L,0,H,originX,originY,sx,sy,sz);
+  ctx.strokeStyle="#7a4a16";
+  ctx.lineWidth=6;
+  [[frontBottomL,frontBottomR],[frontBottomL,frontTopL],[frontBottomR,frontTopR]].forEach(seg=>{
+    ctx.beginPath();ctx.moveTo(seg[0].x,seg[0].y);ctx.lineTo(seg[1].x,seg[1].y);ctx.stroke();
+  });
+
+  // Dimension arrows.
+  drawArrow(ctx,220,860,1380,860,`Length ${L} cm`);
+  drawArrow(ctx,145,760,145,300,`Height ${H} cm`);
+  drawArrow(ctx,1180,255,1380,160,`Width ${W} cm`);
+
+  // Legend.
+  roundedRect(ctx,85,900,1430,120,18,"#ffffff","#cbd5e1");
+  ctx.fillStyle="#111827";
+  ctx.font="900 25px Arial";
+  ctx.textAlign="left";
+  ctx.fillText("Packing Order",115,930);
+
+  const legend=ordered.slice(0,10);
+  ctx.font="700 19px Arial";
+  legend.forEach((p,i)=>{
+    const col=i<5?0:1;
+    const row=i%5;
+    const x=115+col*710;
+    const y=962+row*22;
+    ctx.fillText(`${i+1}. ${shortProductName(p.name)} — ${p.originalDims.join("×")} cm`,x,y);
+  });
+
+  ctx.fillStyle="#7f1d1d";
+  ctx.font="700 20px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("Keep bubble wrap around every item. Heavy items at bottom, fragile items at top.",800,1032);
+}
+
+function downloadPackingGuide(){
+  const data=getFinalPackingSolution();
+  if(!data){alert("Please select products first");return;}
+  generatePackingGuide();
+  const canvas=document.getElementById("packingGuideCanvas");
+  const a=document.createElement("a");
+  a.download="Games_Planet_3D_Box_Packing_Guide.png";
+  a.href=canvas.toDataURL("image/png",1.0);
+  a.click();
+}
+
+
+const packing3DView={
+  yaw:-0.65,
+  pitch:0.55,
+  zoom:1,
+  panX:0,
+  panY:0,
+  dragging:false,
+  lastX:0,
+  lastY:0,
+  activePointers:new Map(),
+  pinchDistance:0
+};
+
+function resetPacking3DView(){
+  packing3DView.yaw=-0.65;
+  packing3DView.pitch=0.55;
+  packing3DView.zoom=1;
+  packing3DView.panX=0;
+  packing3DView.panY=0;
+  generatePackingGuide();
+}
+
+function projectInteractive3D(x,y,z,centerX,centerY,scale){
+  const cy=Math.cos(packing3DView.yaw);
+  const sy=Math.sin(packing3DView.yaw);
+  const cp=Math.cos(packing3DView.pitch);
+  const sp=Math.sin(packing3DView.pitch);
+
+  const rx=x*cy-y*sy;
+  const ry=x*sy+y*cy;
+
+  const py=ry*cp-z*sp;
+  const pz=ry*sp+z*cp;
+
+  return {
+    x:centerX + rx*scale*packing3DView.zoom + packing3DView.panX,
+    y:centerY + py*scale*packing3DView.zoom + packing3DView.panY,
+    depth:pz
+  };
+}
+
+function drawFaceInteractive(ctx,points,fill,stroke="#111827",lineWidth=2){
+  ctx.beginPath();
+  ctx.moveTo(points[0].x,points[0].y);
+  for(let i=1;i<points.length;i++) ctx.lineTo(points[i].x,points[i].y);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.stroke();}
+}
+
+function cuboidFaces(p,centerX,centerY,scale){
+  const x=p.x+1,y=p.z+1,z=p.y+1;
+  const w=Math.max(.6,p.w-1.1),d=Math.max(.6,p.d-1.1),h=Math.max(.6,p.h-1.1);
+
+  const V=[
+    projectInteractive3D(x,y,z,centerX,centerY,scale),
+    projectInteractive3D(x+w,y,z,centerX,centerY,scale),
+    projectInteractive3D(x+w,y+d,z,centerX,centerY,scale),
+    projectInteractive3D(x,y+d,z,centerX,centerY,scale),
+    projectInteractive3D(x,y,z+h,centerX,centerY,scale),
+    projectInteractive3D(x+w,y,z+h,centerX,centerY,scale),
+    projectInteractive3D(x+w,y+d,z+h,centerX,centerY,scale),
+    projectInteractive3D(x,y+d,z+h,centerX,centerY,scale)
+  ];
+
+  return {
+    vertices:V,
+    faces:[
+      {idx:[0,1,5,4],shade:1},
+      {idx:[1,2,6,5],shade:2},
+      {idx:[2,3,7,6],shade:2},
+      {idx:[3,0,4,7],shade:1},
+      {idx:[4,5,6,7],shade:0}
+    ]
+  };
+}
+
+function generatePackingGuide(){
+  const canvas=document.getElementById("packingGuideCanvas");
+  const summary=document.getElementById("packingGuideSummary");
+  if(!canvas||!summary) return;
+
+  const ctx=canvas.getContext("2d");
+  canvas.width=1600;
+  canvas.height=1050;
+  ctx.fillStyle="#f8fafc";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const boxData=getFinalPackingSolution();
+  if(!boxData){
+    summary.innerHTML="Select products to generate the packing arrangement.";
+    roundedRect(ctx,180,50,1240,100,24,"#d80000");
+    ctx.fillStyle="#fff";
+    ctx.font="900 52px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText("SELECT PRODUCTS FOR INTERACTIVE 3D GUIDE",800,100);
+    ctx.fillStyle="#334155";
+    ctx.font="700 30px Arial";
+    ctx.fillText("Drag, rotate and zoom will work after products are selected.",800,480);
+    return;
+  }
+
+  const result=boxData.placement;
+  const [L,W,H]=boxData.selectedBox;
+  if(!result){
+    summary.innerHTML="Packing placement could not be generated for this selection.";
+    return;
+  }
+
+  summary.innerHTML=
+    `<b>Box:</b> ${L} × ${W} × ${H} cm &nbsp; | &nbsp; `+
+    `<b>Items:</b> ${result.placements.length} &nbsp; | &nbsp; `+
+    `<b>Interactive:</b> Drag to rotate, wheel/pinch to zoom`;
+
+  roundedRect(ctx,210,18,1180,88,22,"#d80000");
+  ctx.fillStyle="#fff";
+  ctx.font="900 45px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText("INTERACTIVE 3D OPEN CARTON PACKING GUIDE",800,62);
+
+  const centerX=800,centerY=570;
+  const scale=470/Math.max(L,W,H);
+
+  // Draw carton floor and walls.
+  const corners=[
+    [0,0,0],[L,0,0],[L,W,0],[0,W,0],
+    [0,0,H],[L,0,H],[L,W,H],[0,W,H]
+  ].map(v=>projectInteractive3D(v[0],v[1],v[2],centerX,centerY,scale));
+
+  const cartonFaces=[
+    {idx:[0,1,2,3],fill:"#fef3c7"},
+    {idx:[3,2,6,7],fill:"rgba(214,161,94,.50)"},
+    {idx:[0,3,7,4],fill:"rgba(189,125,56,.45)"}
+  ];
+
+  cartonFaces
+    .map(f=>({...f,depth:f.idx.reduce((s,i)=>s+corners[i].depth,0)/f.idx.length}))
+    .sort((a,b)=>a.depth-b.depth)
+    .forEach(f=>drawFaceInteractive(ctx,f.idx.map(i=>corners[i]),f.fill,"#7a4a16",4));
+
+  // Draw products sorted by depth.
+  const palette=[
+    ["#fde68a","#fcd34d","#f59e0b"],
+    ["#bfdbfe","#93c5fd","#60a5fa"],
+    ["#bbf7d0","#86efac","#4ade80"],
+    ["#fecaca","#fca5a5","#f87171"],
+    ["#ddd6fe","#c4b5fd","#a78bfa"],
+    ["#fed7aa","#fdba74","#fb923c"],
+    ["#a7f3d0","#6ee7b7","#34d399"],
+    ["#fbcfe8","#f9a8d4","#f472b6"],
+    ["#bae6fd","#7dd3fc","#38bdf8"],
+    ["#e9d5ff","#d8b4fe","#c084fc"]
+  ];
+
+  const objects=result.placements.map((p,index)=>{
+    const cf=cuboidFaces(p,centerX,centerY,scale);
+    const avg=cf.vertices.reduce((s,v)=>s+v.depth,0)/cf.vertices.length;
+    return {p,index,cf,avg};
+  }).sort((a,b)=>a.avg-b.avg);
+
+  objects.forEach(obj=>{
+    const colors=palette[obj.index%palette.length];
+    obj.cf.faces
+      .map(f=>({...f,depth:f.idx.reduce((s,i)=>s+obj.cf.vertices[i].depth,0)/f.idx.length}))
+      .sort((a,b)=>a.depth-b.depth)
+      .forEach(f=>drawFaceInteractive(ctx,f.idx.map(i=>obj.cf.vertices[i]),colors[f.shade],"#1f2937",2));
+
+    const top=obj.cf.faces.find(f=>f.shade===0);
+    const pts=top.idx.map(i=>obj.cf.vertices[i]);
+    const cx=pts.reduce((s,v)=>s+v.x,0)/pts.length;
+    const cy=pts.reduce((s,v)=>s+v.y,0)/pts.length;
+    ctx.fillStyle="#111827";
+    ctx.font="900 20px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(String(obj.index+1),cx,cy);
+  });
+
+  // Carton front edges.
+  ctx.strokeStyle="#7a4a16";
+  ctx.lineWidth=6;
+  [[0,1],[0,4],[1,5],[4,5],[5,6],[4,7]].forEach(([a,b])=>{
+    ctx.beginPath();ctx.moveTo(corners[a].x,corners[a].y);ctx.lineTo(corners[b].x,corners[b].y);ctx.stroke();
+  });
+
+  // Status and legend.
+  roundedRect(ctx,75,885,1450,125,18,"#ffffff","#cbd5e1");
+  ctx.fillStyle="#111827";
+  ctx.font="900 25px Arial";
+  ctx.textAlign="left";
+  ctx.fillText(`Box ${L} × ${W} × ${H} cm`,105,918);
+  ctx.font="700 18px Arial";
+  const legend=objects.slice(0,12);
+  legend.forEach((obj,i)=>{
+    const col=i<6?0:1;
+    const row=i%6;
+    const x=105+col*720;
+    const y=950+row*18;
+    ctx.fillText(`${obj.index+1}. ${shortProductName(obj.p.name)} — ${obj.p.originalDims.join("×")} cm`,x,y);
+  });
+
+  ctx.fillStyle="#7f1d1d";
+  ctx.font="700 19px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("Drag to rotate • Mouse wheel / pinch to zoom • Heavy items at bottom • Bubble wrap in empty gaps",800,1032);
+}
+
+function setupPacking3DInteraction(){
+  const canvas=document.getElementById("packingGuideCanvas");
+  if(!canvas || canvas.dataset.interactiveReady==="1") return;
+  canvas.dataset.interactiveReady="1";
+
+  canvas.addEventListener("pointerdown",function(e){
+    canvas.setPointerCapture(e.pointerId);
+    packing3DView.activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    packing3DView.dragging=true;
+    packing3DView.lastX=e.clientX;
+    packing3DView.lastY=e.clientY;
+    canvas.classList.add("is-dragging");
+
+    if(packing3DView.activePointers.size===2){
+      const pts=[...packing3DView.activePointers.values()];
+      packing3DView.pinchDistance=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+    }
+  });
+
+  canvas.addEventListener("pointermove",function(e){
+    if(!packing3DView.activePointers.has(e.pointerId)) return;
+    packing3DView.activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+
+    if(packing3DView.activePointers.size===1){
+      const dx=e.clientX-packing3DView.lastX;
+      const dy=e.clientY-packing3DView.lastY;
+      packing3DView.yaw+=dx*0.008;
+      packing3DView.pitch=Math.max(-1.15,Math.min(1.15,packing3DView.pitch+dy*0.008));
+      packing3DView.lastX=e.clientX;
+      packing3DView.lastY=e.clientY;
+      generatePackingGuide();
+    }else if(packing3DView.activePointers.size===2){
+      const pts=[...packing3DView.activePointers.values()];
+      const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      if(packing3DView.pinchDistance){
+        packing3DView.zoom*=dist/packing3DView.pinchDistance;
+        packing3DView.zoom=Math.max(.45,Math.min(2.8,packing3DView.zoom));
+      }
+      packing3DView.pinchDistance=dist;
+      generatePackingGuide();
+    }
+  });
+
+  function endPointer(e){
+    packing3DView.activePointers.delete(e.pointerId);
+    if(packing3DView.activePointers.size===0){
+      packing3DView.dragging=false;
+      canvas.classList.remove("is-dragging");
+    }else if(packing3DView.activePointers.size===1){
+      const p=[...packing3DView.activePointers.values()][0];
+      packing3DView.lastX=p.x;
+      packing3DView.lastY=p.y;
+    }
+    packing3DView.pinchDistance=0;
+  }
+
+  canvas.addEventListener("pointerup",endPointer);
+  canvas.addEventListener("pointercancel",endPointer);
+
+  canvas.addEventListener("wheel",function(e){
+    e.preventDefault();
+    const factor=e.deltaY<0?1.1:0.9;
+    packing3DView.zoom=Math.max(.45,Math.min(2.8,packing3DView.zoom*factor));
+    generatePackingGuide();
+  },{passive:false});
+}
+
+
+/* Original product image textures inside interactive 3D box */
+const packingTextureCache=new Map();
+
+function getPackingTexture(src){
+  if(!src) return Promise.resolve(null);
+  if(packingTextureCache.has(src)) return packingTextureCache.get(src);
+
+  const promise=new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>resolve(null);
+    img.src=src;
+  });
+  packingTextureCache.set(src,promise);
+  return promise;
+}
+
+function drawImageTriangle(ctx,img,p0,p1,p2,t0,t1,t2){
+  const x0=t0.x,y0=t0.y,x1=t1.x,y1=t1.y,x2=t2.x,y2=t2.y;
+  const X0=p0.x,Y0=p0.y,X1=p1.x,Y1=p1.y,X2=p2.x,Y2=p2.y;
+
+  const det=(x0*(y1-y2)+x1*(y2-y0)+x2*(y0-y1));
+  if(Math.abs(det)<0.0001) return;
+
+  const a=(X0*(y1-y2)+X1*(y2-y0)+X2*(y0-y1))/det;
+  const c=(X0*(x2-x1)+X1*(x0-x2)+X2*(x1-x0))/det;
+  const e=(X0*(x1*y2-x2*y1)+X1*(x2*y0-x0*y2)+X2*(x0*y1-x1*y0))/det;
+
+  const b=(Y0*(y1-y2)+Y1*(y2-y0)+Y2*(y0-y1))/det;
+  const d=(Y0*(x2-x1)+Y1*(x0-x2)+Y2*(x1-x0))/det;
+  const f=(Y0*(x1*y2-x2*y1)+Y1*(x2*y0-x0*y2)+Y2*(x0*y1-x1*y0))/det;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y1);ctx.lineTo(X2,Y2);ctx.closePath();
+  ctx.clip();
+  ctx.setTransform(a,b,c,d,e,f);
+  ctx.drawImage(img,0,0);
+  ctx.restore();
+}
+
+function drawImageOnQuad(ctx,img,q0,q1,q2,q3){
+  if(!img) return;
+  const iw=img.width, ih=img.height;
+  drawImageTriangle(
+    ctx,img,
+    q0,q1,q2,
+    {x:0,y:0},{x:iw,y:0},{x:iw,y:ih}
+  );
+  drawImageTriangle(
+    ctx,img,
+    q0,q2,q3,
+    {x:0,y:0},{x:iw,y:ih},{x:0,y:ih}
+  );
+}
+
+function drawDimension3D(ctx,a,b,label,offsetX=0,offsetY=0){
+  const x1=a.x+offsetX,y1=a.y+offsetY,x2=b.x+offsetX,y2=b.y+offsetY;
+  ctx.strokeStyle="#0f172a";
+  ctx.fillStyle="#0f172a";
+  ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+
+  const ang=Math.atan2(y2-y1,x2-x1), ah=15;
+  [[x1,y1,ang+Math.PI],[x2,y2,ang]].forEach(([x,y,a2])=>{
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x-ah*Math.cos(a2-Math.PI/6),y-ah*Math.sin(a2-Math.PI/6));
+    ctx.lineTo(x-ah*Math.cos(a2+Math.PI/6),y-ah*Math.sin(a2+Math.PI/6));
+    ctx.closePath();ctx.fill();
+  });
+
+  const mx=(x1+x2)/2,my=(y1+y2)/2;
+  ctx.font="900 25px Arial";
+  const tw=ctx.measureText(label).width+26;
+  roundedRect(ctx,mx-tw/2,my-19,tw,38,10,"rgba(255,255,255,.94)","#0f172a");
+  ctx.fillStyle="#0f172a";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText(label,mx,my);
+}
+
+/* Override selected physical items so each 3D item carries its original image */
+function getSelectedPhysicalItems(){
+  const items=[];
+  products.forEach((p,i)=>{
+    if(p.variants){
+      p.variants.forEach(v=>{
+        const qty=state['v_'+i+'_'+v]||0;
+        const image=(p.variantImages&&p.variantImages[v]) || (p.images&&p.images[0]) || "";
+        for(let n=0;n<qty;n++){
+          items.push({
+            name:`${p.name} - ${v}`,
+            dims:[...p.dimensions],
+            weight:p.weight,
+            image
+          });
+        }
+      });
+    }else{
+      const qty=state[i]||0;
+      const image=(p.images&&p.images[0])||"";
+      for(let n=0;n<qty;n++){
+        items.push({
+          name:p.name,
+          dims:[...p.dimensions],
+          weight:p.weight,
+          image
+        });
+      }
+    }
+  });
+  return items;
+}
+
+/* Override placement creator so image information stays attached */
+function getPackingPlacements(items,outerBox){
+  const inner=outerBox.map(v=>Math.max(0,v-2));
+  const sorted=items
+    .map((it,index)=>({
+      id:index,
+      name:it.name,
+      image:it.image||"",
+      dims:paddedItemDims(it),
+      originalDims:[...it.dims],
+      weight:it.weight
+    }))
+    .sort((a,b)=>(b.dims[0]*b.dims[1]*b.dims[2])-(a.dims[0]*a.dims[1]*a.dims[2]));
+
+  let spaces=[{x:0,y:0,z:0,w:inner[0],h:inner[2],d:inner[1]}];
+  const placements=[];
+
+  for(const item of sorted){
+    let best=null;
+
+    spaces.forEach((space,si)=>{
+      permutations3(item.dims).forEach(o=>{
+        const [w,d,h]=o;
+        if(w<=space.w && d<=space.d && h<=space.h){
+          const waste=(space.w*space.d*space.h)-(w*d*h);
+          const score=waste+(space.w-w)*2+(space.d-d)*2+(space.h-h);
+          if(!best||score<best.score) best={si,w,d,h,score};
+        }
+      });
+    });
+
+    if(!best) return null;
+
+    const s=spaces.splice(best.si,1)[0];
+    placements.push({
+      name:item.name,
+      image:item.image,
+      originalDims:item.originalDims,
+      x:s.x,y:s.y,z:s.z,
+      w:best.w,d:best.d,h:best.h
+    });
+
+    const right={x:s.x+best.w,y:s.y,z:s.z,w:s.w-best.w,h:s.h,d:s.d};
+    const front={x:s.x,y:s.y,z:s.z+best.d,w:best.w,h:s.h,d:s.d-best.d};
+    const top={x:s.x,y:s.y+best.h,z:s.z,w:best.w,h:s.h-best.h,d:best.d};
+
+    [right,front,top].forEach(sp=>{
+      if(sp.w>0.5&&sp.d>0.5&&sp.h>0.5) spaces.push(sp);
+    });
+    spaces.sort((a,b)=>(a.w*a.d*a.h)-(b.w*b.d*b.h));
+  }
+
+  return {placements,inner};
+}
+
+async function generatePackingGuide(){
+  const canvas=document.getElementById("packingGuideCanvas");
+  const summary=document.getElementById("packingGuideSummary");
+  if(!canvas||!summary) return;
+
+  const ctx=canvas.getContext("2d");
+  canvas.width=1600;
+  canvas.height=1080;
+  ctx.fillStyle="#f8fafc";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const boxData=getFinalPackingSolution();
+  if(!boxData){
+    summary.innerHTML="Select products to generate the packing arrangement.";
+    roundedRect(ctx,170,45,1260,100,24,"#d80000");
+    ctx.fillStyle="#fff";
+    ctx.font="900 50px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText("SELECT PRODUCTS FOR INTERACTIVE 3D GUIDE",800,95);
+    ctx.fillStyle="#334155";
+    ctx.font="700 30px Arial";
+    ctx.fillText("Original product images will appear inside the carton.",800,500);
+    return;
+  }
+
+  const result=boxData.placement;
+  const [L,W,H]=boxData.selectedBox;
+  if(!result){
+    summary.innerHTML="Packing placement could not be generated for this selection.";
+    return;
+  }
+
+  summary.innerHTML=
+    `<b>Box Size:</b> ${L} × ${W} × ${H} cm &nbsp; | &nbsp; `+
+    `<b>Items:</b> ${result.placements.length} &nbsp; | &nbsp; `+
+    `<b>Control:</b> Drag 360° • Wheel/Pinch Zoom`;
+
+  roundedRect(ctx,185,18,1230,88,22,"#d80000");
+  ctx.fillStyle="#fff";
+  ctx.font="900 43px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText("INTERACTIVE 3D CARTON — ORIGINAL PRODUCT IMAGES",800,62);
+
+  const centerX=800,centerY=590;
+  const scale=455/Math.max(L,W,H);
+
+  const corners=[
+    [0,0,0],[L,0,0],[L,W,0],[0,W,0],
+    [0,0,H],[L,0,H],[L,W,H],[0,W,H]
+  ].map(v=>projectInteractive3D(v[0],v[1],v[2],centerX,centerY,scale));
+
+  const cartonFaces=[
+    {idx:[0,1,2,3],fill:"#fef3c7"},
+    {idx:[3,2,6,7],fill:"rgba(214,161,94,.48)"},
+    {idx:[0,3,7,4],fill:"rgba(189,125,56,.44)"}
+  ];
+
+  cartonFaces
+    .map(f=>({...f,depth:f.idx.reduce((s,i)=>s+corners[i].depth,0)/f.idx.length}))
+    .sort((a,b)=>a.depth-b.depth)
+    .forEach(f=>drawFaceInteractive(ctx,f.idx.map(i=>corners[i]),f.fill,"#7a4a16",4));
+
+  const palette=[
+    ["#fde68a","#fcd34d","#f59e0b"],["#bfdbfe","#93c5fd","#60a5fa"],
+    ["#bbf7d0","#86efac","#4ade80"],["#fecaca","#fca5a5","#f87171"],
+    ["#ddd6fe","#c4b5fd","#a78bfa"],["#fed7aa","#fdba74","#fb923c"],
+    ["#a7f3d0","#6ee7b7","#34d399"],["#fbcfe8","#f9a8d4","#f472b6"],
+    ["#bae6fd","#7dd3fc","#38bdf8"],["#e9d5ff","#d8b4fe","#c084fc"]
+  ];
+
+  const textureList=await Promise.all(result.placements.map(p=>getPackingTexture(p.image)));
+
+  const objects=result.placements.map((p,index)=>{
+    const cf=cuboidFaces(p,centerX,centerY,scale);
+    const avg=cf.vertices.reduce((s,v)=>s+v.depth,0)/cf.vertices.length;
+    return {p,index,cf,avg,img:textureList[index]};
+  }).sort((a,b)=>a.avg-b.avg);
+
+  objects.forEach(obj=>{
+    const colors=palette[obj.index%palette.length];
+    obj.cf.faces
+      .map(f=>({...f,depth:f.idx.reduce((s,i)=>s+obj.cf.vertices[i].depth,0)/f.idx.length}))
+      .sort((a,b)=>a.depth-b.depth)
+      .forEach(f=>drawFaceInteractive(ctx,f.idx.map(i=>obj.cf.vertices[i]),colors[f.shade],"#1f2937",2));
+
+    const top=obj.cf.faces.find(f=>f.shade===0);
+    const pts=top.idx.map(i=>obj.cf.vertices[i]);
+
+    if(obj.img){
+      ctx.save();
+      ctx.globalAlpha=.96;
+      drawImageOnQuad(ctx,obj.img,pts[0],pts[1],pts[2],pts[3]);
+      ctx.restore();
+      drawFaceInteractive(ctx,pts,null,"#111827",2);
+    }
+
+    const cx=pts.reduce((s,v)=>s+v.x,0)/pts.length;
+    const cy=pts.reduce((s,v)=>s+v.y,0)/pts.length;
+    ctx.font="900 19px Arial";
+    const badge=String(obj.index+1);
+    roundedRect(ctx,cx-17,cy-17,34,34,17,"rgba(255,255,255,.92)","#111827");
+    ctx.fillStyle="#111827";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(badge,cx,cy);
+  });
+
+  ctx.strokeStyle="#7a4a16";
+  ctx.lineWidth=6;
+  [[0,1],[0,4],[1,5],[4,5],[5,6],[4,7]].forEach(([a,b])=>{
+    ctx.beginPath();ctx.moveTo(corners[a].x,corners[a].y);ctx.lineTo(corners[b].x,corners[b].y);ctx.stroke();
+  });
+
+  /* 3D dimension arrows that rotate together with the carton */
+  drawDimension3D(ctx,corners[0],corners[1],`Length ${L} cm`,0,55);
+  drawDimension3D(ctx,corners[0],corners[3],`Width ${W} cm`,-45,5);
+  drawDimension3D(ctx,corners[0],corners[4],`Height ${H} cm`,-60,0);
+
+  roundedRect(ctx,70,890,1460,145,18,"#ffffff","#cbd5e1");
+  ctx.fillStyle="#111827";
+  ctx.font="900 27px Arial";
+  ctx.textAlign="left";
+  ctx.fillText(`Recommended Box Size: ${L} × ${W} × ${H} cm`,100,925);
+
+  ctx.font="700 18px Arial";
+  const legend=objects.slice(0,12);
+  legend.forEach((obj,i)=>{
+    const col=i<6?0:1;
+    const row=i%6;
+    const x=100+col*730;
+    const y=960+row*19;
+    ctx.fillText(`${obj.index+1}. ${shortProductName(obj.p.name)} — ${obj.p.originalDims.join("×")} cm`,x,y);
+  });
+
+  ctx.fillStyle="#7f1d1d";
+  ctx.font="700 19px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("Original product photos are shown on the 3D blocks • Drag to rotate • Pinch/wheel to zoom",800,1055);
+}
+
+function initializePage(){
+  try{
+    render();
+    setupPacking3DInteraction();
+  }catch(error){
+    console.error("Page initialization error:", error);
+    alert("Page initialization error: "+(error?.message || "Unknown error"));
+  }
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded", initializePage, {once:true});
+}else{
+  initializePage();
+}
+
+</script>
+
+
+<div class="footer-card"><div class="footer-inner">
+<div style="color:#9fb0c7;font-size:13px;margin-bottom:16px"><b style="color:#fff">Updated Price List</b><br>Last Updated: 21-07-2026</div>
+<h3>🏪 Games Planet</h3>
+<p>📍 Near JK's Tyre, Front of Raza Sugar Mill Gate<br>
+Radha Road to Gurudwara Road, Civil Lines<br>
+Rampur, U.P – 244901</p>
+<p>🕒 <b>Monday – Sunday</b><br>11:00 AM – 9:30 PM</p>
+<p>💬 <a href="https://wa.me/917983624797" style="color:#25D366;font-weight:bold;text-decoration:none;">7983624797</a></p>
+<p><a href="https://maps.app.goo.gl/JTaBzF9TTqFH9X2L9" style="display:inline-block;padding:10px 18px;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;">📍 Google Map Location</a></p>
+</div></div>
+
+<div style="text-align:center;margin:22px">
+<button class="policy-btn" onclick="document.getElementById('policyModal').style.display='flex'">🛡️ Warranty, Return & Refund Policy</button>
+</div>
+</main>
+<aside class="desktop-right">
+<div class="combined-poster-wrap" id="combinedPosterSection">
+  <div class="combined-poster-card">
+    <div class="combined-poster-head">
+      <h3>Selected Products Combined Picture</h3>
+      <div class="combined-poster-actions">
+        <button class="poster-btn poster-refresh" onclick="generateCombinedPoster()">Refresh Picture</button>
+        <button class="poster-btn poster-download" onclick="downloadCombinedPoster()">Download Picture</button>
+      </div>
+    </div>
+    <div class="poster-stage">
+      <canvas id="combinedPoster" width="1600" height="900"></canvas>
+    </div>
+    <div class="poster-note">Selected products and their total quantities automatically appear in one catalog-style picture. For 12 Core Wire, the selected quantity is shown as total meter length.</div>
+  </div>
+</div>
+<div class="combined-poster-wrap" id="boxPlannerSection">
+  <div class="combined-poster-card">
+    <div class="combined-poster-head">
+      <h3>📦 Smart Packing Box Planner</h3>
+      <div class="combined-poster-actions">
+        <button class="poster-btn poster-refresh" onclick="generateBoxPlanner()">Refresh Box</button>
+        <button class="poster-btn poster-download" onclick="downloadBoxPlanner()">Download Box Picture</button>
+      </div>
+    </div>
+    <div id="boxPlannerSummary" class="box-summary">Select products to calculate the recommended box.</div>
+    <div class="poster-stage">
+      <canvas id="boxPlannerCanvas" width="1600" height="900"></canvas>
+    </div>
+    <div class="poster-note">The box is tested using a 3D fit calculation, preset practical sizes and extra safety space for bubble wrap, thermocol and safe packing. Dimensions are not added to the WhatsApp order message.</div>
+  </div>
+</div>
+
+<div class="combined-poster-wrap" id="packingGuideSection">
+  <div class="combined-poster-card">
+    <div class="combined-poster-head">
+      <h3>🧩 Box Packing Placement Guide</h3>
+      <div class="combined-poster-actions">
+        <button class="poster-btn poster-refresh" onclick="generatePackingGuide()">Refresh Guide</button>
+<button class="poster-btn poster-refresh" onclick="resetPacking3DView()">Reset 3D View</button>
+        <button class="poster-btn poster-download" onclick="downloadPackingGuide()">Download Guide</button>
+      </div>
+    </div>
+    <div id="packingGuideSummary" class="box-summary">Select products to generate the packing arrangement.</div>
+    <div class="poster-stage">
+      <canvas id="packingGuideCanvas" width="1600" height="1000"></canvas>
+    </div>
+    <div class="poster-note">This guide shows a practical suggested arrangement based on product dimensions. Keep fragile items cushioned and do not force-fit products.</div>
+<div class="packing-3d-help">🖱️ Drag to rotate • Mouse wheel to zoom • 📱 One finger drag to rotate • Two fingers pinch to zoom</div>
+  </div>
+</div>
+
+</aside>
+</div>
+
+<div id="optionalGameModal" role="dialog" aria-modal="true" aria-labelledby="optionalGameModalTitle">
+  <div class="optional-modal-box">
+    <h3 id="optionalGameModalTitle">⚠️ पहले Order और Payment करें</h3>
+    <p>Optional Games Selector इस्तेमाल करने से पहले इस page पर अपना सही USB या Combo product select करें, quantity add करें, WhatsApp पर order भेजें और payment complete करें। Payment के बाद अपनी पसंद के games select करके list WhatsApp पर submit करें।</p>
+    <div class="optional-modal-actions">
+      <button type="button" class="optional-modal-close" onclick="closeOptionalGameSelector()">अभी नहीं</button>
+      <button type="button" class="optional-modal-continue" onclick="continueOptionalGameSelector()">समझ गया — Selector खोलें</button>
+    </div>
+  </div>
+</div>
+
+<div id="policyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999999;justify-content:center;align-items:center;">
+<div style="max-width:700px;background:#111827;color:#fff;padding:20px;border-radius:14px;margin:20px;">
+<h2>🛡️ Warranty, Return & Refund Policy</h2>
+<p>✅ All products are checked before dispatch and we always try to provide the best quality products.</p>
+<p>❌ No Warranty</p>
+<p>❌ No Return</p>
+<p>❌ No Refund</p>
+<p>❌ No Replacement</p>
+<p>Please verify compatibility before placing your order.</p>
+<div style="text-align:center"><button onclick="document.getElementById('policyModal').style.display='none'" style="padding:10px 18px;border:none;border-radius:8px;background:#2563eb;color:#fff;">Close</button></div>
+</div></div>
+
+<script>
+let pendingOptionalSelectorUrl="";
+function openOptionalGameSelector(event,url){
+  if(event) event.preventDefault();
+  pendingOptionalSelectorUrl=url||"";
+  const modal=document.getElementById("optionalGameModal");
+  if(modal) modal.classList.add("show");
+  document.body.style.overflow="hidden";
+  return false;
+}
+function closeOptionalGameSelector(){
+  const modal=document.getElementById("optionalGameModal");
+  if(modal) modal.classList.remove("show");
+  document.body.style.overflow="";
+  pendingOptionalSelectorUrl="";
+}
+function continueOptionalGameSelector(){
+  const url=pendingOptionalSelectorUrl;
+  closeOptionalGameSelector();
+  if(url) window.open(url,"_blank","noopener");
+}
+document.getElementById("optionalGameModal")?.addEventListener("click",function(event){
+  if(event.target===this) closeOptionalGameSelector();
+});
+</script>
+
+
+
+
+</body>
+</html>
