@@ -413,6 +413,32 @@ select{
 .whatsapp{background:linear-gradient(90deg,#16a34a,#22c55e);color:#04140a}
 .details{background:linear-gradient(90deg,#f59e0b,#facc15);color:#241600}
 .reset{background:linear-gradient(90deg,#b91c1c,#ef4444);color:#fff}
+.top-cart-tools{
+  position:fixed;
+  top:12px;
+  right:12px;
+  z-index:10050;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:15px;
+  background:rgba(8,20,35,.94);
+  backdrop-filter:blur(14px);
+  box-shadow:0 12px 32px rgba(0,0,0,.38);
+}
+.top-cart-count,.top-reset{
+  min-height:40px;
+  padding:9px 12px;
+  border:0;
+  border-radius:10px;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.top-cart-count{background:linear-gradient(90deg,#0369a1,#0891b2)}
+.top-reset{background:linear-gradient(90deg,#b91c1c,#ef4444)}
 .total-grid{
   display:grid;
   grid-template-columns:1fr auto;
@@ -522,6 +548,8 @@ select{
     line-height:1.45;
     padding:11px 10px;
   }
+  .top-cart-tools{top:8px;right:8px;gap:5px;padding:5px}
+  .top-cart-count,.top-reset{min-height:36px;padding:7px 9px;font-size:12px}
 }
 
 /* Combined selected-products poster */
@@ -848,6 +876,11 @@ img,canvas{
 
 <body>
 
+<div class="top-cart-tools" aria-label="Cart controls">
+  <button type="button" class="top-cart-count" onclick="scrollToOrderDetails()">🛒 Cart Items: <span id="topCartItemCount">0</span></button>
+  <button type="button" class="top-reset" onclick="clearCart()">Reset Cart</button>
+</div>
+
 <div class="gpz-ticker" aria-label="Games Planet services">
   <div class="gpz-ticker-track">🎮 आपका Games Planet में स्वागत है। हमारे पास Classic Retro Gaming Consoles, Arcade Machines, Commercial &amp; Non-Commercial Game Boxes, Coin Machines, Parts, Spare Parts, Repair Services, New &amp; Used PlayStation Consoles, Game Sticks, Controllers और Gaming Accessories उपलब्ध हैं। अधिक जानकारी के लिए हमारी WhatsApp Profile Catalog देखें या हमसे संपर्क करें।</div>
 </div>
@@ -891,7 +924,7 @@ img,canvas{
 <main class="desktop-left">
 <div class="container" id="products"></div>
 
-<div class="preview"><div class="preview-card">
+<div class="preview" id="orderDetailsSection"><div class="preview-card">
  <h3>Order Preview</h3>
  <div id="orderList">No items selected</div>
 
@@ -1468,6 +1501,11 @@ function clearCart(){
  render();
 }
 
+function scrollToOrderDetails(){
+ const section=document.getElementById("orderDetailsSection");
+ if(section) section.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
 function openImg(src){
  const modal=document.getElementById("imgModal");
  document.getElementById("modalImg").src=src;
@@ -1612,6 +1650,9 @@ function render(){
    }
    itemCount += state[i] || 0;
  });
+
+ const topCartItemCount=document.getElementById("topCartItemCount");
+ if(topCartItemCount) topCartItemCount.innerText=itemCount;
 
  const packedWeight = totalWeight + (itemCount>0 ? Math.ceil(totalWeight/1000)*100 : 0);
  const chargeableKg = itemCount>0 ? Math.ceil(packedWeight/1000) : 0;
@@ -1947,24 +1988,59 @@ https://gamesplanet13.github.io/arcade-accessories-/order-prefill.html?grandTota
 
 /* 🔹 FULL SYNC TO ORDER PREFILL PAGE */
 
-function goDetails(){
- let total=0,totalWeight=0;
+function buildOrderSummary(){
+ const items=[];
+ let productTotal=0;
+ let totalWeight=0;
+ let totalQuantity=0;
 
  products.forEach((p,i)=>{
-  if(p.variants){
-    p.variants.forEach(v=>{
-      const q=state['v_'+i+'_'+v]||0;
-      if(q>0){
-        total+=p.price*q;
-        totalWeight+=p.weight*q;
-      }
-    });
-  }
-  if(state[i]>0){
-    total+=p.price*state[i];
-    totalWeight+=p.weight*state[i];
-  }
+   if(p.variants){
+     p.variants.forEach(v=>{
+       const quantity=state['v_'+i+'_'+v]||0;
+       if(quantity>0){
+         const lineTotal=p.price*quantity;
+         const lineWeight=p.weight*quantity;
+         items.push({
+           name:`${p.name} - ${v}`,
+           quantity,
+           unitPrice:p.price,
+           lineTotal,
+           unitWeight:p.weight,
+           lineWeight
+         });
+         productTotal+=lineTotal;
+         totalWeight+=lineWeight;
+         totalQuantity+=quantity;
+       }
+     });
+   }
+
+   const quantity=state[i]||0;
+   if(quantity>0){
+     const lineTotal=p.price*quantity;
+     const lineWeight=p.weight*quantity;
+     items.push({
+       name:p.name,
+       quantity,
+       unitPrice:p.price,
+       lineTotal,
+       unitWeight:p.weight,
+       lineWeight
+     });
+     productTotal+=lineTotal;
+     totalWeight+=lineWeight;
+     totalQuantity+=quantity;
+   }
  });
+
+ return {items,productTotal,totalWeight,totalQuantity};
+}
+
+function goDetails(){
+ const summary=buildOrderSummary();
+ const total=summary.productTotal;
+ const totalWeight=summary.totalWeight;
 
  if(total<=0){alert("Please select products first");return;}
 
@@ -1975,6 +2051,14 @@ function goDetails(){
  const courierCharge=delivery.courierCharge;
 
  const grandTotal = total + courierCharge;
+
+ summary.packedWeight=packedWeight;
+ summary.chargeableKg=chargeableKg;
+ summary.deliverySpeed=delivery.label;
+ summary.courier=delivery.courier;
+ summary.courierCharge=courierCharge;
+ summary.grandTotal=grandTotal;
+ localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
  window.location.href=`order-prefill.html?grandTotal=${grandTotal}&deliverySpeed=${encodeURIComponent(delivery.label)}&courier=${encodeURIComponent(delivery.courier)}&courierCharge=${courierCharge}`;
 }

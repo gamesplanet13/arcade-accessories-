@@ -256,6 +256,43 @@ else{
 
 /* ===== SEND WHATSAPP ===== */
 function sendOrder(){
+let orderSummary=null;
+try{
+  orderSummary=JSON.parse(localStorage.getItem("gp_order_summary")||"null");
+}catch(e){
+  orderSummary=null;
+}
+
+let summaryText="";
+if(orderSummary && Array.isArray(orderSummary.items) && orderSummary.items.length){
+  const itemLines=orderSummary.items.map((item,index)=>
+`${index+1}) ${item.name}
+Quantity: ${item.quantity}
+Per Product Price: ₹${item.unitPrice}
+Product Total: ₹${item.lineTotal}
+Per Product Weight: ${item.unitWeight} g
+Total Product Weight: ${item.lineWeight} g`
+  );
+
+  summaryText=`
+
+━━━━━━━━━━━━━━
+📦 PRODUCT SUMMARY
+━━━━━━━━━━━━━━
+
+${itemLines.join("\n\n")}
+
+Total Cart Items: ${orderSummary.totalQuantity}
+Products Amount: ₹${orderSummary.productTotal}
+Actual Product Weight: ${orderSummary.totalWeight} g
+Packed Weight: ${orderSummary.packedWeight} g
+Chargeable Courier Weight: ${orderSummary.chargeableKg} kg
+Delivery Speed: ${orderSummary.deliverySpeed}
+Courier: ${orderSummary.courier}
+Courier Charges: ₹${orderSummary.courierCharge}
+Grand Total: ₹${orderSummary.grandTotal}`;
+}
+
 const msg=`🟢 Prepaid Order
 
 Order ID: ${orderID()}
@@ -275,7 +312,7 @@ Amount Paid: ₹${document.getElementById("amountPaid").value||0}
 
 📏 Distance: ${document.getElementById("distance").value}
 ⏳ ETA: ${document.getElementById("etaText").value}
-📅 Estimated Delivery: ${document.getElementById("dateRange").value}`;
+📅 Estimated Delivery: ${document.getElementById("dateRange").value}${summaryText}`;
 
 window.open("https://wa.me/917983624797?text="+encodeURIComponent(msg));
 }
