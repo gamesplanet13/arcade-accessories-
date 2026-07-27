@@ -64,8 +64,8 @@ button{
 <div class="box">
 <b>Order Type</b>
 <div class="radio">
-<label><input type="radio" name="otype" value="Prepaid" checked> Prepaid</label>
-
+<label><input type="radio" name="otype" value="Prepaid" checked onchange="syncPaymentFields()"> Full Payment (Prepaid)</label>
+<label><input type="radio" name="otype" value="COD" onchange="syncPaymentFields()"> 20% Advance + Rest on Delivery (COD)</label>
 </div>
 </div>
 
@@ -85,6 +85,7 @@ button{
 
 
 <input id="amountPaid" readonly placeholder="Amount Paid">
+<input id="restOnDelivery" readonly placeholder="Rest on Delivery" style="display:none">
 
 <button onclick="sendOrder()">Submit Order on WhatsApp</button>
 
@@ -226,8 +227,8 @@ else{
 
           preEta.textContent=eta;
           document.getElementById("preRange").textContent=prepaidRange;
-          codEta.textContent=`${cod.min}–${cod.max} days`;
-          codRange.textContent=formatDateRange(cod.min,cod.max);
+          if(codEta) codEta.textContent=`${cod.min}–${cod.max} days`;
+          if(codRange) codRange.textContent=formatDateRange(cod.min,cod.max);
 
           deliveryEstimate.innerText =
 `📏 Distance: ${d} km
@@ -285,6 +286,7 @@ ${itemLines.join("\n\n")}
 Total Cart Items: ${orderSummary.totalQuantity}
 Products Amount: ₹${orderSummary.productTotal}
 Actual Product Weight: ${orderSummary.totalWeight} g
+Packing Weight: ${orderSummary.packingWeight||0} g
 Packed Weight: ${orderSummary.packedWeight} g
 Chargeable Courier Weight: ${orderSummary.chargeableKg} kg
 Delivery Speed: ${orderSummary.deliverySpeed}
@@ -293,7 +295,11 @@ Courier Charges: ₹${orderSummary.courierCharge}
 Grand Total: ₹${orderSummary.grandTotal}`;
 }
 
-const msg=`🟢 Prepaid Order
+const orderType=document.querySelector('input[name="otype"]:checked')?.value||"Prepaid";
+const amountPaid=Number(document.getElementById("amountPaid").value||0);
+const restOnDelivery=Number(document.getElementById("restOnDelivery").value||0);
+
+const msg=`${orderType==="COD"?"🟠 COD Order":"🟢 Prepaid Order"}
 
 Order ID: ${orderID()}
 Name: ${document.getElementById("name").value}
@@ -308,7 +314,9 @@ District/City: ${document.getElementById("city").value}
 Post Office: ${document.getElementById("postoffice").value}
 
 Product: Arcade Accessories
-Amount Paid: ₹${document.getElementById("amountPaid").value||0}
+Payment Type: ${orderType}
+Amount Paid: ₹${amountPaid}
+${orderType==="COD"?`Rest on Delivery: ₹${restOnDelivery}`:""}
 
 📏 Distance: ${document.getElementById("distance").value}
 ⏳ ETA: ${document.getElementById("etaText").value}
@@ -322,7 +330,21 @@ window.open("https://wa.me/917983624797?text="+encodeURIComponent(msg));
 <script>
 const params=new URLSearchParams(window.location.search);
 document.getElementById("manualProduct").value="Arcade Accessories";
-document.getElementById("amountPaid").value=params.get("grandTotal")||0;
+const savedSummary=JSON.parse(localStorage.getItem("gp_order_summary")||"null");
+const initialMode=params.get("paymentMode")||savedSummary?.paymentMode||"prepaid";
+const grandTotal=Number(params.get("grandTotal")||savedSummary?.grandTotal||0);
+const advanceAmount=Number(params.get("advanceAmount")||savedSummary?.advanceAmount||Math.ceil(grandTotal*0.20));
+const restAmount=Number(params.get("restAmount")||savedSummary?.restAmount||Math.max(0,grandTotal-advanceAmount));
+const modeRadio=document.querySelector(`input[name="otype"][value="${initialMode==="cod"?"COD":"Prepaid"}"]`);
+if(modeRadio) modeRadio.checked=true;
+
+function syncPaymentFields(){
+  const isCod=document.querySelector('input[name="otype"]:checked')?.value==="COD";
+  document.getElementById("amountPaid").value=isCod?advanceAmount:grandTotal;
+  document.getElementById("restOnDelivery").value=isCod?restAmount:0;
+  document.getElementById("restOnDelivery").style.display=isCod?"block":"none";
+}
+syncPaymentFields();
 </script>
 </body>
 </html>

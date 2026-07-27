@@ -872,19 +872,220 @@ img,canvas{
   line-height:1.5;
 }
 
+/* Screenshot-matched catalog header */
+.gpz-ticker{
+  position:sticky;
+  top:0;
+  z-index:30000;
+  height:34px;
+  background:rgba(2,6,23,.24);
+  border-top:0;
+  border-bottom:1px solid rgba(34,211,238,.22);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.gpz-ticker-track{
+  font-size:clamp(10px,1.5vw,13px);
+  animation-duration:42s;
+}
+.catalog-top{
+  width:min(1420px,calc(100% - 24px));
+  margin:18px auto 0;
+}
+.catalog-brand-row{
+  display:block;
+  align-items:center;
+}
+.catalog-brand{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:7px 126px 7px 8px;
+}
+.catalog-logo{
+  width:48px;
+  height:48px;
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  border:2px solid rgba(34,211,238,.22);
+  border-radius:13px;
+  background:linear-gradient(145deg,#0b2947,#081827);
+  font-size:27px;
+  box-shadow:inset 0 0 22px rgba(34,211,238,.08);
+}
+.catalog-brand-copy{min-width:0}
+.catalog-brand-name{
+  margin:0;
+  font-size:clamp(22px,3.5vw,34px);
+  line-height:.95;
+  letter-spacing:-1.5px;
+  font-weight:950;
+  white-space:nowrap;
+  background:linear-gradient(90deg,#2563eb,#00c8ff);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+.catalog-brand-tagline{
+  margin-top:4px;
+  color:#aebed4;
+  font-size:clamp(9px,1.2vw,13px);
+  line-height:1;
+  white-space:nowrap;
+}
+.top-cart-tools{
+  position:fixed;
+  top:39px;
+  right:6px;
+  z-index:30001;
+  display:flex;
+  gap:3px;
+  padding:2px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:10px;
+  background:rgba(2,6,23,.16);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+  box-shadow:none;
+}
+.top-cart-count,.top-reset{
+  min-height:24px;
+  padding:3px 6px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:7px;
+  font-size:8px;
+  white-space:nowrap;
+}
+.top-cart-count{background:rgba(3,105,161,.32)}
+.top-reset{background:rgba(185,28,28,.34)}
+.header{display:none}
+.notice{
+  max-width:1420px;
+  margin:10px auto 20px;
+  padding:0 12px;
+}
+.notice-inner{
+  display:block;
+  border:2px solid rgba(255,255,255,.08);
+  background:linear-gradient(135deg,rgba(5,21,38,.98),rgba(3,14,27,.98));
+  border-radius:20px;
+  padding:7px 12px 9px;
+}
+.notice-icon,.notice-text{display:none}
+.notice-title{
+  display:block;
+  transform:none;
+  width:100%;
+  margin:0 0 9px;
+  padding:2px 4px;
+  background:transparent;
+  color:#fff;
+  font-size:clamp(8px,2.35vw,16px);
+  line-height:1.2;
+  font-weight:850;
+  text-align:center;
+  white-space:nowrap;
+}
+.notice-inner>div:last-child{display:contents}
+.trust-row.catalog-trust{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin:0;
+}
+.catalog-trust .trust-chip{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:38px;
+  padding:6px 8px;
+  border-radius:12px;
+  background:rgba(10,28,49,.52);
+  border:1px solid rgba(255,255,255,.10);
+  font-size:clamp(8px,1.2vw,12px);
+  text-align:center;
+}
+.catalog-controls{
+  width:min(1420px,calc(100% - 24px));
+  margin:0 auto 12px;
+  display:flex;
+  justify-content:flex-end;
+}
+.catalog-select-wrap{
+  position:relative;
+  width:150px;
+}
+.catalog-select{
+  width:100%;
+  min-height:34px;
+  padding:5px 28px 5px 10px;
+  appearance:none;
+  border:2px solid rgba(255,255,255,.10);
+  border-radius:10px;
+  outline:none;
+  color:#f8fafc;
+  background:#061526;
+  font-size:11px;
+}
+.catalog-select-wrap:after{
+  content:"⌄";
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-58%);
+  color:#dff7ff;
+  font-size:17px;
+  pointer-events:none;
+}
+@media(max-width:680px){
+  .gpz-ticker{height:30px}
+  .catalog-top{margin-top:6px;width:calc(100% - 10px)}
+  .catalog-brand{gap:6px;padding:4px 112px 4px 2px}
+  .catalog-logo{width:36px;height:36px;border-radius:10px;font-size:21px}
+  .catalog-brand-name{font-size:21px;letter-spacing:-.7px}
+  .catalog-brand-tagline{font-size:8px;margin-top:3px}
+  .top-cart-tools{top:34px;right:4px;gap:2px;padding:2px;border-radius:8px}
+  .top-cart-count,.top-reset{
+    min-height:22px;
+    padding:2px 4px;
+    border-radius:6px;
+    font-size:7px;
+  }
+  .notice{margin-top:7px;padding:0 7px}
+  .notice-inner{padding:6px 7px 7px;border-radius:15px}
+  .notice-title{margin:0 0 6px;padding:1px;font-size:clamp(7px,2.55vw,11px)}
+  .catalog-trust .trust-chip{min-height:33px;padding:4px 2px;border-radius:9px;font-size:7px}
+  .catalog-controls{width:calc(100% - 14px);margin-bottom:10px}
+  .catalog-select-wrap{width:126px}
+  .catalog-select{min-height:30px;padding:4px 24px 4px 8px;border-radius:9px;font-size:10px}
+  .catalog-select-wrap:after{right:8px;font-size:15px}
+}
+
 </style>
 
 </head>
 
 <body>
 
-<div class="top-cart-tools" aria-label="Cart controls">
-  <button type="button" class="top-cart-count" onclick="scrollToOrderDetails()">🛒 Cart Items: <span id="topCartItemCount">0</span></button>
-  <button type="button" class="top-reset" onclick="clearCart()">Reset Cart</button>
-</div>
-
 <div class="gpz-ticker" aria-label="Games Planet services">
   <div class="gpz-ticker-track">🎮 आपका Games Planet में स्वागत है। हमारे पास Classic Retro Gaming Consoles, Arcade Machines, Commercial &amp; Non-Commercial Game Boxes, Coin Machines, Parts, Spare Parts, Repair Services, New &amp; Used PlayStation Consoles, Game Sticks, Controllers और Gaming Accessories उपलब्ध हैं। अधिक जानकारी के लिए हमारी WhatsApp Profile Catalog देखें या हमसे संपर्क करें।</div>
+</div>
+
+<div class="catalog-top">
+  <div class="catalog-brand-row">
+    <div class="catalog-brand">
+      <div class="catalog-logo">🎮</div>
+      <div class="catalog-brand-copy">
+        <div class="catalog-brand-name">Games Planet</div>
+        <div class="catalog-brand-tagline">Premium Gaming Accessories</div>
+      </div>
+    </div>
+    <div class="top-cart-tools" aria-label="Cart controls">
+      <button type="button" class="top-cart-count" onclick="scrollToOrderDetails()">🛒 Cart Items: <span id="topCartItemCount">0</span></button>
+      <button type="button" class="top-reset" onclick="clearCart()">Reset Cart</button>
+    </div>
+  </div>
 </div>
 
 <div id="securityOverlay">
@@ -915,9 +1116,33 @@ img,canvas{
   <div class="notice-inner">
     <div class="notice-icon">🚫</div>
     <div>
-      <div class="notice-title">Cash on Delivery is not available</div>
+      <div class="notice-title">Prepaid and Cash on Delivery Both Available</div>
       <div class="notice-text">Full advance payment is accepted. Please select products, choose courier service and continue through WhatsApp or the details form.</div>
     </div>
+    <div class="trust-row catalog-trust">
+      <span class="trust-chip">✅ Checked Products</span>
+      <span class="trust-chip">📦 Secure Packing</span>
+      <span class="trust-chip">💳 Prepaid Orders</span>
+      <span class="trust-chip">💬 WhatsApp Support</span>
+    </div>
+  </div>
+</div>
+
+<div class="catalog-controls">
+  <div class="catalog-select-wrap">
+    <select class="catalog-select" id="catalogFilter" aria-label="Product category" onchange="filterCatalog(this.value)">
+      <option value="all">Category: All</option>
+      <option value="Arcade Box Accessories">Arcade Accessories</option>
+      <option value="Gaming Accessories">Gaming Accessories</option>
+      <option value="PS2">PS2</option>
+      <option value="PS2 Game Drives — USB Only">PS2 Game Drives</option>
+      <option value="PS3">PS3</option>
+      <option value="PS4">PS4</option>
+      <option value="PS5">PS5</option>
+      <option value="Cables">Cables</option>
+      <option value="Electrical Items">Electrical Items</option>
+      <option value="Batteries and Charger">Batteries &amp; Chargers</option>
+    </select>
   </div>
 </div>
 
@@ -931,6 +1156,17 @@ img,canvas{
  <div id="orderList">No items selected</div>
 
  <div class="courier-box">
+<div class="delivery-speed-title">💳 Choose Payment Method</div>
+<div class="delivery-speed-options" id="paymentModeOptions">
+  <label class="speed-option">
+    <input type="radio" name="paymentMode" value="prepaid" checked onchange="onPaymentModeChange()">
+    <span>Full Payment (Prepaid)</span>
+  </label>
+  <label class="speed-option">
+    <input type="radio" name="paymentMode" value="cod" onchange="onPaymentModeChange()">
+    <span>COD: Min. ₹2,500 Order • ₹600 or 20% Advance</span>
+  </label>
+</div>
 <div class="delivery-speed-title">⚡ Choose Delivery Speed</div>
 <div class="delivery-speed-options" id="deliverySpeedOptions">
   <label class="speed-option" id="speedSurfaceOption">
@@ -969,11 +1205,15 @@ img,canvas{
  <div class="total-grid">
 <div>
   <b>Total Amount: ₹<span id="total">0</span></b><br>
-  <b>Total Weight: <span id="totalWeight">0</span> g</b><br>
+  <b>Product Weight: <span id="totalWeight">0</span> g</b><br>
+  <b>Packing Weight: <span id="packingWeight">0</span> g</b><br>
+  <b>Payment Type: <span id="paymentModeLabel">Full Payment (Prepaid)</span></b><br>
   <b>Delivery Speed: <span id="deliverySpeedLabel">Surface Delivery</span></b><br>
   <b>Chargeable Courier Weight: <span id="courierWeightKg">0</span> kg</b><br>
   <b>Courier Charges: ₹<span id="courierCharge">0</span></b><br>
-  <b>Total With Courier: ₹<span id="grandTotal">0</span></b>
+  <b>Grand Total: ₹<span id="grandTotal">0</span></b><br>
+  <b id="advanceLine" style="display:none">COD Advance (Minimum ₹600 or 20%): ₹<span id="advanceAmount">0</span></b><br id="advanceBreak" style="display:none">
+  <b id="restLine" style="display:none">Rest on Delivery: ₹<span id="restAmount">0</span></b>
 </div>
 <div>
   <img id="upiQr" width="90" height="90" style="border-radius:8px;background:#fff">
@@ -1447,7 +1687,7 @@ categoryOrder.forEach(cat=>{
  const catProducts=products.filter(p=>p.category===cat);
  if(!catProducts.length) return;
 
- container.innerHTML += `<h2 style="color:#00f7ff;margin:15px 5px 10px">${cat}</h2>`;
+ container.innerHTML += `<h2 data-category="${cat}" style="color:#00f7ff;margin:15px 5px 10px">${cat}</h2>`;
 
  catProducts.forEach((p)=>{
  const i=products.indexOf(p);
@@ -1455,7 +1695,7 @@ categoryOrder.forEach(cat=>{
 
  const imgs=p.images.map(img=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name}" onclick="openImg('${img}')">`).join("");
  container.innerHTML+=`
- <div class="product">
+ <div class="product" data-category="${cat}">
   <b class="product-title">${p.name}</b>
   <div class="product-specs">
     <span>📏 Size: <b>${p.dimensions ? p.dimensions.join(" × ")+" cm" : "Not set"}</b></span>
@@ -1479,6 +1719,12 @@ categoryOrder.forEach(cat=>{
  </div>`;
 });
 });
+
+function filterCatalog(category){
+ document.querySelectorAll("#products [data-category]").forEach(el=>{
+   el.style.display=(category==="all" || el.dataset.category===category)?"":"none";
+ });
+}
 
 
 function clearCart(){
@@ -1565,22 +1811,30 @@ function getDeliverySpeed(){
  return document.querySelector('input[name="deliverySpeed"]:checked')?.value || "surface";
 }
 
+function getPaymentMode(){
+ return document.querySelector('input[name="paymentMode"]:checked')?.value || "prepaid";
+}
+
 function syncDeliveryControls(){
  const batterySelected=hasSelectedBatteryItem();
+ const paymentMode=getPaymentMode();
  const airOption=document.getElementById("speedAirOption");
  const primeOption=document.getElementById("speedPrimeOption");
  const notice=document.getElementById("batteryAirNotice");
- if(airOption) airOption.classList.toggle("hidden-by-battery",batterySelected);
- if(primeOption) primeOption.classList.toggle("hidden-by-battery",batterySelected);
+ const surfaceOnly=batterySelected || paymentMode==="cod";
+ if(airOption) airOption.classList.toggle("hidden-by-battery",surfaceOnly);
+ if(primeOption) primeOption.classList.toggle("hidden-by-battery",surfaceOnly);
  if(notice) notice.classList.toggle("show",batterySelected);
 
- if(batterySelected && getDeliverySpeed()!=="surface"){
+ if(surfaceOnly && getDeliverySpeed()!=="surface"){
    const surfaceRadio=document.querySelector('input[name="deliverySpeed"][value="surface"]');
    if(surfaceRadio) surfaceRadio.checked=true;
  }
 
  const speed=getDeliverySpeed();
- const allowed=DELIVERY_SPEEDS[speed].couriers;
+ const allowed=paymentMode==="cod"
+   ? ["Delhivery.com","BlueDart","Ecom Express"]
+   : ["Trackon.in","Delhivery.com","BlueDart","Ecom Express","Speed Post","Shreemaruti.com","Dtdc.in"];
  const select=document.getElementById("courier");
  if(select){
    const previous=select.value;
@@ -1595,6 +1849,19 @@ function onDeliverySpeedChange(){
  render();
 }
 
+function onPaymentModeChange(){
+ if(getPaymentMode()==="cod"){
+   const productTotal=buildOrderSummary().productTotal;
+   if(productTotal<2500){
+     alert("COD is available only for product orders of ₹2,500 or more.");
+     const prepaidRadio=document.querySelector('input[name="paymentMode"][value="prepaid"]');
+     if(prepaidRadio) prepaidRadio.checked=true;
+   }
+ }
+ syncDeliveryControls();
+ render();
+}
+
 function courierBaseRate(courier){
  if(courier==="Delhivery.com" || courier==="BlueDart" || courier==="Ecom Express") return 300;
  if(courier==="Speed Post") return 150;
@@ -1605,8 +1872,12 @@ function getCourierCalculation(chargeableKg){
  const speed=syncDeliveryControls();
  const courier=document.getElementById("courier")?.value || "Trackon.in";
  const meta=DELIVERY_SPEEDS[speed];
- const courierCharge=Math.round(chargeableKg*courierBaseRate(courier)*meta.multiplier);
- return {speed,courier,courierCharge,label:meta.label};
+ const paymentMode=getPaymentMode();
+ const preferred=["Trackon.in","Shreemaruti.com","Dtdc.in"].includes(courier);
+ const paymentCourierMultiplier=paymentMode==="cod" ? 2.5 : (preferred ? 1 : 2);
+ const speedMultiplier=paymentMode==="cod" ? 1 : meta.multiplier;
+ const courierCharge=Math.round(chargeableKg*courierBaseRate(courier)*speedMultiplier*paymentCourierMultiplier);
+ return {speed,courier,courierCharge,label:meta.label,paymentMode,paymentCourierMultiplier};
 }
 
 function render(){
@@ -1656,22 +1927,32 @@ function render(){
  const topCartItemCount=document.getElementById("topCartItemCount");
  if(topCartItemCount) topCartItemCount.innerText=itemCount;
 
- const packedWeight = totalWeight + (itemCount>0 ? Math.ceil(totalWeight/1000)*100 : 0);
+ const packingWeight = itemCount>0 ? Math.ceil(totalWeight/1000)*300 : 0;
+ const packedWeight = totalWeight + packingWeight;
  const chargeableKg = itemCount>0 ? Math.ceil(packedWeight/1000) : 0;
  const delivery=getCourierCalculation(chargeableKg);
  const courierCharge=delivery.courierCharge;
  const grandTotal = total + courierCharge;
+ const advanceAmount=delivery.paymentMode==="cod" ? Math.max(600,Math.ceil(grandTotal*0.20)) : grandTotal;
+ const restAmount=delivery.paymentMode==="cod" ? grandTotal-advanceAmount : 0;
  document.getElementById("courierCharge").innerText=courierCharge;
  document.getElementById("grandTotal").innerText=grandTotal;
+ document.getElementById("packingWeight").innerText=packingWeight;
+ document.getElementById("paymentModeLabel").innerText=delivery.paymentMode==="cod"?"COD — Minimum ₹600 or 20% Advance":"Full Payment (Prepaid)";
+ document.getElementById("advanceAmount").innerText=advanceAmount;
+ document.getElementById("restAmount").innerText=restAmount;
+ document.getElementById("advanceLine").style.display=delivery.paymentMode==="cod"?"inline":"none";
+ document.getElementById("advanceBreak").style.display=delivery.paymentMode==="cod"?"":"none";
+ document.getElementById("restLine").style.display=delivery.paymentMode==="cod"?"inline":"none";
  const courierKgEl=document.getElementById("courierWeightKg");
  if(courierKgEl) courierKgEl.innerText=chargeableKg;
  const deliverySpeedLabel=document.getElementById("deliverySpeedLabel");
  if(deliverySpeedLabel) deliverySpeedLabel.innerText=delivery.label;
 
  document.getElementById("floatingSummary").innerHTML =
- `Products: ${itemCount} | Amount: ₹${total} | ${delivery.label} | Courier Weight: ${chargeableKg}kg | Courier: ₹${courierCharge} | Total: ₹${grandTotal}`;
+ `Products: ${itemCount} | ${delivery.paymentMode==="cod"?"COD":"Prepaid"} | Amount: ₹${total} | Courier Weight: ${chargeableKg}kg | Courier: ₹${courierCharge} | Total: ₹${grandTotal}${delivery.paymentMode==="cod"?` | Advance: ₹${advanceAmount} | Rest: ₹${restAmount}`:""}`;
 
- const upi='upi://pay?pa=paytmqr68kzsc@ptys&pn=Surender%20Kaur&am='+grandTotal+'&cu=INR';
+ const upi='upi://pay?pa=paytmqr68kzsc@ptys&pn=Surender%20Kaur&am='+advanceAmount+'&cu=INR';
  const qr=document.getElementById('upiQr');
  if(qr){
    qr.src='https://api.qrserver.com/v1/create-qr-code/?size=90x90&data='+encodeURIComponent(upi);
@@ -1954,16 +2235,24 @@ function orderWhatsApp(){
  });
 
  if(!lines.length){alert("Please select products first");return;}
+ if(getPaymentMode()==="cod" && total<2500){
+   alert("COD is available only for product orders of ₹2,500 or more.");
+   return;
+ }
 
- const packedWeight = totalWeight + (totalWeight>0 ? Math.ceil(totalWeight/1000)*100 : 0);
+ const packingWeight = totalWeight>0 ? Math.ceil(totalWeight/1000)*300 : 0;
+ const packedWeight = totalWeight + packingWeight;
  const chargeableKg = packedWeight>0 ? Math.ceil(packedWeight/1000) : 0;
  const delivery=getCourierCalculation(chargeableKg);
  const courier=delivery.courier;
  const courierCharge=delivery.courierCharge;
  const grandTotal = total + courierCharge;
+ const paymentType=delivery.paymentMode==="cod"?"COD":"Prepaid";
+ const advanceAmount=delivery.paymentMode==="cod"?Math.max(600,Math.ceil(grandTotal*0.20)):grandTotal;
+ const restAmount=delivery.paymentMode==="cod"?grandTotal-advanceAmount:0;
  const fillLink = window.location.origin + window.location.pathname.replace("index","order-prefill") + `?grandTotal=${grandTotal}`;
 
- let msg=`🟢 Prepaid Order
+ let msg=`${delivery.paymentMode==="cod"?"🟠 COD Order":"🟢 Prepaid Order"}
 
 📦 Product Summary
 
@@ -1971,7 +2260,14 @@ ${lines.join('\n')}
 
 ⚡ Delivery Speed: ${delivery.label}
 
+💳 Payment Type: ${paymentType}
+
+${delivery.paymentMode==="cod"?"📌 COD Rule: Minimum ₹2,500 product order • Advance ₹600 or 20%, whichever is higher\n":""}
 🚚 Courier: ${courier}
+
+⚖️ Product Weight: ${totalWeight} g
+
+📦 Packing Weight: ${packingWeight} g
 
 ⚖️ Chargeable Courier Weight: ${chargeableKg} kg
 
@@ -1979,11 +2275,14 @@ ${lines.join('\n')}
 
 🧾 Grand Total: ₹${grandTotal}
 
+💰 Amount Paid / Advance: ₹${advanceAmount}
+
+${delivery.paymentMode==="cod"?`💵 Rest on Delivery: ₹${restAmount}\n`:""}
 ━━━━━━━━━━━━━━
 
 📝 Fill Your Details
 
-https://gamesplanet13.github.io/arcade-accessories-/order-prefill.html?grandTotal=${grandTotal}`;
+https://gamesplanet13.github.io/arcade-accessories-/order-prefill.html?grandTotal=${grandTotal}&paymentMode=${delivery.paymentMode}&advanceAmount=${advanceAmount}&restAmount=${restAmount}`;
 
  window.open("https://wa.me/917983624797?text="+encodeURIComponent(msg));
 }
@@ -2045,24 +2344,36 @@ function goDetails(){
  const totalWeight=summary.totalWeight;
 
  if(total<=0){alert("Please select products first");return;}
+ if(getPaymentMode()==="cod" && total<2500){
+   alert("COD is available only for product orders of ₹2,500 or more.");
+   return;
+ }
 
- const packedWeight = totalWeight + (totalWeight>0 ? Math.ceil(totalWeight/1000)*100 : 0);
+ const packingWeight = totalWeight>0 ? Math.ceil(totalWeight/1000)*300 : 0;
+ const packedWeight = totalWeight + packingWeight;
 
  const chargeableKg = packedWeight>0 ? Math.ceil(packedWeight/1000) : 0;
  const delivery=getCourierCalculation(chargeableKg);
  const courierCharge=delivery.courierCharge;
 
  const grandTotal = total + courierCharge;
+ const advanceAmount=delivery.paymentMode==="cod"?Math.max(600,Math.ceil(grandTotal*0.20)):grandTotal;
+ const restAmount=delivery.paymentMode==="cod"?grandTotal-advanceAmount:0;
 
+ summary.paymentMode=delivery.paymentMode;
+ summary.paymentType=delivery.paymentMode==="cod"?"COD":"Prepaid";
+ summary.packingWeight=packingWeight;
  summary.packedWeight=packedWeight;
  summary.chargeableKg=chargeableKg;
  summary.deliverySpeed=delivery.label;
  summary.courier=delivery.courier;
  summary.courierCharge=courierCharge;
  summary.grandTotal=grandTotal;
+ summary.advanceAmount=advanceAmount;
+ summary.restAmount=restAmount;
  localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
- window.location.href=`order-prefill.html?grandTotal=${grandTotal}&deliverySpeed=${encodeURIComponent(delivery.label)}&courier=${encodeURIComponent(delivery.courier)}&courierCharge=${courierCharge}`;
+ window.location.href=`order-prefill.html?grandTotal=${grandTotal}&paymentMode=${delivery.paymentMode}&advanceAmount=${advanceAmount}&restAmount=${restAmount}&deliverySpeed=${encodeURIComponent(delivery.label)}&courier=${encodeURIComponent(delivery.courier)}&courierCharge=${courierCharge}`;
 }
 
 
