@@ -6,6 +6,8 @@
 <meta name="referrer" content="same-origin">
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
+<meta name="theme-color" content="#07111f">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Games Planet – Arcade Accessories & PS2 USB Game Drives</title>
 
 
@@ -1067,6 +1069,97 @@ img,canvas{
   .catalog-select-wrap:after{right:8px;font-size:15px}
 }
 
+.app-live-panel{
+  width:min(1420px,calc(100% - 14px));
+  margin:0 auto 14px;
+  padding:9px;
+  border:1px solid rgba(34,211,238,.15);
+  border-radius:15px;
+  background:rgba(7,20,36,.58);
+}
+.app-install-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.app-live-title{font-size:12px;font-weight:900;color:#dff7ff}
+.app-install-btn{
+  flex:0 0 auto;
+  min-height:30px;
+  padding:5px 10px;
+  border:1px solid rgba(74,222,128,.35);
+  border-radius:9px;
+  background:linear-gradient(90deg,#15803d,#22c55e);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.app-live-grid{
+  display:grid;
+  grid-template-columns:minmax(150px,280px) minmax(0,1fr);
+  gap:9px;
+  align-items:stretch;
+}
+.latest-video{
+  width:100%;
+  aspect-ratio:16/9;
+  border:0;
+  border-radius:10px;
+  background:#000;
+}
+.latest-products-window{
+  min-width:0;
+  overflow:hidden;
+  border-radius:10px;
+  background:rgba(255,255,255,.035);
+}
+.latest-products-track{
+  display:flex;
+  width:max-content;
+  gap:7px;
+  padding:7px;
+  animation:latestProductsMove 28s linear infinite;
+}
+.latest-mini-card{
+  width:90px;
+  flex:0 0 90px;
+  padding:5px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:9px;
+  background:rgba(7,17,31,.92);
+}
+.latest-mini-card img{
+  width:100%;
+  height:48px;
+  display:block;
+  object-fit:contain;
+  border-radius:6px;
+  background:#fff;
+}
+.latest-mini-name{
+  height:24px;
+  margin-top:4px;
+  overflow:hidden;
+  color:#e2e8f0;
+  font-size:8px;
+  line-height:12px;
+}
+.latest-mini-price{margin-top:2px;color:#67e8f9;font-size:10px;font-weight:900}
+@keyframes latestProductsMove{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+@media(max-width:680px){
+  .app-live-grid{grid-template-columns:112px minmax(0,1fr)}
+  .app-live-title{font-size:9px}
+  .app-install-btn{min-height:26px;padding:4px 7px;font-size:8px}
+  .latest-mini-card{width:72px;flex-basis:72px}
+  .latest-mini-card img{height:38px}
+}
+
 </style>
 
 </head>
@@ -1151,6 +1244,19 @@ img,canvas{
   </div>
 </div>
 
+<section class="app-live-panel" aria-label="Games Planet Android app and latest updates">
+  <div class="app-install-row">
+    <div class="app-live-title">🎮 Current Video &amp; Latest Products</div>
+    <button type="button" class="app-install-btn" id="installAndroidApp">📲 Install Android App</button>
+  </div>
+  <div class="app-live-grid">
+    <iframe class="latest-video" src="https://www.youtube.com/embed/xGR0vUM1-Jw?autoplay=1&mute=1&controls=1&loop=1&playlist=xGR0vUM1-Jw&playsinline=1" title="Games Planet current video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    <div class="latest-products-window">
+      <div class="latest-products-track" id="latestProductsTrack"></div>
+    </div>
+  </div>
+</section>
+
 
 <div class="desktop-layout">
 <main class="desktop-left">
@@ -1160,47 +1266,6 @@ img,canvas{
  <h3>Order Preview</h3>
  <div id="orderList">No items selected</div>
 
- <div class="courier-box">
-<div class="delivery-speed-title">💳 Choose Payment Method</div>
-<div class="delivery-speed-options" id="paymentModeOptions">
-  <label class="speed-option">
-    <input type="radio" name="paymentMode" value="prepaid" checked onchange="onPaymentModeChange()">
-    <span>Full Payment (Prepaid)</span>
-  </label>
-  <label class="speed-option">
-    <input type="radio" name="paymentMode" value="cod" onchange="onPaymentModeChange()">
-    <span>COD: Min. ₹2,500 Order • ₹600 or 20% Advance</span>
-  </label>
-</div>
-<div class="delivery-speed-title">⚡ Choose Delivery Speed</div>
-<div class="delivery-speed-options" id="deliverySpeedOptions">
-  <label class="speed-option" id="speedSurfaceOption">
-    <input type="radio" name="deliverySpeed" value="surface" checked onchange="onDeliverySpeedChange()">
-    <span>Surface Delivery</span>
-  </label>
-  <label class="speed-option" id="speedAirOption">
-    <input type="radio" name="deliverySpeed" value="air" onchange="onDeliverySpeedChange()">
-    <span>By Air Delivery</span>
-  </label>
-  <label class="speed-option" id="speedPrimeOption">
-    <input type="radio" name="deliverySpeed" value="prime" onchange="onDeliverySpeedChange()">
-    <span>Prime Trackon.in</span>
-  </label>
-</div>
-<div id="batteryAirNotice" class="battery-air-notice">🔋 Due battery Item selected no Air or Prime delivery available.</div>
-<div class="courier-label">
-🚚 Choose Your Preferred Courier Service
-</div>
-<select id="courier" onchange="render()" style="padding:8px;border-radius:8px">
-<option value="Trackon.in" selected>Trackon.in</option>
-<option value="Delhivery.com">Delhivery.com</option>
-<option value="BlueDart">BlueDart</option>
-<option value="Ecom Express">Ecom Express</option>
-<option value="Speed Post">Speed Post</option>
-<option value="Shreemaruti.com">Shreemaruti.com</option>
-<option value="Dtdc.in">Dtdc.in</option>
-</select>
-</div>
 <div class="actions">
   <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
   <button class="details" onclick="goDetails()">Fill Your Details</button>
@@ -1209,19 +1274,11 @@ img,canvas{
 
  <div class="total-grid">
 <div>
-  <b>Total Amount: ₹<span id="total">0</span></b><br>
+  <b>Products Amount: ₹<span id="total">0</span></b><br>
   <b>Product Weight: <span id="totalWeight">0</span> g</b><br>
   <b>Packing Weight: <span id="packingWeight">0</span> g</b><br>
-  <b>Payment Type: <span id="paymentModeLabel">Full Payment (Prepaid)</span></b><br>
-  <b>Delivery Speed: <span id="deliverySpeedLabel">Surface Delivery</span></b><br>
   <b>Chargeable Courier Weight: <span id="courierWeightKg">0</span> kg</b><br>
-  <b>Courier Charges: ₹<span id="courierCharge">0</span></b><br>
-  <b>Grand Total: ₹<span id="grandTotal">0</span></b><br>
-  <b id="advanceLine" style="display:none">COD Advance (Minimum ₹600 or 20%): ₹<span id="advanceAmount">0</span></b><br id="advanceBreak" style="display:none">
-  <b id="restLine" style="display:none">Rest on Delivery: ₹<span id="restAmount">0</span></b>
-</div>
-<div>
-  <img id="upiQr" width="90" height="90" style="border-radius:8px;background:#fff">
+  <span style="color:#a5f3fc">Payment, delivery speed and courier will be selected on the next page.</span>
 </div>
 </div>
 </div></div>
@@ -1656,6 +1713,39 @@ ps2GameDrivePrices.forEach(d=>{
   });
 });
 
+products.push(
+  {
+    name:"Best AV Cable for PS2",
+    category:"PS2",
+    price:179,
+    weight:140,
+    dimensions:[18,8,4],
+    compatibility:"PlayStation 2",
+    features:["High-quality audio and video output","PS2 multi-out to RCA connection"],
+    images:["01-Ps2bestavcable.png","01-Ps2bestavcable.jpg"]
+  },
+  {
+    name:"AV Component Connector",
+    category:"Cables",
+    price:160,
+    weight:60,
+    dimensions:[18,7,3],
+    compatibility:"LCD / LED TV, DVD, STB and Projector",
+    features:["3.5mm TRRS to RCA female connector","Video, left audio and right audio"],
+    images:["02-Avcomponenet.png","02-Avcomponenet.jpg"]
+  },
+  {
+    name:"AV Male to Male Cable",
+    category:"Cables",
+    price:120,
+    weight:150,
+    dimensions:[20,12,4],
+    compatibility:"Composite video and stereo audio devices",
+    features:["3 RCA male to 3 RCA male","Yellow video with white/red stereo audio"],
+    images:["03-Av-male-to-male.png","03-Av-male-to-male.jpg"]
+  }
+);
+
 const colorDots={
 "Red":"#FF0000","Yellow":"#FFD700","Ice Blue":"#00CFFF",
 "Pink":"#FF69B4","Green":"#00CC44","Black":"#000000",
@@ -1731,6 +1821,38 @@ function filterCatalog(category){
  });
 }
 
+function renderLatestProducts(){
+ const track=document.getElementById("latestProductsTrack");
+ if(!track) return;
+ const latest=products.slice(-12).reverse();
+ const cards=latest.map(p=>`
+   <div class="latest-mini-card">
+     <img src="${p.images?.[0]||""}" alt="${p.name}" loading="lazy">
+     <div class="latest-mini-name">${p.name}</div>
+     <div class="latest-mini-price">${p.priceLabel||("₹"+p.price)}</div>
+   </div>`).join("");
+ track.innerHTML=cards+cards;
+}
+
+let deferredAppInstall=null;
+window.addEventListener("beforeinstallprompt",event=>{
+ event.preventDefault();
+ deferredAppInstall=event;
+});
+document.getElementById("installAndroidApp")?.addEventListener("click",async()=>{
+ if(deferredAppInstall){
+   deferredAppInstall.prompt();
+   await deferredAppInstall.userChoice;
+   deferredAppInstall=null;
+ }else{
+   alert("Android Chrome menu खोलें और ‘Install app’ या ‘Add to Home screen’ चुनें.");
+ }
+});
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=3",{updateViaCache:"none"}).catch(()=>{}));
+}
+renderLatestProducts();
+
 
 function clearCart(){
  if(!confirm("Reset all selected products?")) return;
@@ -1799,7 +1921,7 @@ function updateVariantQty(i,v,val){
 }
 
 const DELIVERY_SPEEDS={
- surface:{label:"Surface Delivery",multiplier:1,couriers:["Trackon.in","Delhivery.com","BlueDart","Ecom Express","Speed Post","Shreemaruti.com","Dtdc.in"]},
+ surface:{label:"Surface Delivery",multiplier:1,couriers:["Trackon.in","Delhivery.com","BlueDart","Ecom Express","XpressBees","Speed Post","Shreemaruti.com","Dtdc.in"]},
  air:{label:"By Air Delivery",multiplier:1.5,couriers:["Trackon.in","Shreemaruti.com"]},
  prime:{label:"Prime Trackon.in",multiplier:2,couriers:["Trackon.in"]}
 };
@@ -1838,8 +1960,8 @@ function syncDeliveryControls(){
 
  const speed=getDeliverySpeed();
  const allowed=paymentMode==="cod"
-   ? ["Delhivery.com","BlueDart","Ecom Express"]
-   : ["Trackon.in","Delhivery.com","BlueDart","Ecom Express","Speed Post","Shreemaruti.com","Dtdc.in"];
+   ? ["Delhivery.com","BlueDart","Ecom Express","XpressBees"]
+   : ["Trackon.in","Delhivery.com","BlueDart","Ecom Express","XpressBees","Speed Post","Shreemaruti.com","Dtdc.in"];
  const select=document.getElementById("courier");
  if(select){
    const previous=select.value;
@@ -1868,8 +1990,7 @@ function onPaymentModeChange(){
 }
 
 function courierBaseRate(courier){
- if(courier==="Delhivery.com" || courier==="BlueDart" || courier==="Ecom Express") return 300;
- if(courier==="Speed Post") return 150;
+ if(["Speed Post","Delhivery.com","BlueDart","Ecom Express","XpressBees"].includes(courier)) return 200;
  return 100;
 }
 
@@ -1878,11 +1999,9 @@ function getCourierCalculation(chargeableKg){
  const courier=document.getElementById("courier")?.value || "Trackon.in";
  const meta=DELIVERY_SPEEDS[speed];
  const paymentMode=getPaymentMode();
- const preferred=["Trackon.in","Shreemaruti.com","Dtdc.in"].includes(courier);
- const paymentCourierMultiplier=paymentMode==="cod" ? 2.5 : (preferred ? 1 : 2);
  const speedMultiplier=paymentMode==="cod" ? 1 : meta.multiplier;
- const courierCharge=Math.round(chargeableKg*courierBaseRate(courier)*speedMultiplier*paymentCourierMultiplier);
- return {speed,courier,courierCharge,label:meta.label,paymentMode,paymentCourierMultiplier};
+ const courierCharge=Math.round(chargeableKg*courierBaseRate(courier)*speedMultiplier);
+ return {speed,courier,courierCharge,label:meta.label,paymentMode};
 }
 
 function render(){
@@ -1935,33 +2054,12 @@ function render(){
  const packingWeight = itemCount>0 ? Math.ceil(totalWeight/1000)*300 : 0;
  const packedWeight = totalWeight + packingWeight;
  const chargeableKg = itemCount>0 ? Math.ceil(packedWeight/1000) : 0;
- const delivery=getCourierCalculation(chargeableKg);
- const courierCharge=delivery.courierCharge;
- const grandTotal = total + courierCharge;
- const advanceAmount=delivery.paymentMode==="cod" ? Math.max(600,Math.ceil(grandTotal*0.20)) : grandTotal;
- const restAmount=delivery.paymentMode==="cod" ? grandTotal-advanceAmount : 0;
- document.getElementById("courierCharge").innerText=courierCharge;
- document.getElementById("grandTotal").innerText=grandTotal;
  document.getElementById("packingWeight").innerText=packingWeight;
- document.getElementById("paymentModeLabel").innerText=delivery.paymentMode==="cod"?"COD — Minimum ₹600 or 20% Advance":"Full Payment (Prepaid)";
- document.getElementById("advanceAmount").innerText=advanceAmount;
- document.getElementById("restAmount").innerText=restAmount;
- document.getElementById("advanceLine").style.display=delivery.paymentMode==="cod"?"inline":"none";
- document.getElementById("advanceBreak").style.display=delivery.paymentMode==="cod"?"":"none";
- document.getElementById("restLine").style.display=delivery.paymentMode==="cod"?"inline":"none";
  const courierKgEl=document.getElementById("courierWeightKg");
  if(courierKgEl) courierKgEl.innerText=chargeableKg;
- const deliverySpeedLabel=document.getElementById("deliverySpeedLabel");
- if(deliverySpeedLabel) deliverySpeedLabel.innerText=delivery.label;
 
  document.getElementById("floatingSummary").innerHTML =
- `Products: ${itemCount} | ${delivery.paymentMode==="cod"?"COD":"Prepaid"} | Amount: ₹${total} | Courier Weight: ${chargeableKg}kg | Courier: ₹${courierCharge} | Total: ₹${grandTotal}${delivery.paymentMode==="cod"?` | Advance: ₹${advanceAmount} | Rest: ₹${restAmount}`:""}`;
-
- const upi='upi://pay?pa=paytmqr68kzsc@ptys&pn=Surender%20Kaur&am='+advanceAmount+'&cu=INR';
- const qr=document.getElementById('upiQr');
- if(qr){
-   qr.src='https://api.qrserver.com/v1/create-qr-code/?size=90x90&data='+encodeURIComponent(upi);
- }
+ `Products: ${itemCount} | Amount: ₹${total} | Weight: ${totalWeight}g | Select payment & delivery on next page`;
 
  generateCombinedPoster();
  generateBoxPlanner();
@@ -2213,6 +2311,7 @@ function downloadCombinedPoster(){
 
 
 function orderWhatsApp(){
+ return goDetails();
  let lines=[],total=0,totalWeight=0,n=1;
 
  products.forEach((p,i)=>{
@@ -2251,7 +2350,9 @@ function orderWhatsApp(){
  const delivery=getCourierCalculation(chargeableKg);
  const courier=delivery.courier;
  const courierCharge=delivery.courierCharge;
- const grandTotal = total + courierCharge;
+ const subtotalWithCourier=total+courierCharge;
+ const vasCharge=Math.ceil(subtotalWithCourier*0.02);
+ const grandTotal = subtotalWithCourier+vasCharge;
  const paymentType=delivery.paymentMode==="cod"?"COD":"Prepaid";
  const advanceAmount=delivery.paymentMode==="cod"?Math.max(600,Math.ceil(grandTotal*0.20)):grandTotal;
  const restAmount=delivery.paymentMode==="cod"?grandTotal-advanceAmount:0;
@@ -2278,6 +2379,8 @@ ${delivery.paymentMode==="cod"?"📌 COD Rule: Minimum ₹2,500 product order �
 
 🚚 Courier Charges: ₹${courierCharge}
 
+➕ VAS (2% of Product + Courier Total): ₹${vasCharge}
+
 🧾 Grand Total: ₹${grandTotal}
 
 💰 Amount Paid / Advance: ₹${advanceAmount}
@@ -2299,12 +2402,14 @@ function buildOrderSummary(){
  let productTotal=0;
  let totalWeight=0;
  let totalQuantity=0;
+ let hasBatteryItem=false;
 
  products.forEach((p,i)=>{
    if(p.variants){
      p.variants.forEach(v=>{
        const quantity=state['v_'+i+'_'+v]||0;
        if(quantity>0){
+         if(p.containsBattery) hasBatteryItem=true;
          const lineTotal=p.price*quantity;
          const lineWeight=p.weight*quantity;
          items.push({
@@ -2324,6 +2429,7 @@ function buildOrderSummary(){
 
    const quantity=state[i]||0;
    if(quantity>0){
+     if(p.containsBattery) hasBatteryItem=true;
      const lineTotal=p.price*quantity;
      const lineWeight=p.weight*quantity;
      items.push({
@@ -2340,7 +2446,7 @@ function buildOrderSummary(){
    }
  });
 
- return {items,productTotal,totalWeight,totalQuantity};
+ return {items,productTotal,totalWeight,totalQuantity,hasBatteryItem};
 }
 
 function goDetails(){
@@ -2349,36 +2455,16 @@ function goDetails(){
  const totalWeight=summary.totalWeight;
 
  if(total<=0){alert("Please select products first");return;}
- if(getPaymentMode()==="cod" && total<2500){
-   alert("COD is available only for product orders of ₹2,500 or more.");
-   return;
- }
 
  const packingWeight = totalWeight>0 ? Math.ceil(totalWeight/1000)*300 : 0;
  const packedWeight = totalWeight + packingWeight;
-
  const chargeableKg = packedWeight>0 ? Math.ceil(packedWeight/1000) : 0;
- const delivery=getCourierCalculation(chargeableKg);
- const courierCharge=delivery.courierCharge;
-
- const grandTotal = total + courierCharge;
- const advanceAmount=delivery.paymentMode==="cod"?Math.max(600,Math.ceil(grandTotal*0.20)):grandTotal;
- const restAmount=delivery.paymentMode==="cod"?grandTotal-advanceAmount:0;
-
- summary.paymentMode=delivery.paymentMode;
- summary.paymentType=delivery.paymentMode==="cod"?"COD":"Prepaid";
  summary.packingWeight=packingWeight;
  summary.packedWeight=packedWeight;
  summary.chargeableKg=chargeableKg;
- summary.deliverySpeed=delivery.label;
- summary.courier=delivery.courier;
- summary.courierCharge=courierCharge;
- summary.grandTotal=grandTotal;
- summary.advanceAmount=advanceAmount;
- summary.restAmount=restAmount;
  localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
- window.location.href=`order-prefill.html?grandTotal=${grandTotal}&paymentMode=${delivery.paymentMode}&advanceAmount=${advanceAmount}&restAmount=${restAmount}&deliverySpeed=${encodeURIComponent(delivery.label)}&courier=${encodeURIComponent(delivery.courier)}&courierCharge=${courierCharge}`;
+ window.location.href="order-prefill.html";
 }
 
 
