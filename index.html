@@ -987,15 +987,18 @@ img,canvas{
   text-align:center;
   white-space:nowrap;
 }
-.notice-inner>div:last-child{display:contents}
 .trust-row.catalog-trust{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  display:flex;
+  flex-direction:row;
+  flex-wrap:nowrap;
   gap:8px;
   margin:0;
+  width:100%;
 }
 .catalog-trust .trust-chip{
   display:flex;
+  flex:1 1 25%;
+  min-width:0;
   justify-content:center;
   align-items:center;
   min-height:38px;
