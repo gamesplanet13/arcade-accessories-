@@ -1,0 +1,19 @@
+{
+  "name": "Games Planet",
+  "short_name": "Games Planet",
+  "description": "Live Games Planet products, prices, videos and ordering.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "icons": [
+    {
+      "src": "games-planet-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
