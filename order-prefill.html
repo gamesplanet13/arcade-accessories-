@@ -731,10 +731,33 @@ function uniqueText(values){
   });
   return out.sort((a,b)=>a.localeCompare(b,'en-IN'));
 }
+function validIndiaCoordinate(lat,lng){
+  return Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=6&&lat<=38&&lng>=68&&lng<=98;
+}
+function cityCoordinateFallback(city,state){
+  const wantedCity=normalizeText(city).toUpperCase();
+  const wantedState=normalizeText(state).toUpperCase();
+  if(!wantedCity)return null;
+  const points=Object.values(pincodeDB||{}).filter(record=>{
+    const lat=Number(record?.lat),lng=Number(record?.lng);
+    return normalizeText(record?.city).toUpperCase()===wantedCity&&
+      (!wantedState||normalizeText(record?.state).toUpperCase()===wantedState)&&
+      validIndiaCoordinate(lat,lng);
+  }).map(record=>({lat:Number(record.lat),lng:Number(record.lng)}));
+  if(!points.length)return null;
+  points.sort((a,b)=>a.lat-b.lat); const lat=points[Math.floor(points.length/2)].lat;
+  points.sort((a,b)=>a.lng-b.lng); const lng=points[Math.floor(points.length/2)].lng;
+  return {lat,lng};
+}
 function normalizeLocalRecord(record){
   if(!record)return null;
+  let lat=Number(record.lat),lng=Number(record.lng);
+  if(!validIndiaCoordinate(lat,lng)){
+    const fallback=cityCoordinateFallback(record.city,record.state);
+    lat=fallback?.lat; lng=fallback?.lng;
+  }
   return {
-    lat:Number(record.lat),lng:Number(record.lng),
+    lat,lng,
     city:normalizeText(record.city),state:normalizeText(record.state),
     postoffices:uniqueText(record.postoffices||[]),source:'offline'
   };
@@ -862,7 +885,7 @@ function renderPincodeRecord(pin,rec,verification='offline'){
     const o=document.createElement("option");o.value=po;o.text=po;sel.appendChild(o);
   });
   if([...sel.options].some(o=>o.value===previous))sel.value=previous;
-  if(Number.isFinite(rec.lat)&&Number.isFinite(rec.lng)){
+  if(validIndiaCoordinate(rec.lat,rec.lng)){
         const origin=normalizeLocalRecord(pincodeDB['244901']);
         const baseLat=Number.isFinite(origin?.lat)?origin.lat:28.8154;
         const baseLng=Number.isFinite(origin?.lng)?origin.lng:79.0250;
@@ -1192,38 +1215,47 @@ function buildWhatsAppTemplate(){
     `GST Billing Address: ${document.getElementById("buyerBillingAddress").value||""}`
   ]:["GST Invoice: Excluded"];
   const itemLines=o.items.flatMap((i,n)=>[
-    `${n===0?"Base Product":"Add-on "+n}: ${i.name}`,
+    `${n+1}. ${i.name}`,
     `Quantity: ${i.quantity}`,
-    `Unit Price: ${gpzMoney(i.unitPrice)}`,
-    `Line Total: ${gpzMoney(i.lineTotal)}`
+    `Per Price: ${gpzMoney(i.unitPrice)}`,
+    `Product Total: ${gpzMoney(i.lineTotal)}`,
+    `Weight: ${i.unitWeight}g × ${i.quantity} = ${i.lineWeight}g`,
+    ""
   ]);
   return [
-    isCod?"[COD ORDER]":"[PREPAID ORDER]","",
+    isCod?"🔴 COD Order on WhatsApp":"🟢 Prepaid Order on WhatsApp","",
     `Order ID: ${document.getElementById("orderId").value}`,
     `Name: ${document.getElementById("name").value}`,`Mobile: ${document.getElementById("mobile").value}`,
     `Alt Mobile: ${document.getElementById("altMobile").value}`,`Email: ${document.getElementById("email").value}`,
     `Address: ${address}`,`Landmark: ${document.getElementById("landmark").value}`,
     `Pincode: ${document.getElementById("pincode").value}`,`State: ${document.getElementById("state").value}`,
     `District/City: ${document.getElementById("city").value}`,`Post office: ${document.getElementById("postoffice").value}`,"",
-    "Product: PS2 Product",`Variant: ${gpzOrderVariant()}`,
-    `Base Price: ${gpzMoney(o.items[0]?.lineTotal||0)}`,
-    `Products Amount: ${gpzMoney(o.productTotal)}`,
-    `Discount Coupon: ${o.discountCode||"Not used"}`,
-    `Discount Applied: ${gpzMoney(o.discountApplied)}`,
-    ...gstLines,
-    `VAS (2%): ${o.vasApplies?gpzMoney(o.vasCharge):"Not Applicable"}`,
-    `Courier Company: ${o.courier}`,`Courier Charges: ${gpzMoney(o.courierCharge)}`,
-    `Total Amount: ${gpzMoney(o.grandTotal)}`,
-    `${isCod?"Advance Paid":"Amount Paid"}: ${gpzMoney(o.advanceAmount)}`,
+    "Product: Arcade Accessories","Variant:",
+    `Courier Company: ${o.courier}`,
+    `Discount: ${gpzMoney(o.discountApplied)}`,
+    `Amount Paid: ${gpzMoney(o.advanceAmount)}`,
     ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[]),"",
-    `Distance: ${document.getElementById("distance").value||""}`,
-    `ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`,
-    `Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`,"",
-    "PRODUCT BREAKDOWN",...itemLines,
-    `Total Products: ${o.totalQuantity}`,
+    `📏 Distance: ${document.getElementById("distance").value||""}`,
+    `⏳ ${isCod?"COD":"Prepaid"} Order ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`,
+    `📅 Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`,"",
+    "📦 SELECTED PRODUCTS & COMPLETE BREAKDOWN","",...itemLines,
+    `Total Quantity: ${o.totalQuantity}`,
     `Products Total: ${gpzMoney(o.productTotal)}`,
+    `Discount Coupon: ${o.discountCode||"Not used"}`,
+    `Discount Applied: ${o.discountApplied?"-"+gpzMoney(o.discountApplied):gpzMoney(0)}`,
+    ...gstLines,
+    `Total Product Weight: ${o.totalWeight}g`,
+    `Packaging Weight: ${o.packingWeight}g`,
+    `Total Dead Weight: ${o.packedWeight}g`,
+    `Total Dimensions / Box Size: ${o.boxDimensions.join(" × ")} cm`,
+    `Volumetric Weight: ${o.volumetricKg.toFixed(2)}kg`,
+    `Chargeable Weight: ${o.chargeableKg.toFixed(2)}kg`,
+    `Courier Company: ${o.courier}`,
     `Total Courier Charges: ${gpzMoney(o.courierCharge)}`,
-    `Final Total Amount: ${gpzMoney(o.grandTotal)}`
+    `VAS (2%): ${o.vasApplies?gpzMoney(o.vasCharge):"Not Applicable"}`,
+    `Final Total Amount: ${gpzMoney(o.grandTotal)}`,
+    `Total Amount Paid: ${gpzMoney(o.advanceAmount)}`,
+    ...(isCod?[`Total Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[])
   ].join("\n");
 }
 function submitOrder(){
