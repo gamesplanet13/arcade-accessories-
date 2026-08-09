@@ -250,6 +250,64 @@ h2{
 }
 .image-row img:hover{transform:scale(1.05);box-shadow:0 10px 22px rgba(0,0,0,.25)}
 .image-row.multi-image img{width:68px;height:68px;border-radius:10px}
+.product-3d-stage{
+  position:relative;
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  perspective:720px;
+  transform-style:preserve-3d;
+  border-radius:16px;
+  isolation:isolate;
+  touch-action:pan-y;
+}
+.product-3d-stage::before{
+  content:"";
+  position:absolute;
+  inset:12% 10% -7%;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.38),transparent 68%);
+  filter:blur(7px);
+  transform:translateZ(-22px) rotateX(72deg);
+  pointer-events:none;
+  opacity:.85;
+  transition:opacity .25s ease,transform .25s ease;
+}
+.product-3d-stage::after{
+  content:"3D";
+  position:absolute;
+  right:5px;
+  bottom:5px;
+  z-index:3;
+  padding:3px 5px;
+  border-radius:7px;
+  background:rgba(2,6,23,.76);
+  border:1px solid rgba(103,232,249,.45);
+  color:#a5f3fc;
+  font-size:8px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.6px;
+  pointer-events:none;
+}
+.product-3d-stage img{
+  position:relative;
+  z-index:2;
+  transform:rotateX(0deg) rotateY(0deg) translateZ(10px);
+  transform-style:preserve-3d;
+  will-change:transform,filter;
+  filter:drop-shadow(0 10px 9px rgba(0,0,0,.28));
+  transition:transform .16s ease-out,filter .2s ease;
+  backface-visibility:hidden;
+}
+.product-3d-stage.is-active img{
+  filter:drop-shadow(var(--shadow-x,0px) 13px 10px rgba(0,0,0,.36));
+}
+.product-3d-stage.is-active::before{opacity:1;transform:translateZ(-28px) rotateX(75deg) scale(1.08)}
+.image-row.multi-image .product-3d-stage{border-radius:12px}
+@media (prefers-reduced-motion:reduce){
+  .product-3d-stage img{transition:none!important;transform:none!important}
+}
 .product-features{
   margin:10px 0 0;
   padding:10px 12px;
@@ -1489,8 +1547,8 @@ images:[
 "images/jpeg/remote-lead.jpeg"
 ]},
 
-{name:"12 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:60,weight:70,dimensions:[10,5,3],images:[
-"images/jpeg/12-core-wire.jpeg"
+{name:"10 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:60,weight:70,dimensions:[10,5,3],images:[
+"images/jpeg/10-core-wire.jpg"
 ]},
 
 {
@@ -1878,7 +1936,7 @@ categoryOrder.forEach(cat=>{
  const i=products.indexOf(p);
  if(state[i]===undefined) state[i]=0;
 
- const imgs=p.images.map(img=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name}" onclick="openImg('${img}')">`).join("");
+ const imgs=p.images.map((img,imageIndex)=>`<span class="product-3d-stage" aria-label="Interactive 3D view: ${p.name}"><img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')"></span>`).join("");
  container.innerHTML+=`
  <div class="product" data-category="${cat}">
   <b class="product-title">${p.name}</b>
@@ -1910,6 +1968,42 @@ function filterCatalog(category){
    el.style.display=(category==="all" || el.dataset.category===category)?"":"none";
  });
 }
+
+function setupProduct3DViews(root=document){
+ root.querySelectorAll('.product-3d-stage:not([data-3d-ready])').forEach(stage=>{
+   stage.dataset.threeDReady='1';
+   const img=stage.querySelector('img');
+   if(!img) return;
+   let pressed=false;
+
+   const tilt=(clientX,clientY)=>{
+     const rect=stage.getBoundingClientRect();
+     const px=Math.max(0,Math.min(1,(clientX-rect.left)/Math.max(rect.width,1)));
+     const py=Math.max(0,Math.min(1,(clientY-rect.top)/Math.max(rect.height,1)));
+     const rotateY=(px-.5)*24;
+     const rotateX=(.5-py)*20;
+     img.style.transform=`rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(16px) scale(1.035)`;
+     stage.style.setProperty('--shadow-x',`${(-rotateY*.45).toFixed(1)}px`);
+     stage.classList.add('is-active');
+   };
+   const reset=()=>{
+     pressed=false;
+     img.style.transform='rotateX(0deg) rotateY(0deg) translateZ(10px) scale(1)';
+     stage.classList.remove('is-active');
+   };
+
+   stage.addEventListener('pointerenter',event=>tilt(event.clientX,event.clientY));
+   stage.addEventListener('pointermove',event=>{
+     if(event.pointerType==='mouse' || pressed) tilt(event.clientX,event.clientY);
+   });
+   stage.addEventListener('pointerdown',event=>{pressed=true;stage.setPointerCapture?.(event.pointerId);tilt(event.clientX,event.clientY)});
+   stage.addEventListener('pointerup',reset);
+   stage.addEventListener('pointercancel',reset);
+   stage.addEventListener('pointerleave',reset);
+ });
+}
+
+setupProduct3DViews(container);
 
 function renderLatestProducts(){
  const track=document.getElementById("latestProductsTrack");
@@ -2162,7 +2256,7 @@ function toTransparentPngAsset(src){
   if(!src) return "";
   return src
     .replace(/^images\/jpeg\//,"images/png/")
-    .replace(/\.jpeg(?:\?.*)?$/i,".png");
+    .replace(/\.(?:jpe?g)(?:\?.*)?$/i,".png");
 }
 
 function getProductImageForVariant(product, variant){
@@ -2188,7 +2282,7 @@ function getSelectedPosterItems(){
             qty,
             image:getProductImageForVariant(p,v),
             fallbackImage:(p.images&&p.images[0])||"",
-            isWire:/12\s*Core\s*Wire/i.test(p.name),
+            isWire:/10\s*Core\s*Wire/i.test(p.name),
             repeatImage:false
           });
         }
@@ -2203,7 +2297,7 @@ function getSelectedPosterItems(){
         qty,
         image:getProductImageForVariant(p,""),
         fallbackImage:(p.images&&p.images[0])||"",
-        isWire:/12\s*Core\s*Wire/i.test(p.name),
+        isWire:/10\s*Core\s*Wire/i.test(p.name),
         repeatImage:false
       });
     }
@@ -3992,7 +4086,7 @@ Rampur, U.P – 244901</p>
     <div class="poster-stage">
       <canvas id="combinedPoster" width="1600" height="900"></canvas>
     </div>
-    <div class="poster-note">Selected products and their total quantities automatically appear in one catalog-style picture. For 12 Core Wire, the selected quantity is shown as total meter length.</div>
+    <div class="poster-note">Selected products and their total quantities automatically appear in one catalog-style picture. For 10 Core Wire, the selected quantity is shown as total meter length.</div>
   </div>
 </div>
 <div class="combined-poster-wrap" id="boxPlannerSection">
