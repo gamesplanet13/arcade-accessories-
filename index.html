@@ -2223,6 +2223,35 @@ function courierBaseRate(courier){
  return 100;
 }
 
+/* Automatic bulk/quantity pricing. Product names must match the catalogue. */
+const QUANTITY_PRICE_RULES={
+ "Push Button":{min:50,price:30},
+ "Push Button (Imported)":{min:50,price:44},
+ "Black Switch Button":{min:50,price:14},
+ "MD Switch Button":{min:50,price:48},
+ "Coin Drop Switch Button":{min:50,price:43},
+ "Rasila Handle (Without Switch)":{min:20,price:195},
+ "Rasila Handle (With Switch)":{min:20,price:251},
+ "MD Handle (With Switch)":{min:20,price:550},
+ "Coin Acrylic Machine":{min:20,price:190},
+ "10 Core Wire (Per Meter)":{min:20,price:48},
+ "Remote Lead":{min:20,price:95},
+ "Remote Plate":{min:20,price:290},
+ "USB Gamepad":{min:10,price:350},
+ "PS2 Wired Controller (Replica)":{min:10,price:350},
+ "PS2 Wireless Controller":{min:10,price:480},
+ "Matrix Modbo 5.0 Modchip":{min:10,price:530}
+};
+function selectedProductQuantity(p,i){
+ let quantity=Number(state[i]||0);
+ if(p.variants) p.variants.forEach(v=>quantity+=Number(state['v_'+i+'_'+v]||0));
+ return quantity;
+}
+function effectiveUnitPrice(p,i){
+ const rule=QUANTITY_PRICE_RULES[p.name];
+ return rule&&selectedProductQuantity(p,i)>=rule.min?rule.price:p.price;
+}
+
 function getCourierCalculation(chargeableKg){
  const speed=syncDeliveryControls();
  const courier=document.getElementById("courier")?.value || "Trackon.in";
@@ -2241,21 +2270,21 @@ function render(){
     p.variants.forEach(v=>{
       const q=state['v_'+i+'_'+v]||0;
       if(q>0){
-        const sp=p.price*q, sw=p.weight*q;
+        const unitPrice=effectiveUnitPrice(p,i), sp=unitPrice*q, sw=p.weight*q;
         total+=sp; totalWeight+=sw;
-        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${p.price} × ${q} = ₹${sp}<br>${p.weight}g × ${q} = ${sw}g</div>`;
+        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>${p.weight}g × ${q} = ${sw}g</div>`;
       }
     });
   }
   if(state[i]>0){
    const qty=state[i];
-   const sp=p.price*qty;
+   const unitPrice=effectiveUnitPrice(p,i), sp=unitPrice*qty;
    const sw=p.weight*qty;
    total+=sp; totalWeight+=sw;
    html+=`
    <div style="border-bottom:1px dashed #444;margin-bottom:8px">
     <b>${p.name}</b><br>
-    ₹${p.price} × ${qty} = ₹${sp}<br>
+    ₹${unitPrice} × ${qty} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>
     ${p.weight}g × ${qty} = ${sw}g
    </div>`;
   }
@@ -2639,15 +2668,19 @@ function buildOrderSummary(){
        const quantity=state['v_'+i+'_'+v]||0;
        if(quantity>0){
          if(p.containsBattery) hasBatteryItem=true;
-         const lineTotal=p.price*quantity;
+         const unitPrice=effectiveUnitPrice(p,i);
+         const lineTotal=unitPrice*quantity;
          const lineWeight=p.weight*quantity;
          items.push({
            name:`${p.name} - ${v}`,
            quantity,
-           unitPrice:p.price,
+           unitPrice,
+           baseUnitPrice:p.price,
            lineTotal,
            unitWeight:p.weight,
-           lineWeight
+           lineWeight,
+           dimensions:p.dimensions||[],
+           automaticQuantityPrice:unitPrice!==p.price
          });
          productTotal+=lineTotal;
          totalWeight+=lineWeight;
@@ -2659,15 +2692,19 @@ function buildOrderSummary(){
    const quantity=state[i]||0;
    if(quantity>0){
      if(p.containsBattery) hasBatteryItem=true;
-     const lineTotal=p.price*quantity;
+     const unitPrice=effectiveUnitPrice(p,i);
+     const lineTotal=unitPrice*quantity;
      const lineWeight=p.weight*quantity;
      items.push({
        name:p.name,
        quantity,
-       unitPrice:p.price,
+       unitPrice,
+       baseUnitPrice:p.price,
        lineTotal,
        unitWeight:p.weight,
-       lineWeight
+       lineWeight,
+       dimensions:p.dimensions||[],
+       automaticQuantityPrice:unitPrice!==p.price
      });
      productTotal+=lineTotal;
      totalWeight+=lineWeight;
