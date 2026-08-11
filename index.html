@@ -257,7 +257,13 @@ h2{
   place-items:center;
   perspective:720px;
   transform-style:preserve-3d;
-  border-radius:16px;
+  width:118px;
+  min-height:118px;
+  padding:10px;
+  border-radius:22px;
+  background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(15,23,42,.92));
+  border:1px solid rgba(103,232,249,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 18px 30px rgba(0,0,0,.38),0 0 24px rgba(34,211,238,.13);
   isolation:isolate;
   touch-action:pan-y;
 }
@@ -274,17 +280,17 @@ h2{
   transition:opacity .25s ease,transform .25s ease;
 }
 .product-3d-stage::after{
-  content:"3D";
+  content:"3D VIEW";
   position:absolute;
   right:5px;
   bottom:5px;
   z-index:3;
-  padding:3px 5px;
+  padding:4px 7px;
   border-radius:7px;
   background:rgba(2,6,23,.76);
   border:1px solid rgba(103,232,249,.45);
   color:#a5f3fc;
-  font-size:8px;
+  font-size:9px;
   line-height:1;
   font-weight:900;
   letter-spacing:.6px;
@@ -293,10 +299,10 @@ h2{
 .product-3d-stage img{
   position:relative;
   z-index:2;
-  transform:rotateX(0deg) rotateY(0deg) translateZ(10px);
+  transform:rotateX(7deg) rotateY(-9deg) translateZ(20px);
   transform-style:preserve-3d;
   will-change:transform,filter;
-  filter:drop-shadow(0 10px 9px rgba(0,0,0,.28));
+  filter:drop-shadow(12px 15px 10px rgba(0,0,0,.42));
   transition:transform .16s ease-out,filter .2s ease;
   backface-visibility:hidden;
 }
@@ -305,8 +311,22 @@ h2{
 }
 .product-3d-stage.is-active::before{opacity:1;transform:translateZ(-28px) rotateX(75deg) scale(1.08)}
 .image-row.multi-image .product-3d-stage{border-radius:12px}
+.image-row.multi-image .product-3d-stage{width:92px;min-height:92px;padding:8px}
+.product-3d-stage:nth-child(even) img{transform:rotateX(7deg) rotateY(9deg) translateZ(20px)}
+@keyframes productFloat3D{0%,100%{translate:0 0}50%{translate:0 -5px}}
+.category-panel.is-open .product-3d-stage{animation:productFloat3D 3.4s ease-in-out infinite}
+.category-panel.is-open .product-3d-stage:nth-child(2n){animation-delay:-1.7s}
+.category-panel{margin:15px 0 18px;border:1px solid rgba(34,211,238,.2);border-radius:18px;overflow:hidden;background:rgba(3,10,23,.45)}
+.category-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border:0;background:linear-gradient(90deg,rgba(8,47,73,.96),rgba(30,41,59,.96));color:#c8f7ff;font-size:17px;font-weight:900;text-align:left;cursor:pointer}
+.category-toggle .cat-count{font-size:12px;color:#e0f2fe;background:rgba(255,255,255,.1);padding:5px 9px;border-radius:999px}
+.category-toggle .cat-arrow{font-size:18px;transition:transform .2s ease}
+.category-panel.is-open .cat-arrow{transform:rotate(180deg)}
+.category-products{display:none;padding:12px}
+.category-panel.is-open .category-products{display:block}
+.catalog-updated-badge{margin:10px 0 16px;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,rgba(6,182,212,.18),rgba(124,58,237,.18));border:1px solid rgba(103,232,249,.45);color:#e0fbff;font-weight:800;text-align:center}
 @media (prefers-reduced-motion:reduce){
-  .product-3d-stage img{transition:none!important;transform:none!important}
+  .product-3d-stage{animation:none!important}
+  .product-3d-stage img{transition:none!important}
 }
 .product-features{
   margin:10px 0 0;
@@ -1329,6 +1349,7 @@ img,canvas{
 <div class="actions">
   <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
   <button class="details" onclick="goDetails()">Fill Your Details</button>
+  <button class="details" onclick="openInvoiceBuilder()">Create Invoice</button>
   <button class="reset" onclick="clearCart()">Reset Cart</button>
  </div>
 
@@ -1547,8 +1568,12 @@ images:[
 "images/jpeg/remote-lead.jpeg"
 ]},
 
-{name:"10 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:60,weight:70,dimensions:[10,5,3],images:[
+{name:"10 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:50,weight:70,dimensions:[10,5,3],images:[
 "images/jpeg/10-core-wire.jpg"
+]},
+
+{name:"USB Gamepad",category:"Gaming Accessories",price:364,weight:220,dimensions:[19,20,10],images:[
+"images/usb-gamepad.svg"
 ]},
 
 {
@@ -1926,18 +1951,33 @@ const categoryOrder=[
  ,"Mobile Phone Coolers"
 ];
 
-categoryOrder.forEach(cat=>{
+container.innerHTML=`<div class="catalog-updated-badge">✨ NEW 3D PRODUCT CATALOG • Category खोलें/बंद करें • Picture पर tap करके full view देखें</div>`;
+
+categoryOrder.forEach((cat,categoryIndex)=>{
  const catProducts=products.filter(p=>p.category===cat);
  if(!catProducts.length) return;
 
- container.innerHTML += `<h2 data-category="${cat}" style="color:#00f7ff;margin:15px 5px 10px">${cat}</h2>`;
+ const section=document.createElement('section');
+ section.className=`category-panel ${categoryIndex===0?'is-open':''}`;
+ section.dataset.category=cat;
+ section.innerHTML=`<button class="category-toggle" type="button" aria-expanded="${categoryIndex===0?'true':'false'}">
+   <span>${cat}</span><span class="cat-count">${catProducts.length} Products</span><span class="cat-arrow">⌄</span>
+ </button><div class="category-products"></div>`;
+ const categoryProducts=section.querySelector('.category-products');
+ section.querySelector('.category-toggle').addEventListener('click',event=>{
+   const panel=event.currentTarget.closest('.category-panel');
+   panel.classList.toggle('is-open');
+   event.currentTarget.setAttribute('aria-expanded',panel.classList.contains('is-open')?'true':'false');
+   if(panel.classList.contains('is-open')) setupProduct3DViews(panel);
+ });
+ container.appendChild(section);
 
  catProducts.forEach((p)=>{
  const i=products.indexOf(p);
  if(state[i]===undefined) state[i]=0;
 
  const imgs=p.images.map((img,imageIndex)=>`<span class="product-3d-stage" aria-label="Interactive 3D view: ${p.name}"><img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')"></span>`).join("");
- container.innerHTML+=`
+ categoryProducts.insertAdjacentHTML('beforeend',`
  <div class="product" data-category="${cat}">
   <b class="product-title">${p.name}</b>
   <div class="product-specs">
@@ -1959,13 +1999,18 @@ categoryOrder.forEach(cat=>{
     <button onclick="updateQty(${i},1)">+</button>
    </div>`}
   </div>
- </div>`;
+ </div>`);
 });
 });
 
 function filterCatalog(category){
- document.querySelectorAll("#products [data-category]").forEach(el=>{
-   el.style.display=(category==="all" || el.dataset.category===category)?"":"none";
+ document.querySelectorAll("#products .category-panel").forEach(panel=>{
+   const show=category==="all" || panel.dataset.category===category;
+   panel.style.display=show?"":"none";
+   if(category!=="all" && show){
+     panel.classList.add('is-open');
+     panel.querySelector('.category-toggle')?.setAttribute('aria-expanded','true');
+   }
  });
 }
 
@@ -1988,7 +2033,7 @@ function setupProduct3DViews(root=document){
    };
    const reset=()=>{
      pressed=false;
-     img.style.transform='rotateX(0deg) rotateY(0deg) translateZ(10px) scale(1)';
+     img.style.transform='';
      stage.classList.remove('is-active');
    };
 
@@ -2649,6 +2694,17 @@ function goDetails(){
  localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
  window.location.href="order-prefill.html";
+}
+
+function openInvoiceBuilder(){
+ const summary=buildOrderSummary();
+ if(summary.productTotal<=0){alert("Please select products first");return;}
+ const packingWeight = summary.totalWeight>0 ? Math.ceil(summary.totalWeight/1000)*300 : 0;
+ summary.packingWeight=packingWeight;
+ summary.packedWeight=summary.totalWeight+packingWeight;
+ summary.chargeableKg=summary.packedWeight>0 ? Math.ceil(summary.packedWeight/1000) : 0;
+ localStorage.setItem("gp_invoice_summary",JSON.stringify(summary));
+ window.open("invoice.html","_blank");
 }
 
 
