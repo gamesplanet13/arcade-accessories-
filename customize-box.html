@@ -27,7 +27,7 @@
 </div></main>
 <script>
 const A='images/jpeg/';
-const boxes={mini:{name:'Mini Box',size:'2.6 ft W × 1 ft H × 1 ft D',img:'assets/box-designs/mini-box-cutout.png'},counter:{name:'Counter Box',size:'2.6 ft W × 3 ft H × approx. 1.1 ft D',img:'assets/box-designs/counter-box-cutout.png'},full:{name:'Full Body + 32-inch LCD',size:'3 ft W × 6 ft H; lower/middle 2 ft D, upper 1 ft D',img:'assets/box-designs/full-body-32-cutout.png'}};
+const boxes={mini:{name:'Mini Box',size:'2.6 ft W × 1 ft H × 1 ft D',img:'images/arcade-box-mini.png'},counter:{name:'Counter Box',size:'2.6 ft W × 3 ft H × approx. 1.1 ft D',img:'images/arcade-box-counter.png'},full:{name:'Full Body + 32-inch LCD',size:'3 ft W × 6 ft H; lower/middle 2 ft D, upper 1 ft D',img:'images/arcade-box-full-32inch.png'}};
 const buttonSets={imported:{name:'Imported Push Button',price:46,colors:{black:'imported-black.jpeg',blue:'imported-blue.jpeg',green:'imported-green.jpeg',pink:'imported-pink.jpeg'}},normal:{name:'Normal Push Button',price:32,colors:{red:'pushbutton-red.jpeg',yellow:'pushbutton-yellow.jpeg'}}};
 const handleSets={md:{name:'MD Handle with Switch',price:585,img:'md-handle-black.jpeg'},rasila:{name:'Rasila Handle with Switch',price:251,img:'rasila-handle.jpeg'}};
 const state=Object.assign({box:'mini',boxColor:'#e9dfca',buttonType:'imported',buttonColor:'black',handle:'md',coinQty:2,system:'none',card:'none',rx:0,ry:0,scale:1},JSON.parse(localStorage.getItem('gpBoxDesign')||'{}'));
