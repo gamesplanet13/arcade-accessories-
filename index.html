@@ -250,72 +250,6 @@ h2{
 }
 .image-row img:hover{transform:scale(1.05);box-shadow:0 10px 22px rgba(0,0,0,.25)}
 .image-row.multi-image img{width:68px;height:68px;border-radius:10px}
-.product-3d-stage{
-  position:relative;
-  flex:0 0 auto;
-  display:grid;
-  place-items:center;
-  perspective:720px;
-  transform-style:preserve-3d;
-  width:118px;
-  min-height:118px;
-  padding:10px;
-  border-radius:22px;
-  background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(15,23,42,.92));
-  border:1px solid rgba(103,232,249,.55);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 18px 30px rgba(0,0,0,.38),0 0 24px rgba(34,211,238,.13);
-  isolation:isolate;
-  touch-action:pan-y;
-}
-.product-3d-stage::before{
-  content:"";
-  position:absolute;
-  inset:12% 10% -7%;
-  border-radius:50%;
-  background:radial-gradient(ellipse,rgba(0,0,0,.38),transparent 68%);
-  filter:blur(7px);
-  transform:translateZ(-22px) rotateX(72deg);
-  pointer-events:none;
-  opacity:.85;
-  transition:opacity .25s ease,transform .25s ease;
-}
-.product-3d-stage::after{
-  content:"3D VIEW";
-  position:absolute;
-  right:5px;
-  bottom:5px;
-  z-index:3;
-  padding:4px 7px;
-  border-radius:7px;
-  background:rgba(2,6,23,.76);
-  border:1px solid rgba(103,232,249,.45);
-  color:#a5f3fc;
-  font-size:9px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:.6px;
-  pointer-events:none;
-}
-.product-3d-stage img{
-  position:relative;
-  z-index:2;
-  transform:rotateX(7deg) rotateY(-9deg) translateZ(20px);
-  transform-style:preserve-3d;
-  will-change:transform,filter;
-  filter:drop-shadow(12px 15px 10px rgba(0,0,0,.42));
-  transition:transform .16s ease-out,filter .2s ease;
-  backface-visibility:hidden;
-}
-.product-3d-stage.is-active img{
-  filter:drop-shadow(var(--shadow-x,0px) 13px 10px rgba(0,0,0,.36));
-}
-.product-3d-stage.is-active::before{opacity:1;transform:translateZ(-28px) rotateX(75deg) scale(1.08)}
-.image-row.multi-image .product-3d-stage{border-radius:12px}
-.image-row.multi-image .product-3d-stage{width:92px;min-height:92px;padding:8px}
-.product-3d-stage:nth-child(even) img{transform:rotateX(7deg) rotateY(9deg) translateZ(20px)}
-@keyframes productFloat3D{0%,100%{translate:0 0}50%{translate:0 -5px}}
-.category-panel.is-open .product-3d-stage{animation:productFloat3D 3.4s ease-in-out infinite}
-.category-panel.is-open .product-3d-stage:nth-child(2n){animation-delay:-1.7s}
 .category-panel{margin:15px 0 18px;border:1px solid rgba(34,211,238,.2);border-radius:18px;overflow:hidden;background:rgba(3,10,23,.45)}
 .category-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border:0;background:linear-gradient(90deg,rgba(8,47,73,.96),rgba(30,41,59,.96));color:#c8f7ff;font-size:17px;font-weight:900;text-align:left;cursor:pointer}
 .category-toggle .cat-count{font-size:12px;color:#e0f2fe;background:rgba(255,255,255,.1);padding:5px 9px;border-radius:999px}
@@ -324,10 +258,6 @@ h2{
 .category-products{display:none;padding:12px}
 .category-panel.is-open .category-products{display:block}
 .catalog-updated-badge{margin:10px 0 16px;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,rgba(6,182,212,.18),rgba(124,58,237,.18));border:1px solid rgba(103,232,249,.45);color:#e0fbff;font-weight:800;text-align:center}
-@media (prefers-reduced-motion:reduce){
-  .product-3d-stage{animation:none!important}
-  .product-3d-stage img{transition:none!important}
-}
 .product-features{
   margin:10px 0 0;
   padding:10px 12px;
@@ -573,16 +503,17 @@ select{
   object-fit:contain;
   box-shadow:0 0 35px rgba(0,0,0,.68);
 }
+.modal-image-box{position:relative;display:inline-flex;max-width:95vw;max-height:90vh}
 .close-btn{
-  position:fixed;
-  top:16px;right:18px;
-  width:48px;height:48px;
+  position:absolute;
+  top:10px;right:10px;
+  width:42px;height:42px;
   border-radius:50%;
   background:linear-gradient(145deg,#b91c1c,#ef4444);
   color:#fff;
   font-size:30px;
   font-weight:900;
-  line-height:46px;
+  line-height:40px;
   text-align:center;
   cursor:pointer;
   z-index:100000;
@@ -1365,8 +1296,10 @@ img,canvas{
 </div></div>
 
 <div id="imgModal">
- <div class="close-btn" onclick="closeImg()">×</div>
- <img id="modalImg">
+ <div class="modal-image-box">
+  <img id="modalImg">
+  <div class="close-btn" onclick="closeImg()" role="button" aria-label="Close image">×</div>
+ </div>
 </div>
 
 
@@ -1951,7 +1884,7 @@ const categoryOrder=[
  ,"Mobile Phone Coolers"
 ];
 
-container.innerHTML=`<div class="catalog-updated-badge">✨ NEW 3D PRODUCT CATALOG • Category खोलें/बंद करें • Picture पर tap करके full view देखें</div>`;
+container.innerHTML=`<div class="catalog-updated-badge">✨ PRODUCT CATALOG • Category खोलें/बंद करें • Picture पर tap करके full view देखें</div>`;
 
 categoryOrder.forEach((cat,categoryIndex)=>{
  const catProducts=products.filter(p=>p.category===cat);
@@ -1968,7 +1901,6 @@ categoryOrder.forEach((cat,categoryIndex)=>{
    const panel=event.currentTarget.closest('.category-panel');
    panel.classList.toggle('is-open');
    event.currentTarget.setAttribute('aria-expanded',panel.classList.contains('is-open')?'true':'false');
-   if(panel.classList.contains('is-open')) setupProduct3DViews(panel);
  });
  container.appendChild(section);
 
@@ -1976,7 +1908,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
  const i=products.indexOf(p);
  if(state[i]===undefined) state[i]=0;
 
- const imgs=p.images.map((img,imageIndex)=>`<span class="product-3d-stage" aria-label="Interactive 3D view: ${p.name}"><img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')"></span>`).join("");
+ const imgs=p.images.map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join("");
  categoryProducts.insertAdjacentHTML('beforeend',`
  <div class="product" data-category="${cat}">
   <b class="product-title">${p.name}</b>
@@ -2013,42 +1945,6 @@ function filterCatalog(category){
    }
  });
 }
-
-function setupProduct3DViews(root=document){
- root.querySelectorAll('.product-3d-stage:not([data-3d-ready])').forEach(stage=>{
-   stage.dataset.threeDReady='1';
-   const img=stage.querySelector('img');
-   if(!img) return;
-   let pressed=false;
-
-   const tilt=(clientX,clientY)=>{
-     const rect=stage.getBoundingClientRect();
-     const px=Math.max(0,Math.min(1,(clientX-rect.left)/Math.max(rect.width,1)));
-     const py=Math.max(0,Math.min(1,(clientY-rect.top)/Math.max(rect.height,1)));
-     const rotateY=(px-.5)*24;
-     const rotateX=(.5-py)*20;
-     img.style.transform=`rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(16px) scale(1.035)`;
-     stage.style.setProperty('--shadow-x',`${(-rotateY*.45).toFixed(1)}px`);
-     stage.classList.add('is-active');
-   };
-   const reset=()=>{
-     pressed=false;
-     img.style.transform='';
-     stage.classList.remove('is-active');
-   };
-
-   stage.addEventListener('pointerenter',event=>tilt(event.clientX,event.clientY));
-   stage.addEventListener('pointermove',event=>{
-     if(event.pointerType==='mouse' || pressed) tilt(event.clientX,event.clientY);
-   });
-   stage.addEventListener('pointerdown',event=>{pressed=true;stage.setPointerCapture?.(event.pointerId);tilt(event.clientX,event.clientY)});
-   stage.addEventListener('pointerup',reset);
-   stage.addEventListener('pointercancel',reset);
-   stage.addEventListener('pointerleave',reset);
- });
-}
-
-setupProduct3DViews(container);
 
 function renderLatestProducts(){
  const track=document.getElementById("latestProductsTrack");
