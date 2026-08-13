@@ -1,6 +1,7 @@
-const CACHE_NAME="games-planet-live-v9";
+const CACHE_NAME="games-planet-live-v10";
 const APP_SHELL=[
-  "./","./index.html","./Simple.html","./order-prefill.html","./manifest.webmanifest",
+  "./","./index.html","./Simple.html","./order-prefill.html","./invoice.html","./manifest.webmanifest",
+  "./assets/html2canvas.min.js","./assets/jspdf.umd.min.js",
   "./games-planet-logo-transparent.png","./games-planet-icon-192.png","./games-planet-icon-512.png",
   "./01-Current-ac-qr.jpg",
   "./images/jpeg/best-av-cable-for-ps2.jpeg","./images/png/best-av-cable-for-ps2.png",
