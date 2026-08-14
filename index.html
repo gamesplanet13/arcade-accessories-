@@ -250,14 +250,6 @@ h2{
 }
 .image-row img:hover{transform:scale(1.05);box-shadow:0 10px 22px rgba(0,0,0,.25)}
 .image-row.multi-image img{width:68px;height:68px;border-radius:10px}
-.category-panel{margin:15px 0 18px;border:1px solid rgba(34,211,238,.2);border-radius:18px;overflow:hidden;background:rgba(3,10,23,.45)}
-.category-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border:0;background:linear-gradient(90deg,rgba(8,47,73,.96),rgba(30,41,59,.96));color:#c8f7ff;font-size:17px;font-weight:900;text-align:left;cursor:pointer}
-.category-toggle .cat-count{font-size:12px;color:#e0f2fe;background:rgba(255,255,255,.1);padding:5px 9px;border-radius:999px}
-.category-toggle .cat-arrow{font-size:18px;transition:transform .2s ease}
-.category-panel.is-open .cat-arrow{transform:rotate(180deg)}
-.category-products{display:none;padding:12px}
-.category-panel.is-open .category-products{display:block}
-.catalog-updated-badge{margin:10px 0 16px;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,rgba(6,182,212,.18),rgba(124,58,237,.18));border:1px solid rgba(103,232,249,.45);color:#e0fbff;font-weight:800;text-align:center}
 .product-features{
   margin:10px 0 0;
   padding:10px 12px;
@@ -503,17 +495,16 @@ select{
   object-fit:contain;
   box-shadow:0 0 35px rgba(0,0,0,.68);
 }
-.modal-image-box{position:relative;display:inline-flex;max-width:95vw;max-height:90vh}
 .close-btn{
-  position:absolute;
-  top:10px;right:10px;
-  width:42px;height:42px;
+  position:fixed;
+  top:16px;right:18px;
+  width:48px;height:48px;
   border-radius:50%;
   background:linear-gradient(145deg,#b91c1c,#ef4444);
   color:#fff;
   font-size:30px;
   font-weight:900;
-  line-height:40px;
+  line-height:46px;
   text-align:center;
   cursor:pointer;
   z-index:100000;
@@ -1280,7 +1271,6 @@ img,canvas{
 <div class="actions">
   <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
   <button class="details" onclick="goDetails()">Fill Your Details</button>
-  <button class="details" onclick="openInvoiceBuilder()">Create Invoice</button>
   <button class="reset" onclick="clearCart()">Reset Cart</button>
  </div>
 
@@ -1296,10 +1286,8 @@ img,canvas{
 </div></div>
 
 <div id="imgModal">
- <div class="modal-image-box">
-  <img id="modalImg">
-  <div class="close-btn" onclick="closeImg()" role="button" aria-label="Close image">×</div>
- </div>
+ <div class="close-btn" onclick="closeImg()">×</div>
+ <img id="modalImg">
 </div>
 
 
@@ -1501,12 +1489,8 @@ images:[
 "images/jpeg/remote-lead.jpeg"
 ]},
 
-{name:"10 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:50,weight:70,dimensions:[10,5,3],images:[
-"images/jpeg/10-core-wire.jpg"
-]},
-
-{name:"USB Gamepad",category:"Gaming Accessories",price:364,weight:220,dimensions:[19,20,10],images:[
-"images/usb-gamepad.svg"
+{name:"12 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:60,weight:70,dimensions:[10,5,3],images:[
+"images/jpeg/12-core-wire.jpeg"
 ]},
 
 {
@@ -1884,32 +1868,18 @@ const categoryOrder=[
  ,"Mobile Phone Coolers"
 ];
 
-container.innerHTML=`<div class="catalog-updated-badge">✨ PRODUCT CATALOG • Category खोलें/बंद करें • Picture पर tap करके full view देखें</div>`;
-
-categoryOrder.forEach((cat,categoryIndex)=>{
+categoryOrder.forEach(cat=>{
  const catProducts=products.filter(p=>p.category===cat);
  if(!catProducts.length) return;
 
- const section=document.createElement('section');
- section.className=`category-panel ${categoryIndex===0?'is-open':''}`;
- section.dataset.category=cat;
- section.innerHTML=`<button class="category-toggle" type="button" aria-expanded="${categoryIndex===0?'true':'false'}">
-   <span>${cat}</span><span class="cat-count">${catProducts.length} Products</span><span class="cat-arrow">⌄</span>
- </button><div class="category-products"></div>`;
- const categoryProducts=section.querySelector('.category-products');
- section.querySelector('.category-toggle').addEventListener('click',event=>{
-   const panel=event.currentTarget.closest('.category-panel');
-   panel.classList.toggle('is-open');
-   event.currentTarget.setAttribute('aria-expanded',panel.classList.contains('is-open')?'true':'false');
- });
- container.appendChild(section);
+ container.innerHTML += `<h2 data-category="${cat}" style="color:#00f7ff;margin:15px 5px 10px">${cat}</h2>`;
 
  catProducts.forEach((p)=>{
  const i=products.indexOf(p);
  if(state[i]===undefined) state[i]=0;
 
- const imgs=p.images.map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join("");
- categoryProducts.insertAdjacentHTML('beforeend',`
+ const imgs=p.images.map(img=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name}" onclick="openImg('${img}')">`).join("");
+ container.innerHTML+=`
  <div class="product" data-category="${cat}">
   <b class="product-title">${p.name}</b>
   <div class="product-specs">
@@ -1931,18 +1901,13 @@ categoryOrder.forEach((cat,categoryIndex)=>{
     <button onclick="updateQty(${i},1)">+</button>
    </div>`}
   </div>
- </div>`);
+ </div>`;
 });
 });
 
 function filterCatalog(category){
- document.querySelectorAll("#products .category-panel").forEach(panel=>{
-   const show=category==="all" || panel.dataset.category===category;
-   panel.style.display=show?"":"none";
-   if(category!=="all" && show){
-     panel.classList.add('is-open');
-     panel.querySelector('.category-toggle')?.setAttribute('aria-expanded','true');
-   }
+ document.querySelectorAll("#products [data-category]").forEach(el=>{
+   el.style.display=(category==="all" || el.dataset.category===category)?"":"none";
  });
 }
 
@@ -1974,7 +1939,7 @@ document.getElementById("installAndroidApp")?.addEventListener("click",async()=>
  }
 });
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=4",{updateViaCache:"none"}).catch(()=>{}));
+ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=3",{updateViaCache:"none"}).catch(()=>{}));
 }
 renderLatestProducts();
 
@@ -2119,35 +2084,6 @@ function courierBaseRate(courier){
  return 100;
 }
 
-/* Automatic bulk/quantity pricing. Product names must match the catalogue. */
-const QUANTITY_PRICE_RULES={
- "Push Button":{min:50,price:30},
- "Push Button (Imported)":{min:50,price:44},
- "Black Switch Button":{min:50,price:14},
- "MD Switch Button":{min:50,price:48},
- "Coin Drop Switch Button":{min:50,price:43},
- "Rasila Handle (Without Switch)":{min:20,price:195},
- "Rasila Handle (With Switch)":{min:20,price:251},
- "MD Handle (With Switch)":{min:20,price:550},
- "Coin Acrylic Machine":{min:20,price:190},
- "10 Core Wire (Per Meter)":{min:20,price:48},
- "Remote Lead":{min:20,price:95},
- "Remote Plate":{min:20,price:290},
- "USB Gamepad":{min:10,price:350},
- "PS2 Wired Controller (Replica)":{min:10,price:350},
- "PS2 Wireless Controller":{min:10,price:480},
- "Matrix Modbo 5.0 Modchip":{min:10,price:530}
-};
-function selectedProductQuantity(p,i){
- let quantity=Number(state[i]||0);
- if(p.variants) p.variants.forEach(v=>quantity+=Number(state['v_'+i+'_'+v]||0));
- return quantity;
-}
-function effectiveUnitPrice(p,i){
- const rule=QUANTITY_PRICE_RULES[p.name];
- return rule&&selectedProductQuantity(p,i)>=rule.min?rule.price:p.price;
-}
-
 function getCourierCalculation(chargeableKg){
  const speed=syncDeliveryControls();
  const courier=document.getElementById("courier")?.value || "Trackon.in";
@@ -2166,21 +2102,21 @@ function render(){
     p.variants.forEach(v=>{
       const q=state['v_'+i+'_'+v]||0;
       if(q>0){
-        const unitPrice=effectiveUnitPrice(p,i), sp=unitPrice*q, sw=p.weight*q;
+        const sp=p.price*q, sw=p.weight*q;
         total+=sp; totalWeight+=sw;
-        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>${p.weight}g × ${q} = ${sw}g</div>`;
+        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${p.price} × ${q} = ₹${sp}<br>${p.weight}g × ${q} = ${sw}g</div>`;
       }
     });
   }
   if(state[i]>0){
    const qty=state[i];
-   const unitPrice=effectiveUnitPrice(p,i), sp=unitPrice*qty;
+   const sp=p.price*qty;
    const sw=p.weight*qty;
    total+=sp; totalWeight+=sw;
    html+=`
    <div style="border-bottom:1px dashed #444;margin-bottom:8px">
     <b>${p.name}</b><br>
-    ₹${unitPrice} × ${qty} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>
+    ₹${p.price} × ${qty} = ₹${sp}<br>
     ${p.weight}g × ${qty} = ${sw}g
    </div>`;
   }
@@ -2215,7 +2151,9 @@ function render(){
  document.getElementById("floatingSummary").innerHTML =
  `Products: ${itemCount} | Amount: ₹${total} | Weight: ${totalWeight}g | Select payment & delivery on next page`;
 
-generateCombinedPoster();
+ generateCombinedPoster();
+ generateBoxPlanner();
+ generatePackingGuide();
 }
 
 
@@ -2224,7 +2162,7 @@ function toTransparentPngAsset(src){
   if(!src) return "";
   return src
     .replace(/^images\/jpeg\//,"images/png/")
-    .replace(/\.(?:jpe?g)(?:\?.*)?$/i,".png");
+    .replace(/\.jpeg(?:\?.*)?$/i,".png");
 }
 
 function getProductImageForVariant(product, variant){
@@ -2250,7 +2188,7 @@ function getSelectedPosterItems(){
             qty,
             image:getProductImageForVariant(p,v),
             fallbackImage:(p.images&&p.images[0])||"",
-            isWire:/10\s*Core\s*Wire/i.test(p.name),
+            isWire:/12\s*Core\s*Wire/i.test(p.name),
             repeatImage:false
           });
         }
@@ -2265,7 +2203,7 @@ function getSelectedPosterItems(){
         qty,
         image:getProductImageForVariant(p,""),
         fallbackImage:(p.images&&p.images[0])||"",
-        isWire:/10\s*Core\s*Wire/i.test(p.name),
+        isWire:/12\s*Core\s*Wire/i.test(p.name),
         repeatImage:false
       });
     }
@@ -2562,19 +2500,15 @@ function buildOrderSummary(){
        const quantity=state['v_'+i+'_'+v]||0;
        if(quantity>0){
          if(p.containsBattery) hasBatteryItem=true;
-         const unitPrice=effectiveUnitPrice(p,i);
-         const lineTotal=unitPrice*quantity;
+         const lineTotal=p.price*quantity;
          const lineWeight=p.weight*quantity;
          items.push({
            name:`${p.name} - ${v}`,
            quantity,
-           unitPrice,
-           baseUnitPrice:p.price,
+           unitPrice:p.price,
            lineTotal,
            unitWeight:p.weight,
-           lineWeight,
-           dimensions:p.dimensions||[],
-           automaticQuantityPrice:unitPrice!==p.price
+           lineWeight
          });
          productTotal+=lineTotal;
          totalWeight+=lineWeight;
@@ -2586,19 +2520,15 @@ function buildOrderSummary(){
    const quantity=state[i]||0;
    if(quantity>0){
      if(p.containsBattery) hasBatteryItem=true;
-     const unitPrice=effectiveUnitPrice(p,i);
-     const lineTotal=unitPrice*quantity;
+     const lineTotal=p.price*quantity;
      const lineWeight=p.weight*quantity;
      items.push({
        name:p.name,
        quantity,
-       unitPrice,
-       baseUnitPrice:p.price,
+       unitPrice:p.price,
        lineTotal,
        unitWeight:p.weight,
-       lineWeight,
-       dimensions:p.dimensions||[],
-       automaticQuantityPrice:unitPrice!==p.price
+       lineWeight
      });
      productTotal+=lineTotal;
      totalWeight+=lineWeight;
@@ -2625,17 +2555,6 @@ function goDetails(){
  localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
  window.location.href="order-prefill.html";
-}
-
-function openInvoiceBuilder(){
- const summary=buildOrderSummary();
- if(summary.productTotal<=0){alert("Please select products first");return;}
- const packingWeight = summary.totalWeight>0 ? Math.ceil(summary.totalWeight/1000)*300 : 0;
- summary.packingWeight=packingWeight;
- summary.packedWeight=summary.totalWeight+packingWeight;
- summary.chargeableKg=summary.packedWeight>0 ? Math.ceil(summary.packedWeight/1000) : 0;
- localStorage.setItem("gp_invoice_summary",JSON.stringify(summary));
- window.open("invoice.html","_blank");
 }
 
 
@@ -4028,6 +3947,8 @@ async function generatePackingGuide(){
 function initializePage(){
   try{
     render();
+    setupPacking3DInteraction();
+    startPacking3DAutoRotate();
   }catch(error){
     console.error("Page initialization error:", error);
     alert("Page initialization error: "+(error?.message || "Unknown error"));
@@ -4071,9 +3992,45 @@ Rampur, U.P – 244901</p>
     <div class="poster-stage">
       <canvas id="combinedPoster" width="1600" height="900"></canvas>
     </div>
-    <div class="poster-note">Selected products and their total quantities automatically appear in one catalog-style picture. For 10 Core Wire, the selected quantity is shown as total meter length.</div>
+    <div class="poster-note">Selected products and their total quantities automatically appear in one catalog-style picture. For 12 Core Wire, the selected quantity is shown as total meter length.</div>
   </div>
 </div>
+<div class="combined-poster-wrap" id="boxPlannerSection">
+  <div class="combined-poster-card">
+    <div class="combined-poster-head">
+      <h3>📦 Smart Packing Box Planner</h3>
+      <div class="combined-poster-actions">
+        <button class="poster-btn poster-refresh" onclick="generateBoxPlanner()">Refresh Box</button>
+        <button class="poster-btn poster-download" onclick="downloadBoxPlanner()">Download Box Picture</button>
+      </div>
+    </div>
+    <div id="boxPlannerSummary" class="box-summary">Select products to calculate the recommended box.</div>
+    <div class="poster-stage">
+      <canvas id="boxPlannerCanvas" width="1600" height="900"></canvas>
+    </div>
+    <div class="poster-note">The box is tested using a 3D fit calculation, preset practical sizes and extra safety space for bubble wrap, thermocol and safe packing. Dimensions are not added to the WhatsApp order message.</div>
+  </div>
+</div>
+
+<div class="combined-poster-wrap" id="packingGuideSection">
+  <div class="combined-poster-card">
+    <div class="combined-poster-head">
+      <h3>🧩 Box Packing Placement Guide</h3>
+      <div class="combined-poster-actions">
+        <button class="poster-btn poster-refresh" onclick="generatePackingGuide()">Refresh Guide</button>
+<button class="poster-btn poster-refresh" onclick="resetPacking3DView()">Reset 3D View</button>
+        <button class="poster-btn poster-download" onclick="downloadPackingGuide()">Download Guide</button>
+      </div>
+    </div>
+    <div id="packingGuideSummary" class="box-summary">Select products to generate the packing arrangement.</div>
+    <div class="poster-stage">
+      <canvas id="packingGuideCanvas" width="1600" height="1000"></canvas>
+    </div>
+    <div class="poster-note">This guide shows a practical suggested arrangement based on product dimensions. Keep fragile items cushioned and do not force-fit products.</div>
+<div class="packing-3d-help">🖱️ Drag to rotate • Mouse wheel to zoom • 📱 One finger drag to rotate • Two fingers pinch to zoom</div>
+  </div>
+</div>
+
 </aside>
 </div>
 
