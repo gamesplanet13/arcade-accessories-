@@ -250,6 +250,11 @@ h2{
 }
 .image-row img:hover{transform:scale(1.05);box-shadow:0 10px 22px rgba(0,0,0,.25)}
 .image-row.multi-image img{width:54px;height:54px;border-radius:9px}
+.variant-list{min-width:220px;display:grid;gap:6px}
+.variant-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 5px;border-radius:10px;background:rgba(255,255,255,.035)}
+.variant-label{display:flex;align-items:center;gap:7px;min-width:0;color:var(--muted);font-size:12px;font-weight:800}
+.variant-thumb{width:30px;height:30px;flex:0 0 30px;object-fit:contain;border-radius:7px;border:1px solid rgba(148,163,184,.55);background:#fff;cursor:zoom-in;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.variant-thumb:hover{transform:scale(1.08)}
 .category-panel{margin:15px 0 18px;border:1px solid rgba(34,211,238,.2);border-radius:18px;overflow:hidden;background:rgba(3,10,23,.45)}
 .category-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border:0;background:linear-gradient(90deg,rgba(8,47,73,.96),rgba(30,41,59,.96));color:#c8f7ff;font-size:17px;font-weight:900;text-align:left;cursor:pointer}
 .category-toggle .cat-count{font-size:12px;color:#e0f2fe;background:rgba(255,255,255,.1);padding:5px 9px;border-radius:999px}
@@ -272,6 +277,8 @@ h2{
 @media(max-width:520px){
   .image-row img{width:58px;height:58px;border-radius:10px}
   .image-row.multi-image img{width:46px;height:46px;border-radius:8px}
+  .variant-list{min-width:205px}
+  .variant-thumb{width:27px;height:27px;flex-basis:27px}
 }
 .info{
   display:flex;
@@ -1280,6 +1287,7 @@ img,canvas{
   <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
   <button class="details" onclick="goDetails()">Fill Your Details</button>
   <button class="details" onclick="openInvoiceBuilder()">Create Invoice</button>
+  <button class="details" onclick="window.open('invoice-manager.html','_blank')">Custom Invoice</button>
   <button class="reset" onclick="clearCart()">Reset Cart</button>
  </div>
 
@@ -1417,19 +1425,17 @@ dimensions:[5,4,4],
 category:"Arcade Box Accessories",
 price:46,
 weight:12,
-variants:["Ice Blue","Pink","Green","Yellow","Black"],
+variants:["Ice Blue","Pink","Green","Black"],
 variantImages:{
   "Ice Blue":"images/jpeg/imported-blue.jpeg",
   "Pink":"images/jpeg/imported-pink.jpeg",
   "Green":"images/jpeg/imported-green.jpeg",
-  "Yellow":"images/jpeg/imported-yellow.jpeg",
   "Black":"images/jpeg/imported-black.jpeg"
 },
 images:[
   "images/jpeg/imported-blue.jpeg",
   "images/jpeg/imported-pink.jpeg",
   "images/jpeg/imported-green.jpeg",
-  "images/jpeg/imported-yellow.jpeg",
   "images/jpeg/imported-black.jpeg"
 ]
 },
@@ -1905,7 +1911,8 @@ categoryOrder.forEach((cat,categoryIndex)=>{
  const i=products.indexOf(p);
  if(state[i]===undefined) state[i]=0;
 
- const imgs=p.images.map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join("");
+ const showTopGallery=!(p.variants && p.variantImages);
+ const imgs=showTopGallery?p.images.map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join(""):"";
  categoryProducts.insertAdjacentHTML('beforeend',`
  <div class="product" data-category="${cat}">
   <b class="product-title">${p.name}</b>
@@ -1914,7 +1921,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
     <span>⚖️ Weight: <b>${p.weight} g</b></span>
     ${p.packLabel?`<span>🎮 <b>${p.packLabel}</b></span>`:""}
   </div>
-  <div class="image-row ${p.images.length>1?'multi-image':''}">${imgs}</div>
+  ${imgs?`<div class="image-row ${p.images.length>1?'multi-image':''}">${imgs}</div>`:""}
   ${p.features?`<div class="product-features">${p.features.map(f=>`<div>✓ ${f}</div>`).join("")}</div>`:""}
   ${productActionLinks(p)}
   <div class="info">
@@ -1922,7 +1929,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
     <div class="price">${p.priceLabel || ("₹"+p.price)}</div>
     <small>${p.weight} g / piece${p.compatibility?'<br><b>Compatibility:</b> '+p.compatibility:''}</small>
    </div>
-   ${p.variants?`<div style="min-width:220px">${p.variants.map(v=>`<div style="display:flex;justify-content:space-between;align-items:center;margin:3px 0"><small><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999;margin-right:6px;vertical-align:middle"></span>${v}</small><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><span id="vq${i}_${v.replace(/\s+/g,'_')}">${state['v_'+i+'_'+v]||0}</span><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`).join('')}</div>`:`<div class="qty">
+   ${p.variants?`<div class="variant-list">${p.variants.map(v=>{const variantImg=p.variantImages?.[v]||p.images?.[0]||"";return `<div class="variant-row"><span class="variant-label">${variantImg?`<img class="variant-thumb" src="${variantImg}" loading="lazy" decoding="async" alt="${p.name} ${v}" onclick="openImg('${variantImg}')">`:`<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999"></span>`}<span>${v}</span></span><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><span id="vq${i}_${v.replace(/\s+/g,'_')}">${state['v_'+i+'_'+v]||0}</span><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`}).join('')}</div>`:`<div class="qty">
     <button onclick="updateQty(${i},-1)">−</button>
     <span id="q${i}">${state[i]}</span>
     <button onclick="updateQty(${i},1)">+</button>
