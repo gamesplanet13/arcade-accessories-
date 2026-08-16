@@ -250,6 +250,84 @@ h2{
 }
 .image-row img:hover{transform:scale(1.05);box-shadow:0 10px 22px rgba(0,0,0,.25)}
 .image-row.multi-image img{width:68px;height:68px;border-radius:10px}
+.product-3d-stage{
+  position:relative;
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  perspective:720px;
+  transform-style:preserve-3d;
+  width:118px;
+  min-height:118px;
+  padding:10px;
+  border-radius:22px;
+  background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(15,23,42,.92));
+  border:1px solid rgba(103,232,249,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 18px 30px rgba(0,0,0,.38),0 0 24px rgba(34,211,238,.13);
+  isolation:isolate;
+  touch-action:pan-y;
+}
+.product-3d-stage::before{
+  content:"";
+  position:absolute;
+  inset:12% 10% -7%;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.38),transparent 68%);
+  filter:blur(7px);
+  transform:translateZ(-22px) rotateX(72deg);
+  pointer-events:none;
+  opacity:.85;
+  transition:opacity .25s ease,transform .25s ease;
+}
+.product-3d-stage::after{
+  content:"3D VIEW";
+  position:absolute;
+  right:5px;
+  bottom:5px;
+  z-index:3;
+  padding:4px 7px;
+  border-radius:7px;
+  background:rgba(2,6,23,.76);
+  border:1px solid rgba(103,232,249,.45);
+  color:#a5f3fc;
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.6px;
+  pointer-events:none;
+}
+.product-3d-stage img{
+  position:relative;
+  z-index:2;
+  transform:rotateX(7deg) rotateY(-9deg) translateZ(20px);
+  transform-style:preserve-3d;
+  will-change:transform,filter;
+  filter:drop-shadow(12px 15px 10px rgba(0,0,0,.42));
+  transition:transform .16s ease-out,filter .2s ease;
+  backface-visibility:hidden;
+}
+.product-3d-stage.is-active img{
+  filter:drop-shadow(var(--shadow-x,0px) 13px 10px rgba(0,0,0,.36));
+}
+.product-3d-stage.is-active::before{opacity:1;transform:translateZ(-28px) rotateX(75deg) scale(1.08)}
+.image-row.multi-image .product-3d-stage{border-radius:12px}
+.image-row.multi-image .product-3d-stage{width:92px;min-height:92px;padding:8px}
+.product-3d-stage:nth-child(even) img{transform:rotateX(7deg) rotateY(9deg) translateZ(20px)}
+@keyframes productFloat3D{0%,100%{translate:0 0}50%{translate:0 -5px}}
+.category-panel.is-open .product-3d-stage{animation:productFloat3D 3.4s ease-in-out infinite}
+.category-panel.is-open .product-3d-stage:nth-child(2n){animation-delay:-1.7s}
+.category-panel{margin:15px 0 18px;border:1px solid rgba(34,211,238,.2);border-radius:18px;overflow:hidden;background:rgba(3,10,23,.45)}
+.category-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border:0;background:linear-gradient(90deg,rgba(8,47,73,.96),rgba(30,41,59,.96));color:#c8f7ff;font-size:17px;font-weight:900;text-align:left;cursor:pointer}
+.category-toggle .cat-count{font-size:12px;color:#e0f2fe;background:rgba(255,255,255,.1);padding:5px 9px;border-radius:999px}
+.category-toggle .cat-arrow{font-size:18px;transition:transform .2s ease}
+.category-panel.is-open .cat-arrow{transform:rotate(180deg)}
+.category-products{display:none;padding:12px}
+.category-panel.is-open .category-products{display:block}
+.catalog-updated-badge{margin:10px 0 16px;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,rgba(6,182,212,.18),rgba(124,58,237,.18));border:1px solid rgba(103,232,249,.45);color:#e0fbff;font-weight:800;text-align:center}
+@media (prefers-reduced-motion:reduce){
+  .product-3d-stage{animation:none!important}
+  .product-3d-stage img{transition:none!important}
+}
 .product-features{
   margin:10px 0 0;
   padding:10px 12px;
@@ -1271,6 +1349,7 @@ img,canvas{
 <div class="actions">
   <button class="whatsapp" onclick="orderWhatsApp()">Order on WhatsApp</button>
   <button class="details" onclick="goDetails()">Fill Your Details</button>
+  <button class="details" onclick="openInvoiceBuilder()">Create Invoice</button>
   <button class="reset" onclick="clearCart()">Reset Cart</button>
  </div>
 
@@ -1489,8 +1568,12 @@ images:[
 "images/jpeg/remote-lead.jpeg"
 ]},
 
-{name:"12 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:60,weight:70,dimensions:[10,5,3],images:[
-"images/jpeg/12-core-wire.jpeg"
+{name:"10 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:50,weight:70,dimensions:[10,5,3],images:[
+"images/jpeg/10-core-wire.jpg"
+]},
+
+{name:"USB Gamepad",category:"Gaming Accessories",price:364,weight:220,dimensions:[19,20,10],images:[
+"images/usb-gamepad.svg"
 ]},
 
 {
@@ -1868,18 +1951,33 @@ const categoryOrder=[
  ,"Mobile Phone Coolers"
 ];
 
-categoryOrder.forEach(cat=>{
+container.innerHTML=`<div class="catalog-updated-badge">✨ NEW 3D PRODUCT CATALOG • Category खोलें/बंद करें • Picture पर tap करके full view देखें</div>`;
+
+categoryOrder.forEach((cat,categoryIndex)=>{
  const catProducts=products.filter(p=>p.category===cat);
  if(!catProducts.length) return;
 
- container.innerHTML += `<h2 data-category="${cat}" style="color:#00f7ff;margin:15px 5px 10px">${cat}</h2>`;
+ const section=document.createElement('section');
+ section.className=`category-panel ${categoryIndex===0?'is-open':''}`;
+ section.dataset.category=cat;
+ section.innerHTML=`<button class="category-toggle" type="button" aria-expanded="${categoryIndex===0?'true':'false'}">
+   <span>${cat}</span><span class="cat-count">${catProducts.length} Products</span><span class="cat-arrow">⌄</span>
+ </button><div class="category-products"></div>`;
+ const categoryProducts=section.querySelector('.category-products');
+ section.querySelector('.category-toggle').addEventListener('click',event=>{
+   const panel=event.currentTarget.closest('.category-panel');
+   panel.classList.toggle('is-open');
+   event.currentTarget.setAttribute('aria-expanded',panel.classList.contains('is-open')?'true':'false');
+   if(panel.classList.contains('is-open')) setupProduct3DViews(panel);
+ });
+ container.appendChild(section);
 
  catProducts.forEach((p)=>{
  const i=products.indexOf(p);
  if(state[i]===undefined) state[i]=0;
 
- const imgs=p.images.map(img=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name}" onclick="openImg('${img}')">`).join("");
- container.innerHTML+=`
+ const imgs=p.images.map((img,imageIndex)=>`<span class="product-3d-stage" aria-label="Interactive 3D view: ${p.name}"><img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')"></span>`).join("");
+ categoryProducts.insertAdjacentHTML('beforeend',`
  <div class="product" data-category="${cat}">
   <b class="product-title">${p.name}</b>
   <div class="product-specs">
@@ -1901,15 +1999,56 @@ categoryOrder.forEach(cat=>{
     <button onclick="updateQty(${i},1)">+</button>
    </div>`}
   </div>
- </div>`;
+ </div>`);
 });
 });
 
 function filterCatalog(category){
- document.querySelectorAll("#products [data-category]").forEach(el=>{
-   el.style.display=(category==="all" || el.dataset.category===category)?"":"none";
+ document.querySelectorAll("#products .category-panel").forEach(panel=>{
+   const show=category==="all" || panel.dataset.category===category;
+   panel.style.display=show?"":"none";
+   if(category!=="all" && show){
+     panel.classList.add('is-open');
+     panel.querySelector('.category-toggle')?.setAttribute('aria-expanded','true');
+   }
  });
 }
+
+function setupProduct3DViews(root=document){
+ root.querySelectorAll('.product-3d-stage:not([data-3d-ready])').forEach(stage=>{
+   stage.dataset.threeDReady='1';
+   const img=stage.querySelector('img');
+   if(!img) return;
+   let pressed=false;
+
+   const tilt=(clientX,clientY)=>{
+     const rect=stage.getBoundingClientRect();
+     const px=Math.max(0,Math.min(1,(clientX-rect.left)/Math.max(rect.width,1)));
+     const py=Math.max(0,Math.min(1,(clientY-rect.top)/Math.max(rect.height,1)));
+     const rotateY=(px-.5)*24;
+     const rotateX=(.5-py)*20;
+     img.style.transform=`rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(16px) scale(1.035)`;
+     stage.style.setProperty('--shadow-x',`${(-rotateY*.45).toFixed(1)}px`);
+     stage.classList.add('is-active');
+   };
+   const reset=()=>{
+     pressed=false;
+     img.style.transform='';
+     stage.classList.remove('is-active');
+   };
+
+   stage.addEventListener('pointerenter',event=>tilt(event.clientX,event.clientY));
+   stage.addEventListener('pointermove',event=>{
+     if(event.pointerType==='mouse' || pressed) tilt(event.clientX,event.clientY);
+   });
+   stage.addEventListener('pointerdown',event=>{pressed=true;stage.setPointerCapture?.(event.pointerId);tilt(event.clientX,event.clientY)});
+   stage.addEventListener('pointerup',reset);
+   stage.addEventListener('pointercancel',reset);
+   stage.addEventListener('pointerleave',reset);
+ });
+}
+
+setupProduct3DViews(container);
 
 function renderLatestProducts(){
  const track=document.getElementById("latestProductsTrack");
@@ -2084,6 +2223,35 @@ function courierBaseRate(courier){
  return 100;
 }
 
+/* Automatic bulk/quantity pricing. Product names must match the catalogue. */
+const QUANTITY_PRICE_RULES={
+ "Push Button":{min:50,price:30},
+ "Push Button (Imported)":{min:50,price:44},
+ "Black Switch Button":{min:50,price:14},
+ "MD Switch Button":{min:50,price:48},
+ "Coin Drop Switch Button":{min:50,price:43},
+ "Rasila Handle (Without Switch)":{min:20,price:195},
+ "Rasila Handle (With Switch)":{min:20,price:251},
+ "MD Handle (With Switch)":{min:20,price:550},
+ "Coin Acrylic Machine":{min:20,price:190},
+ "10 Core Wire (Per Meter)":{min:20,price:48},
+ "Remote Lead":{min:20,price:95},
+ "Remote Plate":{min:20,price:290},
+ "USB Gamepad":{min:10,price:350},
+ "PS2 Wired Controller (Replica)":{min:10,price:350},
+ "PS2 Wireless Controller":{min:10,price:480},
+ "Matrix Modbo 5.0 Modchip":{min:10,price:530}
+};
+function selectedProductQuantity(p,i){
+ let quantity=Number(state[i]||0);
+ if(p.variants) p.variants.forEach(v=>quantity+=Number(state['v_'+i+'_'+v]||0));
+ return quantity;
+}
+function effectiveUnitPrice(p,i){
+ const rule=QUANTITY_PRICE_RULES[p.name];
+ return rule&&selectedProductQuantity(p,i)>=rule.min?rule.price:p.price;
+}
+
 function getCourierCalculation(chargeableKg){
  const speed=syncDeliveryControls();
  const courier=document.getElementById("courier")?.value || "Trackon.in";
@@ -2102,21 +2270,21 @@ function render(){
     p.variants.forEach(v=>{
       const q=state['v_'+i+'_'+v]||0;
       if(q>0){
-        const sp=p.price*q, sw=p.weight*q;
+        const unitPrice=effectiveUnitPrice(p,i), sp=unitPrice*q, sw=p.weight*q;
         total+=sp; totalWeight+=sw;
-        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${p.price} × ${q} = ₹${sp}<br>${p.weight}g × ${q} = ${sw}g</div>`;
+        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>${p.weight}g × ${q} = ${sw}g</div>`;
       }
     });
   }
   if(state[i]>0){
    const qty=state[i];
-   const sp=p.price*qty;
+   const unitPrice=effectiveUnitPrice(p,i), sp=unitPrice*qty;
    const sw=p.weight*qty;
    total+=sp; totalWeight+=sw;
    html+=`
    <div style="border-bottom:1px dashed #444;margin-bottom:8px">
     <b>${p.name}</b><br>
-    ₹${p.price} × ${qty} = ₹${sp}<br>
+    ₹${unitPrice} × ${qty} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>
     ${p.weight}g × ${qty} = ${sw}g
    </div>`;
   }
@@ -2162,7 +2330,7 @@ function toTransparentPngAsset(src){
   if(!src) return "";
   return src
     .replace(/^images\/jpeg\//,"images/png/")
-    .replace(/\.jpeg(?:\?.*)?$/i,".png");
+    .replace(/\.(?:jpe?g)(?:\?.*)?$/i,".png");
 }
 
 function getProductImageForVariant(product, variant){
@@ -2188,7 +2356,7 @@ function getSelectedPosterItems(){
             qty,
             image:getProductImageForVariant(p,v),
             fallbackImage:(p.images&&p.images[0])||"",
-            isWire:/12\s*Core\s*Wire/i.test(p.name),
+            isWire:/10\s*Core\s*Wire/i.test(p.name),
             repeatImage:false
           });
         }
@@ -2203,7 +2371,7 @@ function getSelectedPosterItems(){
         qty,
         image:getProductImageForVariant(p,""),
         fallbackImage:(p.images&&p.images[0])||"",
-        isWire:/12\s*Core\s*Wire/i.test(p.name),
+        isWire:/10\s*Core\s*Wire/i.test(p.name),
         repeatImage:false
       });
     }
@@ -2500,15 +2668,19 @@ function buildOrderSummary(){
        const quantity=state['v_'+i+'_'+v]||0;
        if(quantity>0){
          if(p.containsBattery) hasBatteryItem=true;
-         const lineTotal=p.price*quantity;
+         const unitPrice=effectiveUnitPrice(p,i);
+         const lineTotal=unitPrice*quantity;
          const lineWeight=p.weight*quantity;
          items.push({
            name:`${p.name} - ${v}`,
            quantity,
-           unitPrice:p.price,
+           unitPrice,
+           baseUnitPrice:p.price,
            lineTotal,
            unitWeight:p.weight,
-           lineWeight
+           lineWeight,
+           dimensions:p.dimensions||[],
+           automaticQuantityPrice:unitPrice!==p.price
          });
          productTotal+=lineTotal;
          totalWeight+=lineWeight;
@@ -2520,15 +2692,19 @@ function buildOrderSummary(){
    const quantity=state[i]||0;
    if(quantity>0){
      if(p.containsBattery) hasBatteryItem=true;
-     const lineTotal=p.price*quantity;
+     const unitPrice=effectiveUnitPrice(p,i);
+     const lineTotal=unitPrice*quantity;
      const lineWeight=p.weight*quantity;
      items.push({
        name:p.name,
        quantity,
-       unitPrice:p.price,
+       unitPrice,
+       baseUnitPrice:p.price,
        lineTotal,
        unitWeight:p.weight,
-       lineWeight
+       lineWeight,
+       dimensions:p.dimensions||[],
+       automaticQuantityPrice:unitPrice!==p.price
      });
      productTotal+=lineTotal;
      totalWeight+=lineWeight;
@@ -2555,6 +2731,17 @@ function goDetails(){
  localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
  window.location.href="order-prefill.html";
+}
+
+function openInvoiceBuilder(){
+ const summary=buildOrderSummary();
+ if(summary.productTotal<=0){alert("Please select products first");return;}
+ const packingWeight = summary.totalWeight>0 ? Math.ceil(summary.totalWeight/1000)*300 : 0;
+ summary.packingWeight=packingWeight;
+ summary.packedWeight=summary.totalWeight+packingWeight;
+ summary.chargeableKg=summary.packedWeight>0 ? Math.ceil(summary.packedWeight/1000) : 0;
+ localStorage.setItem("gp_invoice_summary",JSON.stringify(summary));
+ window.open("invoice.html","_blank");
 }
 
 
@@ -3992,7 +4179,7 @@ Rampur, U.P – 244901</p>
     <div class="poster-stage">
       <canvas id="combinedPoster" width="1600" height="900"></canvas>
     </div>
-    <div class="poster-note">Selected products and their total quantities automatically appear in one catalog-style picture. For 12 Core Wire, the selected quantity is shown as total meter length.</div>
+    <div class="poster-note">Selected products and their total quantities automatically appear in one catalog-style picture. For 10 Core Wire, the selected quantity is shown as total meter length.</div>
   </div>
 </div>
 <div class="combined-poster-wrap" id="boxPlannerSection">
