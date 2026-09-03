@@ -2573,6 +2573,8 @@ function buildOrderSummary(){
          const lineWeight=p.weight*quantity;
          items.push({
            name:`${p.name} - ${v}`,
+           product:p.name,
+           variant:v,
            quantity,
            unitPrice,
            baseUnitPrice:p.price,
@@ -2597,6 +2599,8 @@ function buildOrderSummary(){
      const lineWeight=p.weight*quantity;
      items.push({
        name:p.name,
+       product:p.name,
+       variant:"",
        quantity,
        unitPrice,
        baseUnitPrice:p.price,
@@ -2628,9 +2632,20 @@ function goDetails(){
  summary.packingWeight=packingWeight;
  summary.packedWeight=packedWeight;
  summary.chargeableKg=chargeableKg;
+ summary.source="cart";
  localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
- window.location.href="order-prefill.html";
+ // Send the complete cart in the URL and keep localStorage as a backup.
+ // This prevents stale/generic checkout data when storage is blocked or cleared.
+ const params=new URLSearchParams({
+   source:"cart",
+   cart:JSON.stringify(summary.items),
+   product:summary.items.map(item=>`${item.name} × ${item.quantity}`).join(" | "),
+   base:String(summary.productTotal),
+   weight:String(summary.totalWeight),
+   quantity:String(summary.totalQuantity)
+ });
+ window.location.href=`order-prefill.html?${params.toString()}`;
 }
 
 function openInvoiceBuilder(){

@@ -1,15 +1,16 @@
-const CACHE_NAME="games-planet-live-v10";
+const CACHE_NAME="games-planet-live-v11";
 const APP_SHELL=[
   "./","./index.html","./Simple.html","./order-prefill.html","./invoice.html","./manifest.webmanifest",
   "./assets/html2canvas.min.js","./assets/jspdf.umd.min.js",
   "./games-planet-logo-transparent.png","./games-planet-icon-192.png","./games-planet-icon-512.png",
-  "./01-Current-ac-qr.jpg",
-  "./images/jpeg/best-av-cable-for-ps2.jpeg","./images/png/best-av-cable-for-ps2.png",
-  "./images/jpeg/av-component-connector.jpeg","./images/png/av-component-connector.png",
-  "./images/jpeg/av-male-to-male-cable.jpeg","./images/png/av-male-to-male-cable.png"
+  "./NonGSTcurrentQR.jpg","./GSTcurrentQR.png","./pincode_merged_final.json"
 ];
 self.addEventListener("install",event=>{
-  event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE_NAME).then(async cache=>{
+    await Promise.all(APP_SHELL.map(async url=>{
+      try{ await cache.add(url); }catch(error){ console.warn("Offline cache skipped:",url,error); }
+    }));
+  }).then(()=>self.skipWaiting()));
 });
 self.addEventListener("activate",event=>{
   event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));

@@ -323,9 +323,9 @@
   <div class="card" style="text-align:center; margin-top:20px;">
     <span class="badge" id="paymentQrBadge">Non-GST Payment QR</span>
     <div style="margin:15px 0;">
-      <img id="paymentQrImage" src="./Qr%20%281%29.jpg" onerror="this.onerror=null;this.src='./01-Current-ac-qr.jpg';" alt="Games Planet Zone payment QR Code" style="max-width:260px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.15);" />
+      <img id="paymentQrImage" src="./NonGSTcurrentQR.jpg" alt="Games Planet Zone payment QR Code" style="max-width:260px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.15);" />
     </div>
-    <a id="paymentQrDownload" href="./Qr%20%281%29.jpg" download="Games_Planet_Zone_Non_GST_QR.jpg" class="btn act">⬇️ Download QR</a>
+    <a id="paymentQrDownload" href="./NonGSTcurrentQR.jpg" download="Games_Planet_Zone_Non_GST_QR.jpg" class="btn act">⬇️ Download QR</a>
   </div>
 </div>
 
@@ -1201,11 +1201,8 @@ function gpzUpdatePaymentQr(invoiceIncluded){
   const link=document.getElementById("paymentQrDownload");
   const badge=document.getElementById("paymentQrBadge");
   if(!img||!link||!badge)return;
-  const src=invoiceIncluded?"./GSTcurrentQR.png":"./Qr%20%281%29.jpg";
-  img.onerror=function(){
-    this.onerror=null;
-    this.src=invoiceIncluded?"./01-GSTcurrentQR.png":"./01-Current-ac-qr.jpg";
-  };
+  const src=invoiceIncluded?"./GSTcurrentQR.png":"./NonGSTcurrentQR.jpg";
+  img.onerror=null;
   img.src=src;
   img.alt=invoiceIncluded?"Games Planet Zone GST payment QR Code":"Games Planet Zone non-GST payment QR Code";
   link.href=src;
@@ -1525,7 +1522,7 @@ function submitOrder(){
   const at=orders.findIndex(x=>x.orderId===saved.orderId);if(at>=0)orders[at]=saved;else orders.unshift(saved);
   localStorage.setItem("gp_customer_orders_v1",JSON.stringify(orders.slice(0,100)));
   window.open(`https://wa.me/917983624797?text=${encodeURIComponent(message)}`,"_blank","noopener,noreferrer");
-  setTimeout(()=>location.href="orders.html",450);
+  // Keep checkout open after WhatsApp submission; orders.html is not part of this project.
 }
 function gpzInitialize(){
   const cartItems=gpzIncomingCartItems().map(gpzNormalizeIncomingItem);
