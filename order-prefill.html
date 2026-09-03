@@ -63,7 +63,7 @@
 <body>
 <div class="wrap">
   <h1>Games Planet — Quick Order</h1>
-  <div class="sub">Prefilled from main page • Offline pincode autofill • India Post fallback • Payment rules applied here</div>
+  <div class="sub">Prefilled from main page • Offline India pincode autofill • Payment rules applied here</div>
 
   <!-- Customer -->
   <div class="card">
@@ -71,11 +71,11 @@
     <div class="grid2">
       <div>
         <div class="label">Name</div>
-        <input id="name" placeholder="Name" autocomplete="name">
+        <input id="name" placeholder="Name" autocomplete="name" required>
       </div>
       <div>
         <div class="label">Mobile</div>
-        <input id="mobile" placeholder="Mobile" autocomplete="tel">
+        <input id="mobile" placeholder="Mobile" autocomplete="tel" required>
       </div>
     </div>
     <div class="grid2">
@@ -89,7 +89,7 @@
       </div>
     </div>
     <div class="label">Address</div>
-    <textarea id="address" placeholder="Address (Area/Village/Street)" rows="2"></textarea>
+    <textarea id="address" placeholder="Address (Area/Village/Street)" rows="2" required></textarea>
     <div class="grid3" style="margin-top:8px">
       <div>
         <div class="label">House number</div>
@@ -101,11 +101,12 @@
       </div>
       <div>
         <div class="label">Pincode</div>
-        <input id="pincode" placeholder="Pincode" inputmode="numeric" maxlength="6" autocomplete="postal-code">
+        <input id="pincode" placeholder="Pincode" inputmode="numeric" maxlength="6" autocomplete="postal-code" required>
       </div>
     </div>
 
-    <div id="pincodeStatus" class="hint" role="status" aria-live="polite">Local pincode database loading…</div>
+    <div id="pincodeStatus" class="hint" role="status" aria-live="polite">Offline pincode lookup ready.</div>
+    <div id="areaTypeStatus" class="hint" role="status" aria-live="polite" style="display:none"></div>
     <div id="deliveryEstimate" class="hint"></div>
 
     <!-- Mini Preview under pincode -->
@@ -116,16 +117,19 @@
 
     <div class="grid3" style="margin-top:8px">
       <div>
-        <div class="label">State</div>
-        <input id="state" placeholder="State" readonly>
+        <div class="label">State <span style="font-weight:400;color:var(--muted)">(Auto / Manual)</span></div>
+        <input id="state" placeholder="State" autocomplete="address-level1" list="stateSuggestions">
+        <datalist id="stateSuggestions"></datalist>
       </div>
       <div>
-        <div class="label">District/City</div>
-        <input id="city" placeholder="District/City" readonly>
+        <div class="label">District/City <span style="font-weight:400;color:var(--muted)">(Auto / Manual)</span></div>
+        <input id="city" placeholder="District/City" autocomplete="address-level2" list="citySuggestions">
+        <datalist id="citySuggestions"></datalist>
       </div>
       <div>
-        <div class="label">Post Office</div>
-        <select id="postoffice"><option value="">Select Post Office</option></select>
+        <div class="label">Post Office <span style="font-weight:400;color:var(--muted)">(Auto / Manual)</span></div>
+        <select id="postoffice"><option value="">Select Post Office</option><option value="__manual__">Other / Enter manually</option></select>
+        <input id="postofficeManual" placeholder="Type Post Office" style="display:none;margin-top:7px">
       </div>
     </div>
   </div>
@@ -146,7 +150,7 @@
     </div>
     <div class="grid3" style="margin-top:8px">
       <div>
-        <div class="label">Base Price (only product)</div>
+        <div class="label">Base Price (All Products + Add-ons + Courier + VAS)</div>
         <input id="basePrice" type="number" placeholder="₹" readonly>
       </div>
       <div>
@@ -154,7 +158,7 @@
         <input id="addonsTotal" type="number" placeholder="₹" readonly>
       </div>
       <div>
-        <div class="label">Subtotal (Base + Add-ons)</div>
+        <div class="label">Products + Add-ons Subtotal</div>
         <input id="subtotal" type="number" placeholder="₹" readonly>
       </div>
     </div>
@@ -173,6 +177,9 @@
       </div>
     </div>
     <div class="hint" id="couponNote">Coupon discount लागू होने पर total में अपने आप घट जाएगा।</div>
+  </div>
+  <div class="card" id="couponCodNotice" style="display:none">
+    <b>Coupon is only valid for prepaid orders, not for COD.</b>
   </div>
 
   <!-- Add-ons -->
@@ -201,7 +208,7 @@
 
 <option value="Blank Memory Card 8MB" data-price="369">Blank Memory Card 8MB — ₹369</option>
 
-<option value="AAA Batteries of duaracel PACK OF 4" data-price="88">AAA Batteries of duaracel PACK OF 4 — ₹99</option>
+<option value="AAA Batteries of duaracel PACK OF 4" data-price="99">AAA Batteries of duaracel PACK OF 4 — ₹99</option>
 
 <option value="AAA RECHARGEABLE BATTERIES PACK OF 4" data-price="599">AAA RECHARGEABLE BATTERIES PACK OF 4 — ₹599</option>
 
@@ -304,14 +311,12 @@
     <input id="distance" type="text" />
     <input id="etaText" type="text" />
     <input id="dateRange" type="text" />
-    <input id="etaTextCod" type="text" />
-    <input id="dateRangeCOD" type="text" />
   </div>
 
   <!-- Actions -->
   <div class="btns">
     <button class="alt" onclick="submitOrder()">Submit this order</button>
-    <a id="payNow" class="btn act" href="#" target="_blank" rel="noopener">Pay Now</a>
+    <a id="payNow" class="btn act" href="#" onclick="return launchUpiPayment(event)">Pay Now</a>
   </div>
 
   <!-- QR Code Section -->
@@ -329,10 +334,8 @@ const WHATSAPP_PHONE="917983624797";
 const UPI_ID="paytmqr5hyx5o@ptys";
 const UPI_NAME="Surender Kaur";
 
-/* === COD RULES === */
-const COD_ALLOW_MIN = 1399;      // below this → No COD
-const COD_FREE_THRESHOLD = 1899;  // ≥ this → COD charges 199
-const COD_MID_CHARGE = 99;        // between 1399 and 1898 → ₹199
+/* Current checkout rules */
+const GPZ_COD_MIN=1300;
 
 let discountValue=0,mode="prepaid";
 
@@ -392,7 +395,7 @@ function isRuralDeliveryAddress(){
     document.getElementById("address")?.value,
     document.getElementById("landmark")?.value,
     document.getElementById("city")?.value,
-    document.getElementById("postoffice")?.value
+    getPostOfficeValue()
   ].filter(Boolean).join(" ").toLowerCase();
 
   // Common rural-address words used in Indian addresses.
@@ -435,34 +438,27 @@ function updatePrimeCourierAvailability(){
 /* ===== Coupon helpers & logic ===== */
 function norm(s){return (s||"").toString().trim().toUpperCase();}
 function getBaseProduct(){ return norm(document.getElementById("product").value); }
-function getVariantGB(){
-  const v = norm(document.getElementById("variant").value) || getBaseProduct();
-  const m = v.match(/(\d+)\s*GB/);
-  return m ? Number(m[1]) : null;
-}
-function isFMCBorUSBCombo(){
-  if(new URLSearchParams(location.search).get("source")==="cart"){
-    return gpzAllItems().some(i=>/FMCB|FUNTUNA|USB|COMBO/i.test(i.name));
-  }
-  const p=getBaseProduct();
-  const hasFMCB = p.includes("FMCB");
-  const hasUSB  = p.includes("USB");
-  const hasCOMBO= p.includes("COMBO") || p.includes(" + ");
-  return hasFMCB || hasUSB || hasCOMBO; // any FMCB/USB/Combo qualifies for 5%
+function couponDiscountCap(){
+  const items=(typeof gpzAllItems==="function")?gpzAllItems():[];
+  const description=items.length
+    ? items.map(i=>`${i.name||""} ${i.product||""} ${i.variant||""}`).join(" ")
+    : `${document.getElementById("product").value||""} ${document.getElementById("variant").value||""}`;
+  const caps=[];
+  if(/500\s*GB/i.test(description)) caps.push(100);
+  if(/256\s*GB/i.test(description)) caps.push(60);
+  if(/128\s*GB/i.test(description)) caps.push(50);
+  if(/64\s*GB/i.test(description)) caps.push(30);
+  if(/32\s*GB/i.test(description)) caps.push(20);
+  if(/FMCB|FUNTUNA/i.test(description)) caps.push(20);
+  return caps.length?Math.max(...caps):0;
 }
 function computeCouponDiscount(subtotal){
-  if(isFMCBorUSBCombo()){
-    return Math.round(subtotal * 0.05);
-  }
-  const gb=getVariantGB();
-  if(gb===64)  return 200;
-  if(gb===128) return 300;
-  if(gb===256) return 500;
-  return 0;
+  const cap=couponDiscountCap();
+  return cap?Math.min(Math.round(subtotal*.05),cap):0;
 }
 function applyCoupon(){
-  const code=(document.getElementById("couponCode").value||"").trim().toLowerCase();
-  if(code!=="gpz2025"){
+  const code=(document.getElementById("couponCode").value||"").trim().toUpperCase();
+  if(code!=="GPZ2026"){
     discountValue=0;
     document.getElementById("couponNote").innerText="❌ Invalid coupon";
     computeTotals(); return;
@@ -475,15 +471,9 @@ function applyCoupon(){
   const subtotal=getSubtotal();
   const d=computeCouponDiscount(subtotal);
   discountValue=Math.max(0, Math.min(d, subtotal));
-  if(isFMCBorUSBCombo()){
-    document.getElementById("couponNote").innerText=`✅ Coupon applied: -₹${discountValue} (5% on FMCB/USB/Combo)`;
-  }else{
-    const gb=getVariantGB();
-    const slab=(gb===64?200:gb===128?300:gb===256?500:0);
-    document.getElementById("couponNote").innerText = slab>0
-      ? `✅ Coupon applied: -₹${slab} (GB slab: ${gb}GB)`
-      : `ℹ️ Coupon applied: ₹0 (no GB slab matched)`;
-  }
+  document.getElementById("couponNote").innerText=discountValue>0
+    ? `✅ Coupon applied: -₹${discountValue}`
+    : "ℹ️ Coupon is not applicable to the selected product.";
   computeTotals();
 }
 
@@ -504,94 +494,6 @@ function getSubtotal(){
 function recomputeAddons(){
   document.getElementById("addonsTotal").value = sumAddons();
   computeTotals();
-}
-
-/* ===== COD gating & charges ===== */
-function codEligible(){
-  const sub=getSubtotal();
-  return sub >= COD_ALLOW_MIN;
-}
-function currentCodCharge(sub){
-  if(sub >= COD_FREE_THRESHOLD) return 0;
-  if(sub >= COD_ALLOW_MIN) return COD_MID_CHARGE;
-  return null; // not allowed
-}
-function updateCodButton(){
-  const codBtn=document.getElementById("btn-cod");
-  const sub=getSubtotal();
-  const eligible=codEligible();
-  const charge=currentCodCharge(sub);
-
-  if(!eligible){
-    codBtn.setAttribute("disabled","disabled");
-    document.getElementById("codNote").textContent="COD not available below ₹1399";
-    if(mode==="cod"){ mode="prepaid"; setModeBadge(); document.getElementById("prepaidBlock").style.display="block"; document.getElementById("codBlock").style.display="none"; }
-  }else{
-    codBtn.removeAttribute("disabled");
-    document.getElementById("codNote").textContent = (charge===0)
-      ? "COD charges: ₹0 (Subtotal ≥ ₹1899)"
-      : "COD charges: ₹99 (Subtotal ₹1399–₹1898)";
-  }
-}
-
-/* ===== Mode toggle ===== */
-function setMode(m){
-  if(m==="cod" && !codEligible()){
-    alert("Subtotal ₹1399 se niche hai — COD allowed nahi.");
-    return;
-  }
-  mode=m;
-  document.getElementById("btn-prepaid").className=(m==="prepaid"?"ghost act":"ghost");
-  document.getElementById("btn-cod").className=(m==="cod"?"ghost act":"ghost");
-  document.getElementById("couponCard").style.display=(m==="prepaid")?"block":"none";
-  document.getElementById("prepaidCourierCard").style.display=(m==="prepaid")?"block":"none";
-  document.getElementById("prepaidBlock").style.display=(m==="prepaid")?"block":"none";
-  document.getElementById("codBlock").style.display=(m==="cod")?"block":"none";
-  setModeBadge();
-  computeTotals();
-}
-
-/* ===== Totals ===== */
-function computeTotals(){
-  const base = +document.getElementById("basePrice").value||0;
-  const addons = sumAddons();
-  const subtotal = base + addons;
-  document.getElementById("addonsTotal").value = addons;
-  document.getElementById("subtotal").value = subtotal;
-
-  // Hidden info text (reference only; not visible)
-  document.getElementById("ruleNote").innerText =
-    "COD rules: ≥ ₹1899 → ₹0 • ₹1399–₹1898 → ₹99 • < ₹1399 → No COD. Coupon (prepaid): FMCB/USB/Combo 5% OR 64GB ₹200 • 128GB ₹300 • 256GB ₹500.";
-
-  updateCodButton();
-
-  let codC=0, paid=0, rest=0;
-  if(mode==="prepaid"){
-    document.getElementById("prepaidBlock").style.display="block";
-    document.getElementById("codBlock").style.display="none";
-    if(discountValue>0){
-      document.getElementById("discountAmount").value = discountValue;
-      paid = Math.max(0, subtotal - discountValue);
-    }else{
-      document.getElementById("discountAmount").value = 0;
-      paid = subtotal;
-    }
-    document.getElementById("amountPaid_pre").value = paid;
-  }else{
-    document.getElementById("prepaidBlock").style.display="none";
-    document.getElementById("codBlock").style.display="block";
-    const charge = currentCodCharge(subtotal);
-    codC = (charge===null)?0:charge;
-    document.getElementById("codCharges").value = codC;
-    // Advance: max(₹500, 10% of (subtotal+codC))
-    paid = Math.max(500, Math.ceil((subtotal + codC) * 0.10));
-    rest = Math.max(0, subtotal + codC - paid);
-    document.getElementById("amountPaid_cod").value = paid;
-    document.getElementById("restAmount").value = rest;
-  }
-
-  const note=(mode==="prepaid")?"Prepaid for Games Planet Order":"Advance for Games Planet Order";
-  document.getElementById("payNow").href = upiLink(paid, note);
 }
 
 /* ===== Utils ===== */
@@ -645,7 +547,7 @@ function buildWhatsAppTemplate(forMode){
     `Pincode: ${document.getElementById("pincode").value || ""}`,
     `State: ${document.getElementById("state").value || ""}`,
     `District/City: ${document.getElementById("city").value || ""}`,
-    `Post office: ${document.getElementById("postoffice").value || ""}`,
+    `Post office: ${getPostOfficeValue() || ""}`,
     `Product: ${productWithAddons()}`,
     `Variant: ${document.getElementById("variant").value || ""}`,
     `Base Price: ${rs(basePrice)}`
@@ -685,9 +587,12 @@ function buildWhatsAppTemplate(forMode){
 
 /* ===== Single action: Submit this order ===== */
 function submitOrder(){
-  if(mode==="prepaid" && !document.getElementById("prepaidCourier").value){
-    alert("Please choose a prepaid courier company.");
-    document.getElementById("prepaidCourier").focus();
+  const required=["name","mobile","address","pincode"];
+  const missing=required.find(id=>!String(document.getElementById(id)?.value||"").trim());
+  if(missing){
+    const labels={name:"Name",mobile:"Mobile Number",address:"Address",pincode:"Pincode"};
+    alert(`${labels[missing]} is required.`);
+    document.getElementById(missing)?.focus();
     return;
   }
   const text = buildWhatsAppTemplate(mode === "cod" ? "cod" : "prepaid");
@@ -711,40 +616,25 @@ function submitOrder(){
 })();
 
 /* ====== ETA / PINCODE — OFFLINE FIRST ====== */
-/* =========================================================
-   GAMES PLANET — PINCODE AUTOFILL MODULE
-   Required local file beside this HTML:
-   1) pincode_merged_final.json   (preferred)
-   OR
-   2) pincode_data.json           (fallback)
-
-   Expected record format:
-   {
-     "244901": {
-       "city": "Rampur",
-       "state": "Uttar Pradesh",
-       "postoffices": ["Rampur", "..."],
-       "lat": 28.8,
-       "lng": 79.0
-     }
-   }
-   ========================================================= */
-
 let pincodeLatLng={};
 let pincodeDB={};
 let pincodeLookupToken=0;
 let pincodeTimer=0;
+let pincodeAutoWriting=false;
+let pincodeManualState=false;
+let pincodeManualCity=false;
+let pincodeManualPostOffice=false;
+let pincodeLastAuto={state:'',city:'',postoffice:''};
+let pincodeCurrentRecord=null;
 
-const PINCODE_DB_FILES=['pincode_merged_final.json','pincode_data.json'];
-const INDIA_POST_API='https://api.postalpincode.in/pincode/';
+const PINCODE_DB_FILES=['pincode_merged_final.json'];
 const ORIGIN_PINCODE='244901'; // Games Planet, Rampur
 
 function setPincodeStatus(message,type='info'){
   const el=document.getElementById('pincodeStatus');
   if(!el)return;
   el.textContent=message;
-  el.className='hint';
-  el.style.color=type==='ok'?'#15803d':type==='error'?'#dc2626':'';
+  el.className='status'+(type==='ok'?' ok':type==='error'?' error':'');
 }
 
 function normalizeText(value){
@@ -763,6 +653,96 @@ function uniqueText(values){
     }
   });
   return out.sort((a,b)=>a.localeCompare(b,'en-IN'));
+}
+
+function fillDatalist(id,values){
+  const list=document.getElementById(id);
+  if(!list)return;
+  list.innerHTML=uniqueText(values).map(v=>`<option value="${String(v).replace(/"/g,'&quot;')}"></option>`).join('');
+}
+
+function getPostOfficeValue(){
+  const sel=document.getElementById('postoffice');
+  const manual=document.getElementById('postofficeManual');
+  if(!sel)return '';
+  return sel.value==='__manual__' ? normalizeText(manual?.value) : normalizeText(sel.value);
+}
+
+function officeMatchKey(value){
+  return normalizeText(value).toUpperCase()
+    .replace(/\b(B\.?O\.?|S\.?O\.?|H\.?O\.?)\b/g,'')
+    .replace(/[^A-Z0-9]/g,'');
+}
+
+function selectedOfficeDetail(){
+  const details=pincodeCurrentRecord?.officeDetails||[];
+  const selected=officeMatchKey(getPostOfficeValue());
+  if(selected){
+    const exact=details.find(item=>officeMatchKey(item.name)===selected);
+    if(exact)return exact;
+  }
+  return details.length&&details.every(item=>String(item.type||'').toUpperCase()==='BO')
+    ? details[0]
+    : null;
+}
+
+function gpzIsRuralDestination(){
+  const office=selectedOfficeDetail();
+  if(office)return String(office.type||'').toUpperCase()==='BO';
+  return isRuralDeliveryAddress();
+}
+
+function updateAreaTypeStatus(){
+  const el=document.getElementById('areaTypeStatus');
+  if(!el)return;
+  const office=selectedOfficeDetail();
+  const rural=gpzIsRuralDestination();
+  el.style.display='block';
+  if(office){
+    const delivery=String(office.delivery||'').toLowerCase().includes('non')?'Non-Delivery office':'Delivery office';
+    const productValue=typeof getSubtotal==='function'?getSubtotal():0;
+    el.textContent=rural
+      ? (productValue>3000
+        ? `🌾 Rural area detected (Branch Office • ${delivery}). Order above ₹3,000: only Delhivery is available.`
+        : `🌾 Rural area detected (Branch Office • ${delivery}). Delhivery and Speed Post are available up to ₹3,000.`)
+      : `🏙️ Urban area detected (${office.type||'PO'} • ${delivery}).`;
+  }else{
+    el.textContent=rural
+      ? '🌾 Rural address detected. Only Delhivery and Speed Post are available.'
+      : 'ℹ️ Select the exact Post Office to confirm Rural/Urban serviceability.';
+  }
+}
+
+function setPostOfficeOptions(postoffices,preferred=''){
+  const sel=document.getElementById('postoffice');
+  if(!sel)return;
+  const manual=document.getElementById('postofficeManual');
+  const current=getPostOfficeValue();
+  const offices=uniqueText(postoffices||[]);
+  sel.innerHTML='<option value="">Select Post Office</option>'+
+    offices.map(po=>`<option value="${String(po).replace(/"/g,'&quot;')}">${po}</option>`).join('')+
+    '<option value="__manual__">Other / Enter manually</option>';
+
+  if(pincodeManualPostOffice && current){
+    const exact=[...sel.options].find(o=>o.value===current);
+    if(exact){ sel.value=current; if(manual)manual.style.display='none'; }
+    else { sel.value='__manual__'; if(manual){manual.style.display='block';manual.value=current;} }
+    return;
+  }
+
+  const wanted=preferred||pincodeLastAuto.postoffice;
+  if(wanted && [...sel.options].some(o=>o.value===wanted)) sel.value=wanted;
+  else if(offices.length===1) sel.value=offices[0];
+  else sel.value='';
+  pincodeLastAuto.postoffice=getPostOfficeValue();
+  if(manual){manual.style.display=sel.value==='__manual__'?'block':'none'; if(sel.value!=='__manual__')manual.value='';}
+}
+
+function resetPincodeManualFlags(){
+  pincodeManualState=false;
+  pincodeManualCity=false;
+  pincodeManualPostOffice=false;
+  pincodeLastAuto={state:'',city:'',postoffice:''};
 }
 
 function validIndiaCoordinate(lat,lng){
@@ -811,37 +791,12 @@ function normalizeLocalRecord(record){
     city:normalizeText(record.city),
     state:normalizeText(record.state),
     postoffices:uniqueText(record.postoffices||[]),
+    officeDetails:Array.isArray(record.officeDetails)?record.officeDetails:[],
     source:'offline'
   };
 }
 
-/* India Post is only a fallback/verification layer.
-   Offline result is shown immediately when local JSON has the pincode. */
-function normalizeApiRecord(payload){
-  const block=Array.isArray(payload)?payload[0]:null;
-  const offices=block&&Array.isArray(block.PostOffice)?block.PostOffice:[];
-  if(!offices.length)return null;
-
-  return {
-    city:normalizeText(offices[0].District||offices[0].Division||offices[0].Region),
-    state:normalizeText(offices[0].State),
-    postoffices:uniqueText(offices.map(office=>office.Name)),
-    source:'India Post API'
-  };
-}
-
-function mergePincodeRecords(local,online){
-  if(!local&&!online)return null;
-  return {
-    lat:local?.lat,
-    lng:local?.lng,
-    city:online?.city||local?.city||'',
-    state:online?.state||local?.state||'',
-    postoffices:uniqueText([...(local?.postoffices||[]),...(online?.postoffices||[])]),
-    source:local&&online?'offline + India Post':online?'India Post API':'offline'
-  };
-}
-
+/* All address and post-office data is loaded from the local database. */
 async function loadLocalPincodeDB(){
   for(const file of PINCODE_DB_FILES){
     try{
@@ -868,43 +823,9 @@ async function loadLocalPincodeDB(){
   }
 
   setPincodeStatus(
-    'Offline pincode database could not load. Keep pincode_merged_final.json or pincode_data.json beside this HTML.',
+    'Offline pincode database could not load. Keep pincode_merged_final.json beside this HTML.',
     'error'
   );
-}
-
-async function getIndiaPostRecord(pin){
-  const cacheKey=`gpz-post-${pin}`;
-
-  try{
-    const cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
-    if(cached&&Date.now()-cached.savedAt<7*86400000)return cached.record;
-  }catch(_error){}
-
-  const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),4500);
-
-  try{
-    const response=await fetch(`${INDIA_POST_API}${pin}`,{
-      signal:controller.signal,
-      cache:'no-store'
-    });
-
-    if(!response.ok)throw new Error(`HTTP ${response.status}`);
-
-    const record=normalizeApiRecord(await response.json());
-    if(record){
-      try{
-        localStorage.setItem(cacheKey,JSON.stringify({savedAt:Date.now(),record}));
-      }catch(_error){}
-    }
-    return record;
-  }catch(error){
-    console.info('India Post unavailable; offline data retained.',error);
-    return null;
-  }finally{
-    clearTimeout(timeout);
-  }
 }
 
 function haversine(lat1,lon1,lat2,lon2){
@@ -956,10 +877,27 @@ function formatDateRange(minDays,maxDays){
   return `${s.toLocaleDateString('en-IN',opts)} – ${e.toLocaleDateString('en-IN',opts)}`;
 }
 
+function ensurePincodeMetaFields(){
+  if(!document.getElementById('etaTextCod')){
+    const el=document.createElement('input'); el.type='hidden'; el.id='etaTextCod'; document.body.appendChild(el);
+  }
+  if(!document.getElementById('dateRangeCOD')){
+    const el=document.createElement('input'); el.type='hidden'; el.id='dateRangeCOD'; document.body.appendChild(el);
+  }
+}
+
 function clearPincodeResult(){
+  pincodeCurrentRecord=null;
+  ensurePincodeMetaFields();
+  pincodeAutoWriting=true;
   document.getElementById('state').value='';
   document.getElementById('city').value='';
-  document.getElementById('postoffice').innerHTML='<option value="">Select Post Office</option>';
+  fillDatalist('stateSuggestions',[]);
+  fillDatalist('citySuggestions',[]);
+  const manual=document.getElementById('postofficeManual');
+  if(manual){manual.value='';manual.style.display='none';}
+  setPostOfficeOptions([], '');
+  pincodeAutoWriting=false;
   document.getElementById('distance').value='';
   document.getElementById('etaText').value='';
   document.getElementById('dateRange').value='';
@@ -971,29 +909,26 @@ function clearPincodeResult(){
   document.getElementById('codEta').textContent='—';
   document.getElementById('codRange').textContent='—';
   document.getElementById('miniPreview').style.display='none';
+  const areaStatus=document.getElementById('areaTypeStatus');
+  if(areaStatus){areaStatus.style.display='none';areaStatus.textContent='';}
   if(typeof updatePrimeCourierAvailability==='function') updatePrimeCourierAvailability();
+  if(typeof syncCourierOptions==='function') syncCourierOptions();
 }
 
 function renderPincodeRecord(pin,rec,verification='offline'){
   if(!rec)return false;
+  ensurePincodeMetaFields();
+  pincodeCurrentRecord=rec;
 
-  document.getElementById('state').value=rec.state||'';
-  document.getElementById('city').value=rec.city||'';
-
-  const sel=document.getElementById('postoffice');
-  const previous=sel.value;
-  sel.innerHTML='<option value="">Select Post Office</option>';
-
-  (rec.postoffices||[]).forEach(po=>{
-    const option=document.createElement('option');
-    option.value=po;
-    option.textContent=po;
-    sel.appendChild(option);
-  });
-
-  if([...sel.options].some(option=>option.value===previous)){
-    sel.value=previous;
-  }
+  const stateEl=document.getElementById('state');
+  const cityEl=document.getElementById('city');
+  pincodeAutoWriting=true;
+  fillDatalist('stateSuggestions',[rec.state,stateEl.value]);
+  fillDatalist('citySuggestions',[rec.city,cityEl.value]);
+  if(!pincodeManualState){ stateEl.value=rec.state||''; pincodeLastAuto.state=stateEl.value; }
+  if(!pincodeManualCity){ cityEl.value=rec.city||''; pincodeLastAuto.city=cityEl.value; }
+  setPostOfficeOptions(rec.postoffices||[], getPostOfficeValue());
+  pincodeAutoWriting=false;
 
   if(validIndiaCoordinate(rec.lat,rec.lng)){
     const origin=normalizeLocalRecord(pincodeDB[ORIGIN_PINCODE]);
@@ -1021,53 +956,33 @@ function renderPincodeRecord(pin,rec,verification='offline'){
     document.getElementById('codEta').textContent=codEta;
     document.getElementById('codRange').textContent=codRange;
     document.getElementById('miniPreview').style.display='block';
-    if(typeof updatePrimeCourierAvailability==='function') updatePrimeCourierAvailability();
   }
 
   const officeCount=(rec.postoffices||[]).length;
-  const label=verification==='verified'?'Offline + India Post matched':
-    verification==='online'?'India Post data':'Offline data';
+  const label='Offline data';
 
   setPincodeStatus(
     `✓ ${pin}: ${label} • ${officeCount} post office${officeCount===1?'':'s'}`,
     'ok'
   );
 
+  updateAreaTypeStatus();
+
+  if(typeof updatePrimeCourierAvailability==='function') updatePrimeCourierAvailability();
+  if(typeof syncCourierOptions==='function') syncCourierOptions();
   return true;
 }
 
-async function lookupPincode(pin){
-  const token=++pincodeLookupToken;
+function lookupPincode(pin){
+  ++pincodeLookupToken;
   const local=normalizeLocalRecord(pincodeDB[pin]);
 
   if(local){
     renderPincodeRecord(pin,local,'offline');
-    setPincodeStatus(`✓ ${pin}: Offline result shown • checking India Post…`,'ok');
+    setPincodeStatus(`✓ ${pin}: Offline database result • ${(local.postoffices||[]).length} post office(s)`,'ok');
   }else{
     clearPincodeResult();
-    setPincodeStatus(`Checking ${pin} with India Post…`);
-  }
-
-  const online=await getIndiaPostRecord(pin);
-  if(token!==pincodeLookupToken)return;
-
-  const merged=mergePincodeRecords(local,online);
-
-  if(merged){
-    renderPincodeRecord(
-      pin,
-      merged,
-      local&&online?'verified':local?'offline':'online'
-    );
-
-    if(local&&!online){
-      setPincodeStatus(`✓ ${pin}: Offline data active (India Post server unavailable)`,'ok');
-    }else if(!local&&online){
-      setPincodeStatus(`✓ ${pin}: India Post result active; offline coordinates unavailable`,'ok');
-    }
-  }else{
-    clearPincodeResult();
-    setPincodeStatus(`Pincode ${pin} was not found in offline data or India Post.`,'error');
+    setPincodeStatus(`Pincode ${pin} was not found in the offline database.`,'error');
   }
 }
 
@@ -1079,35 +994,51 @@ document.getElementById('pincode').addEventListener('input',function(){
 
   if(pin.length!==6){
     ++pincodeLookupToken;
+    resetPincodeManualFlags();
     clearPincodeResult();
     setPincodeStatus('Enter a valid 6-digit pincode.');
     return;
   }
 
+  resetPincodeManualFlags();
   pincodeTimer=setTimeout(()=>lookupPincode(pin),180);
 });
 
 loadLocalPincodeDB();
 
-/* Keep courier/address-dependent controls synced with the offline pincode result. */
+/* Allow manual correction without a later offline refresh overwriting it. */
+const stateManualEl=document.getElementById('state');
+const cityManualEl=document.getElementById('city');
+const postOfficeEl=document.getElementById('postoffice');
+const postOfficeManualEl=document.getElementById('postofficeManual');
+stateManualEl?.addEventListener('input',()=>{if(!pincodeAutoWriting)pincodeManualState=true;});
+cityManualEl?.addEventListener('input',()=>{if(!pincodeAutoWriting)pincodeManualCity=true;});
+postOfficeEl?.addEventListener('change',()=>{
+  if(!pincodeAutoWriting)pincodeManualPostOffice=true;
+  if(postOfficeManualEl){
+    postOfficeManualEl.style.display=postOfficeEl.value==='__manual__'?'block':'none';
+    if(postOfficeEl.value==='__manual__')postOfficeManualEl.focus();
+  }
+  updateAreaTypeStatus();
+  syncCourierOptions();
+});
+postOfficeManualEl?.addEventListener('input',()=>{
+  if(!pincodeAutoWriting)pincodeManualPostOffice=true;
+  updateAreaTypeStatus();
+  syncCourierOptions();
+});
+
+/* Live updates that might affect totals/eligibility */
 ["name","mobile","altMobile","email","address","landmark","pincode","state","city","product","variant","basePrice","house"]
 .forEach(id=>{
   const el=document.getElementById(id);
   if(el){
     el.addEventListener("input",()=>{
-      if(["address","landmark","pincode","city","house"].includes(id) && typeof updatePrimeCourierAvailability==='function'){
-        updatePrimeCourierAvailability();
-      }
+      if(["address","landmark","pincode","city","house"].includes(id)) updatePrimeCourierAvailability();
     });
   }
 });
-const gpzPostOfficeSelect=document.getElementById("postoffice");
-if(gpzPostOfficeSelect){
-  gpzPostOfficeSelect.addEventListener("change",()=>{
-    if(typeof updatePrimeCourierAvailability==='function') updatePrimeCourierAvailability();
-  });
-}
-
+document.getElementById("postoffice").addEventListener("change",()=>{ updatePrimeCourierAvailability(); });
 </script>
 
 <script id="gpz-fmcb-final-calculator">
@@ -1119,6 +1050,11 @@ const GPZ_AIR=["Trackon.in","ShreeMaruti.com"];
 const GPZ_PRIME=["Trackon.in","ShreeMaruti.com"];
 const GPZ_COD=["Delhivery.com","BlueDart"];
 const GPZ_VAS_COURIERS=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
+// Payment accounts: Non-GST and GST MUST remain separate.
+const GPZ_NON_GST_UPI_ID="paytmqr5hyx5o@ptys";
+const GPZ_NON_GST_UPI_NAME="Surender Kaur";
+const GPZ_GST_UPI_ID="gnsl.khalsa@okhdfcbank";
+const GPZ_GST_UPI_NAME="GAMES PLANET ZONE";
 const GPZ_ADDON_WEIGHTS={
   "Wire Gamepad":250,"Wireless Gamepad":250,"PS2 Slim Sticker/Skin":0,
   "PS2 AV Cable":70,"HDMI Converter":80,"HDMI Cable":99,"Best HDMI Cable":120,
@@ -1127,6 +1063,69 @@ const GPZ_ADDON_WEIGHTS={
   "AAA 4 BATTERIES AND 4 PORT CHARGER COMBO":370,"TRACKON.IN PRIME COURIER SERVICE":0
 };
 let gpzCurrentOrder=null;
+let gpzDirectBasePrice=0;
+
+/* Read the cart that belongs to THIS checkout.
+   URL payload is primary so checkout still works when localStorage is blocked,
+   cleared, or a stale cart exists from an older order. */
+function gpzIncomingCartItems(){
+  if(GPZ_PARAMS.get("source")!=="cart") return [];
+
+  const urlCart=GPZ_PARAMS.get("cart");
+  if(urlCart){
+    try{
+      const parsed=JSON.parse(urlCart);
+      if(Array.isArray(parsed)&&parsed.length) return parsed;
+    }catch(e){
+      console.warn("Could not parse cart from checkout URL.",e);
+    }
+  }
+
+  try{
+    const stored=JSON.parse(localStorage.getItem("gp_order_summary")||"null");
+    if(stored&&stored.source==="cart"&&Array.isArray(stored.items)&&stored.items.length) return stored.items;
+  }catch(e){
+    console.warn("Could not read saved checkout cart.",e);
+  }
+
+  // Last-resort fallback: read the original persistent cart used by index.html / Simple.html.
+  // This prevents a generic “PS2 Product” label if checkout-summary storage was cleared or overwritten.
+  try{
+    const rawCart=JSON.parse(localStorage.getItem("gpz_ps2_cart_v1")||"[]");
+    if(Array.isArray(rawCart)&&rawCart.length){
+      return rawCart.map(i=>({
+        name:(i.variant&&i.variant!=="PS2")?`${i.product} — ${i.variant}`:i.product,
+        product:i.product,
+        variant:i.variant||"PS2",
+        pack:i.pack||"",
+        quantity:Number(i.quantity)||1,
+        unitPrice:Number(i.unitPrice)||0,
+        lineTotal:(Number(i.unitPrice)||0)*(Number(i.quantity)||1),
+        unitWeight:Number(i.unitWeight)||25,
+        lineWeight:(Number(i.unitWeight)||25)*(Number(i.quantity)||1),
+        size:i.size||""
+      }));
+    }
+  }catch(e){
+    console.warn("Could not read persistent PS2 cart.",e);
+  }
+  return [];
+}
+
+function gpzNormalizeIncomingItem(i){
+  const quantity=Math.max(1,Number(i?.quantity)||1);
+  const unitPrice=Number(i?.unitPrice)||0;
+  const unitWeight=Number(i?.unitWeight)||gpzInferWeight(i?.product||i?.name||"",i?.variant||"");
+  const product=String(i?.product||"").trim();
+  const variant=String(i?.variant||"").trim();
+  const name=String(i?.name||((variant&&variant!=="PS2")?`${product} — ${variant}`:product)||"PS2 Product");
+  return {
+    name,product,variant,pack:String(i?.pack||""),quantity,unitPrice,
+    lineTotal:Number(i?.lineTotal)||(unitPrice*quantity),
+    unitWeight,lineWeight:Number(i?.lineWeight)||(unitWeight*quantity),
+    dimensions:i?.dimensions||i?.unitDimensions||i?.size||""
+  };
+}
 
 function gpzMoney(n){return "₹"+Math.ceil(Number(n)||0).toLocaleString("en-IN");}
 function gpzEscape(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
@@ -1145,23 +1144,31 @@ function gpzInferWeight(product,variant){
   if(text.includes("ADAPTER")) weight=340;
   return weight;
 }
+function gpzItemDimensions(item){
+  if(item&&item.dimensions){
+    if(Array.isArray(item.dimensions)) return item.dimensions.join(" × ")+" cm";
+    return String(item.dimensions);
+  }
+  const w=Number(item?.unitWeight)||0;
+  if(w<=30) return "10 × 7 × 2 cm";
+  if(w<=100) return "15 × 10 × 4 cm";
+  if(w<=300) return "20 × 15 × 8 cm";
+  if(w<=600) return "22 × 17 × 9 cm";
+  if(w<=1200) return "28 × 22 × 12 cm";
+  return "32 × 26 × 18 cm";
+}
 function gpzBaseItems(){
+  const incomingCart=gpzIncomingCartItems();
+  if(incomingCart.length) return incomingCart.map(gpzNormalizeIncomingItem);
+
   const product=GPZ_PARAMS.get("product")||document.getElementById("product").value||"PS2 Product";
   const variant=GPZ_PARAMS.get("variant")||document.getElementById("variant").value||"";
-  const base=Number(GPZ_PARAMS.get("base")||document.getElementById("basePrice").value||0);
+  const base=Number(GPZ_PARAMS.get("base")||gpzDirectBasePrice||0);
   const quantity=Math.max(1,Number(GPZ_PARAMS.get("quantity")||1));
   const suppliedWeight=Number(GPZ_PARAMS.get("weight")||0);
-  let stored=null;
-  try{stored=JSON.parse(localStorage.getItem("gp_order_summary")||"null");}catch(e){}
-  const storedMatches=stored&&Array.isArray(stored.items)&&stored.items.length&&
-    (GPZ_PARAMS.get("source")==="cart"||!GPZ_PARAMS.get("product")||stored.items.some(i=>String(i.name).toLowerCase()===product.toLowerCase()));
-  if(storedMatches) return stored.items.map(i=>({
-    name:i.name,quantity:Number(i.quantity)||1,unitPrice:Number(i.unitPrice)||0,
-    lineTotal:Number(i.lineTotal)||0,unitWeight:Number(i.unitWeight)||0,lineWeight:Number(i.lineWeight)||0
-  }));
   const unitPrice=quantity?base/quantity:base;
   const unitWeight=suppliedWeight?suppliedWeight/quantity:gpzInferWeight(product,variant);
-  return [{name:variant?`${product} — ${variant}`:product,quantity,unitPrice,lineTotal:base,unitWeight,lineWeight:unitWeight*quantity}];
+  return [{name:variant?`${product} — ${variant}`:product,product,variant,quantity,unitPrice,lineTotal:base,unitWeight,lineWeight:unitWeight*quantity,dimensions:GPZ_PARAMS.get("dimensions")||""}];
 }
 function gpzAllItems(){
   const items=gpzBaseItems();
@@ -1171,7 +1178,7 @@ function gpzAllItems(){
     const quantity=Number(row.querySelector(".i-qty").value||0);
     if(quantity>0&&name!=="TRACKON.IN PRIME COURIER SERVICE"){
       const unitWeight=GPZ_ADDON_WEIGHTS[name]||100;
-      items.push({name,quantity,unitPrice,lineTotal:unitPrice*quantity,unitWeight,lineWeight:unitWeight*quantity});
+      items.push({name,quantity,unitPrice,lineTotal:unitPrice*quantity,unitWeight,lineWeight:unitWeight*quantity,dimensions:""});
     }
   });
   return items;
@@ -1216,11 +1223,14 @@ function gpzCourierRate(courier,speed,payment,kg){
 function getSubtotal(){return gpzAllItems().reduce((s,i)=>s+i.lineTotal,0);}
 function recomputeAddons(){
   document.getElementById("addonsTotal").value=sumAddons();
-  computeTotals();
+  updateAreaTypeStatus();
+  syncCourierOptions();
 }
 function syncCourierOptions(){
   const payment=gpzMode();
-  if(payment==="cod"){
+  const rural=gpzIsRuralDestination();
+  const productValue=getSubtotal();
+  if(payment==="cod"||rural){
     document.querySelector('input[name="deliverySpeed"][value="surface"]').checked=true;
     document.getElementById("airChoice").style.display="none";
     document.getElementById("primeChoice").style.display="none";
@@ -1229,20 +1239,26 @@ function syncCourierOptions(){
     document.getElementById("primeChoice").style.display="";
   }
   const speed=gpzSpeed();
-  const allowed=payment==="cod"?GPZ_COD:(speed==="air"?GPZ_AIR:(speed==="prime"?GPZ_PRIME:GPZ_SURFACE));
+  const allowed=rural
+    ? (productValue>3000?["Delhivery.com"]:["Delhivery.com","Speed Post"])
+    : (payment==="cod"?GPZ_COD:(speed==="air"?GPZ_AIR:(speed==="prime"?GPZ_PRIME:GPZ_SURFACE)));
   const select=document.getElementById("courier");
   const old=select.value;
   select.innerHTML=allowed.map(c=>`<option value="${c}">${c}</option>`).join("");
   select.value=allowed.includes(old)?old:allowed[0];
   const pin=(document.getElementById("pincode").value||"").trim();
   document.getElementById("courierServiceNote").textContent=/^\d{6}$/.test(pin)
-    ? `Pincode ${pin}: mode के अनुसार courier list दिखाई गई है। Final serviceability courier booking के समय confirm होगी।`
+    ? (rural
+      ? (productValue>3000
+        ? `Rural PIN ${pin}: ₹3,000 से ऊपर केवल Delhivery उपलब्ध है।`
+        : `Rural PIN ${pin}: Delhivery और Speed Post उपलब्ध हैं।`)
+      : `Pincode ${pin}: mode के अनुसार courier list दिखाई गई है। Final serviceability courier booking के समय confirm होगी।`)
     : "पहले valid 6-digit pincode भरें। Final courier serviceability destination pincode पर depend करेगी।";
   computeTotals();
 }
 function setMode(nextMode){
   const productValue=getSubtotal();
-  if(nextMode==="cod"&&productValue<1300){
+  if(nextMode==="cod"&&productValue<GPZ_COD_MIN){
     alert("COD is available only when product value is ₹1,300 or more.");
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     mode="prepaid";
@@ -1250,6 +1266,7 @@ function setMode(nextMode){
     mode=nextMode;
   }
   document.getElementById("couponCard").style.display=mode==="prepaid"?"block":"none";
+  document.getElementById("couponCodNotice").style.display=mode==="cod"?"block":"none";
   if(mode==="cod"){
     discountValue=0;
     document.getElementById("couponCode").value="";
@@ -1284,7 +1301,7 @@ function computeTotals(){
   const volumetricKg=(boxDimensions[0]*boxDimensions[1]*boxDimensions[2])/5000;
   const chargeableKg=Math.max(.5,Math.max(actualKg,volumetricKg));
   let payment=gpzMode();
-  if(payment==="cod"&&productTotal<1300){
+  if(payment==="cod"&&productTotal<GPZ_COD_MIN){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     payment="prepaid"; mode="prepaid";
   }
@@ -1298,26 +1315,39 @@ function computeTotals(){
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
   gpzUpdatePaymentQr(invoiceIncluded);
-  const productGst=invoiceIncluded?Math.ceil(discountedProducts*.18):0;
+  // Billing order:
+  // Products + add-ons + courier - discount + GST = total before VAS.
+  // VAS is calculated on that total, then added to make the final amount.
+  const amountBeforeGst=Math.max(0,productTotal+courierCharge-appliedDiscount);
+  const productGst=invoiceIncluded?Math.ceil(amountBeforeGst*.18):0;
+  const totalBeforeVas=amountBeforeGst+productGst;
   const vasApplies=GPZ_VAS_COURIERS.includes(courier);
-  const vasCharge=vasApplies?Math.ceil(discountedProducts*.02):0;
-  const grandTotal=discountedProducts+productGst+courierCharge+vasCharge;
+  const vasCharge=vasApplies?Math.ceil(totalBeforeVas*.02):0;
+  const grandTotal=totalBeforeVas+vasCharge;
   const advanceAmount=payment==="cod"?Math.min(grandTotal,Math.max(500,Math.ceil(grandTotal*.10))):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
-  gpzCurrentOrder={items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
+  gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,chargeableKg,paymentMode:payment,deliverySpeed:speed,courier,
     courierBaseCharge,courierGst,courierCharge,gstInvoiceIncluded:invoiceIncluded,productGst,
     discountApplied:appliedDiscount,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",
-    discountedProducts,vasApplies,vasCharge,grandTotal,
+    discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
+    // User-facing Base Price is deliberately GST-exclusive and follows:
+    // all products + add-ons + courier + VAS. Discount/GST are shown separately.
+    basePriceDisplay:productTotal+courierCharge+vasCharge,
     advanceAmount,restAmount,hasBatteryItem:items.some(i=>/BATTER/i.test(i.name))};
   localStorage.setItem("gp_order_summary",JSON.stringify(gpzCurrentOrder));
-  document.getElementById("basePrice").value=Number(GPZ_PARAMS.get("base")||document.getElementById("basePrice").value||0);
+  document.getElementById("basePrice").value=Math.ceil(gpzCurrentOrder.basePriceDisplay);
   document.getElementById("addonsTotal").value=sumAddons();
   document.getElementById("subtotal").value=productTotal;
   document.getElementById("gstDetails").style.display=invoiceIncluded?"block":"none";
-  document.getElementById("codChoice").style.display=productTotal<1300?"none":"";
-  document.querySelector('input[name="paymentMode"][value="cod"]').disabled=productTotal<1300;
+  const codAvailable=productTotal>=GPZ_COD_MIN;
+  document.getElementById("codChoice").style.display=codAvailable?"":"none";
+  document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
+  document.getElementById("codNote").textContent=codAvailable
+    ? "COD available. Courier charges will be added separately."
+    : "COD is available when products + add-ons total is ₹1,300 or more.";
   document.getElementById("couponCard").style.display=payment==="prepaid"?"block":"none";
+  document.getElementById("couponCodNotice").style.display=payment==="cod"?"block":"none";
   document.getElementById("itemBreakdown").innerHTML=items.map((i,n)=>`<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${gpzMoney(i.unitPrice)} × ${i.quantity} = <b>${gpzMoney(i.lineTotal)}</b><br>${i.unitWeight}g × ${i.quantity} = <b>${i.lineWeight}g</b></div>`).join("");
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:"-"+gpzMoney(appliedDiscount),sumProductGst:gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
     sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:volumetricKg.toFixed(2)+"kg",
@@ -1329,11 +1359,35 @@ function computeTotals(){
   document.getElementById("sumRest").style.display=payment==="cod"?"":"none";
   document.getElementById("modeBadge").textContent=payment==="cod"?"Mode: COD":"Mode: Prepaid";
   document.getElementById("modeBadge").className="badge right "+(payment==="cod"?"mode-cod":"mode-pre");
-  document.getElementById("payNow").href=gpzUpiLink(advanceAmount,payment==="cod"?"COD Advance":"Prepaid Order");
+  const paymentNote=payment==="cod"?"COD Payment":(invoiceIncluded?"GST Invoice Payment":"Prepaid Order");
+  const payNow=document.getElementById("payNow");
+  const paymentUpi=gpzUpiLink(advanceAmount,paymentNote,invoiceIncluded);
+  payNow.href=paymentUpi;
+  payNow.dataset.upi=paymentUpi;
   gpzRenderRateGuide(chargeableKg);
 }
-function gpzUpiLink(amount,note){
-  return "upi://pay?"+new URLSearchParams({pa:"gnsl.khalsa@okhdfcbank",pn:"GAMES PLANET ZONE",am:String(amount),cu:"INR",tn:note}).toString();
+function gpzUpiLink(amount,note,invoiceIncluded=gpzInvoice()){
+  const isGst=Boolean(invoiceIncluded);
+  const pa=isGst?GPZ_GST_UPI_ID:GPZ_NON_GST_UPI_ID;
+  const pn=isGst?GPZ_GST_UPI_NAME:GPZ_NON_GST_UPI_NAME;
+  return "upi://pay?"+new URLSearchParams({pa,pn,am:String(Number(amount)||0),cu:"INR",tn:note}).toString();
+}
+function launchUpiPayment(event){
+  computeTotals();
+  const o=gpzCurrentOrder;
+  if(!o||!Number(o.advanceAmount)){
+    if(event) event.preventDefault();
+    alert("Payment amount is not ready. Please complete the order details first.");
+    return false;
+  }
+  const note=o.paymentMode==="cod"?"COD Payment":(o.gstInvoiceIncluded?"GST Invoice Payment":"Prepaid Order");
+  const upiUrl=gpzUpiLink(o.advanceAmount,note,o.gstInvoiceIncluded);
+  const payNow=document.getElementById("payNow");
+  // Keep a real anchor href so Android/Chrome can open the installed UPI app natively.
+  // Returning true lets the browser follow the upi:// link from the user's click gesture.
+  payNow.href=upiUrl;
+  payNow.dataset.upi=upiUrl;
+  return true;
 }
 function productWithAddons(){return gpzCurrentOrder?gpzCurrentOrder.items.map(i=>`${i.name} x${i.quantity}`).join(", "):document.getElementById("product").value;}
 function gpzOrderVariant(){
@@ -1351,18 +1405,33 @@ function buildWhatsAppTemplate(){
   const isCod=o.paymentMode==="cod";
   const house=(document.getElementById("house").value||"").trim();
   const address=((house?house+", ":"")+(document.getElementById("address").value||"")).trim();
-  const gstLines=o.gstInvoiceIncluded?[
-    "GST Invoice: Included (18%)",`Product GST: ${gpzMoney(o.productGst)}`,"Seller GSTIN: 09DIDPS5066Q1ZB",
+  const simpleProducts=o.items.map(i=>{
+    const parts=String(i.name||"Games Planet Product").split(/\s+—\s+/);
+    return `${parts[0]} x${i.quantity}`;
+  }).join(" + ");
+  const simpleVariants=o.items.map(i=>{
+    const parts=String(i.name||"").split(/\s+—\s+/);
+    const details=parts.slice(1).join(" — ");
+    return details?`${details} x${i.quantity}`:"";
+  }).filter(Boolean).join(" + ") ||
+    `${(document.getElementById("variant").value||"PS2").trim()} x${o.items[0]?.quantity||1}`;
+  const gstTop=o.gstInvoiceIncluded?"GST Invoice: Included (18%)":"GST Invoice: Excluded";
+  const gstCustomerLines=o.gstInvoiceIncluded?[
+    "Seller GSTIN: 09DIDPS5066Q1ZB",
     `Customer / Business Name: ${document.getElementById("buyerBusinessName").value||""}`,
     `Customer GSTIN: ${document.getElementById("buyerGstin").value||""}`,
     `GST Billing Address: ${document.getElementById("buyerBillingAddress").value||""}`
-  ]:["GST Invoice: Excluded"];
+  ]:[];
   const itemLines=o.items.flatMap((i,n)=>[
-    `${n+1}. ${i.name}`,
+    `${n+1}. ${n===0?"PRODUCT":"ADD-ON"}`,
+    `Name / Variant: ${i.name}`,
     `Quantity: ${i.quantity}`,
-    `Per Price: ${gpzMoney(i.unitPrice)}`,
-    `Product Total: ${gpzMoney(i.lineTotal)}`,
-    `Weight: ${i.unitWeight}g × ${i.quantity} = ${i.lineWeight}g`,
+    `Unit Price: ${gpzMoney(i.unitPrice)}`,
+    `Line Total: ${gpzMoney(i.lineTotal)}`,
+    `Unit Weight: ${i.unitWeight}g`,
+    `Total Weight: ${i.lineWeight}g`,
+    `Approx. Unit Dimensions: ${gpzItemDimensions(i)}`,
+    "────────────────────",
     ""
   ]);
   return [
@@ -1372,61 +1441,139 @@ function buildWhatsAppTemplate(){
     `Alt Mobile: ${document.getElementById("altMobile").value}`,`Email: ${document.getElementById("email").value}`,
     `Address: ${address}`,`Landmark: ${document.getElementById("landmark").value}`,
     `Pincode: ${document.getElementById("pincode").value}`,`State: ${document.getElementById("state").value}`,
-    `District/City: ${document.getElementById("city").value}`,`Post office: ${document.getElementById("postoffice").value}`,"",
-    "Product: Arcade Accessories","Variant:",
+    `District/City: ${document.getElementById("city").value}`,`Post office: ${getPostOfficeValue()}`,"",
+    `Product: ${simpleProducts}`,
+    `Variant: ${simpleVariants}`,
+    `Base Price: ${gpzMoney(o.basePriceDisplay||0)}`,
     `Courier Company: ${o.courier}`,
-    `Discount: ${gpzMoney(o.discountApplied)}`,
+    `Discount Applied: ${o.discountApplied?gpzMoney(o.discountApplied):""}`,
+    gstTop,
     `Amount Paid: ${gpzMoney(o.advanceAmount)}`,
     ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[]),"",
     `📏 Distance: ${document.getElementById("distance").value||""}`,
     `⏳ ${isCod?"COD":"Prepaid"} Order ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`,
     `📅 Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`,"",
-    "📦 SELECTED PRODUCTS & COMPLETE BREAKDOWN","",...itemLines,
-    `Total Quantity: ${o.totalQuantity}`,
-    `Products Total: ${gpzMoney(o.productTotal)}`,
-    `Discount Coupon: ${o.discountCode||"Not used"}`,
-    `Discount Applied: ${o.discountApplied?"-"+gpzMoney(o.discountApplied):gpzMoney(0)}`,
-    ...gstLines,
-    `Total Product Weight: ${o.totalWeight}g`,
+    "━━━━━━━━━━━━━━━━━━━━",
+    "🧾 COMPLETE ORDER BREAKDOWN",
+    "━━━━━━━━━━━━━━━━━━━━","",
+    ...itemLines,"",
+    "📦 WEIGHT & DIMENSION BREAKDOWN",
+    `Products Weight: ${o.totalWeight}g`,
     `Packaging Weight: ${o.packingWeight}g`,
-    `Total Dead Weight: ${o.packedWeight}g`,
-    `Total Dimensions / Box Size: ${o.boxDimensions.join(" × ")} cm`,
+    `Packed Weight: ${o.packedWeight}g`,
+    `Recommended Box: ${o.boxDimensions.join(" × ")} cm`,
+    `Actual Weight: ${o.actualKg.toFixed(2)}kg`,
     `Volumetric Weight: ${o.volumetricKg.toFixed(2)}kg`,
-    `Chargeable Weight: ${o.chargeableKg.toFixed(2)}kg`,
-    `Courier Company: ${o.courier}`,
-    `Total Courier Charges: ${gpzMoney(o.courierCharge)}`,
-    `VAS (2%): ${o.vasApplies?gpzMoney(o.vasCharge):"Not Applicable"}`,
-    `Final Total Amount: ${gpzMoney(o.grandTotal)}`,
-    `Total Amount Paid: ${gpzMoney(o.advanceAmount)}`,
-    ...(isCod?[`Total Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[])
+    `Chargeable Weight: ${o.chargeableKg.toFixed(2)}kg`,"",
+    "━━━━━━━━━━━━━━━━━━━━",
+    "💰 PAYMENT BREAKDOWN",
+    "━━━━━━━━━━━━━━━━━━━━","",
+    `Total Products: ${o.totalQuantity}`,
+    `Products + Add-ons: ${gpzMoney(o.productTotal)}`,
+    `Courier Charges: +${gpzMoney(o.courierCharge)}`,
+    `Products + Courier: ${gpzMoney(o.productTotal+o.courierCharge)}`,
+    `Discount Coupon: ${o.discountCode||"Not used"}`,
+    `Discount Applied: -${gpzMoney(o.discountApplied)}`,
+    `Amount After Discount: ${gpzMoney(o.amountBeforeGst)}`,
+    `GST Invoice (18%): ${o.gstInvoiceIncluded?"+"+gpzMoney(o.productGst):gpzMoney(0)+" (Excluded)"}`,
+    ...gstCustomerLines,
+    `Total Before VAS: ${gpzMoney(o.totalBeforeVas)}`,
+    `VAS (2%): ${o.vasApplies?"+"+gpzMoney(o.vasCharge):gpzMoney(0)+" (Not Applicable)"}`,
+    "",
+    `Final Order Total: ${gpzMoney(o.grandTotal)}`,
+    `Amount Paid: ${gpzMoney(o.advanceAmount)}`,
+    ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[`Remaining Amount: ${gpzMoney(0)}`]),
+    `Payment Status: ${isCod?"PARTIALLY PAID — COD":"FULLY PAID"}`,
+    `Payment Method: ${isCod?"Cash on Delivery":"Prepaid"}`
   ].join("\n");
 }
 function submitOrder(){
-  const required=["name","mobile","address","pincode","state","city","postoffice"];
-  const missing=required.filter(id=>!String(document.getElementById(id).value||"").trim());
-  if(missing.length){alert("Please fill all required customer and delivery details.");document.getElementById(missing[0]).focus();return;}
-  if(gpzInvoice()&&!document.getElementById("buyerBusinessName").value.trim()){alert("Please enter Customer / Business Name for GST invoice.");return;}
-  window.open(`https://wa.me/917983624797?text=${encodeURIComponent(buildWhatsAppTemplate())}`,"_blank","noopener,noreferrer");
+  // Only these four customer fields are compulsory. Everything else is optional.
+  const required=["name","mobile","address","pincode"];
+  const labels={name:"Name",mobile:"Mobile Number",address:"Address",pincode:"Pincode"};
+  const missing=required.find(id=>!String(document.getElementById(id)?.value||"").trim());
+  if(missing){
+    alert(`${labels[missing]} is required.`);
+    document.getElementById(missing)?.focus();
+    return;
+  }
+  const message=buildWhatsAppTemplate();
+  const saved={
+    orderId:document.getElementById("orderId").value,
+    createdAt:new Date().toISOString(),
+    customer:{name:document.getElementById("name").value,mobile:document.getElementById("mobile").value,email:document.getElementById("email").value},
+    paymentMode:gpzCurrentOrder.paymentMode,
+    paymentStatus:gpzCurrentOrder.paymentMode==="cod"?"Amount paid — verification pending":"Payment submitted — verification pending",
+    amountPaid:gpzCurrentOrder.advanceAmount,
+    restOnDelivery:gpzCurrentOrder.restAmount,
+    total:gpzCurrentOrder.grandTotal,
+    courier:gpzCurrentOrder.courier,
+    items:gpzCurrentOrder.items,
+    message
+  };
+  let orders=[];try{orders=JSON.parse(localStorage.getItem("gp_customer_orders_v1")||"[]")}catch(e){}
+  const at=orders.findIndex(x=>x.orderId===saved.orderId);if(at>=0)orders[at]=saved;else orders.unshift(saved);
+  localStorage.setItem("gp_customer_orders_v1",JSON.stringify(orders.slice(0,100)));
+  window.open(`https://wa.me/917983624797?text=${encodeURIComponent(message)}`,"_blank","noopener,noreferrer");
+  setTimeout(()=>location.href="orders.html",450);
 }
 function gpzInitialize(){
-  const product=GPZ_PARAMS.get("product")||"PS2 Product";
-  const variant=GPZ_PARAMS.get("variant")||"";
-  const base=Number(GPZ_PARAMS.get("base")||0);
+  const cartItems=gpzIncomingCartItems().map(gpzNormalizeIncomingItem);
+  const queryProduct=String(GPZ_PARAMS.get("product")||"").trim();
+  const product=cartItems.length
+    ? cartItems.map(i=>`${i.name} × ${i.quantity}`).join(" | ")
+    : ((queryProduct && queryProduct.toLowerCase()!=="ps2 product")?queryProduct:"Games Planet Product");
+  const variant=cartItems.length
+    ? (cartItems.length>1?"Multiple selected products":(cartItems[0].variant||GPZ_PARAMS.get("variant")||"As selected"))
+    : (GPZ_PARAMS.get("variant")||"As selected");
+  const base=cartItems.length
+    ? cartItems.reduce((sum,i)=>sum+i.lineTotal,0)
+    : Number(GPZ_PARAMS.get("base")||0);
+  gpzDirectBasePrice=base;
+
   document.getElementById("product").value=product;
   document.getElementById("variant").value=variant;
   document.getElementById("basePrice").value=base;
-  setPackBadge(GPZ_PARAMS.get("pack")||"");
+  document.getElementById("addonsTotal").value=0;
+  document.getElementById("subtotal").value=base;
+  setPackBadge(GPZ_PARAMS.get("pack")||(cartItems.length===1?(cartItems[0].pack||""):""));
   document.getElementById("orderId").value=orderIdNow();
   mode="prepaid";
   document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
   syncCourierOptions();
+  computeTotals();
 }
+function gpzSyncOptionalGstCustomerName(force=false){
+  const gstIncluded=gpzInvoice();
+  const customerName=document.getElementById("name");
+  const businessName=document.getElementById("buyerBusinessName");
+  if(!gstIncluded||!customerName||!businessName)return;
+
+  const currentCustomer=String(customerName.value||"").trim();
+  const currentBusiness=String(businessName.value||"").trim();
+  const stillAuto=businessName.dataset.gpzAutoName==="1";
+
+  // Auto-fill only when empty/auto-managed. A customer's manual business name is never overwritten.
+  if(force||!currentBusiness||stillAuto){
+    businessName.value=currentCustomer;
+    businessName.dataset.gpzAutoName="1";
+  }
+}
+
+document.getElementById("name").addEventListener("input",()=>{
+  const businessName=document.getElementById("buyerBusinessName");
+  if(gpzInvoice()&&businessName?.dataset.gpzAutoName==="1") gpzSyncOptionalGstCustomerName(true);
+});
+document.getElementById("buyerBusinessName").addEventListener("input",function(){
+  // Once the customer edits this field themselves, keep their custom value.
+  this.dataset.gpzAutoName="0";
+});
 document.getElementById("pincode").addEventListener("input",()=>setTimeout(syncCourierOptions,0));
-document.querySelectorAll('input[name="gstInvoice"]').forEach(el=>el.addEventListener("change",computeTotals));
+document.querySelectorAll('input[name="gstInvoice"]').forEach(el=>el.addEventListener("change",()=>{
+  if(el.checked&&el.value==="included") gpzSyncOptionalGstCustomerName(false);
+  computeTotals();
+}));
 gpzInitialize();
-if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./pincode-offline-sw.js').catch(()=>{}));
-}
 </script>
 </body>
 </html>
