@@ -1348,7 +1348,17 @@ function computeTotals(){
     : "COD is available when products + add-ons total is ₹1,300 or more.";
   document.getElementById("couponCard").style.display=payment==="prepaid"?"block":"none";
   document.getElementById("couponCodNotice").style.display=payment==="cod"?"block":"none";
-  document.getElementById("itemBreakdown").innerHTML=items.map((i,n)=>`<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${gpzMoney(i.unitPrice)} × ${i.quantity} = <b>${gpzMoney(i.lineTotal)}</b><br>${i.unitWeight}g × ${i.quantity} = <b>${i.lineWeight}g</b></div>`).join("");
+  document.getElementById("itemBreakdown").innerHTML=items.map((i,n)=>{
+    const details=[];
+    if(i.product&&i.product!==i.name) details.push(`Product: <b>${gpzEscape(i.product)}</b>`);
+    if(i.variant) details.push(`Variant: <b>${gpzEscape(i.variant)}</b>`);
+    if(i.pack) details.push(`Pack: <b>${gpzEscape(i.pack)}</b>`);
+    details.push(`Quantity: <b>${i.quantity}</b>`);
+    details.push(`Price: ${gpzMoney(i.unitPrice)} × ${i.quantity} = <b>${gpzMoney(i.lineTotal)}</b>`);
+    details.push(`Weight: ${i.unitWeight}g × ${i.quantity} = <b>${i.lineWeight}g</b>`);
+    details.push(`Dimensions: <b>${gpzEscape(gpzItemDimensions(i))}</b>`);
+    return `<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${details.join("<br>")}</div>`;
+  }).join("");
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:"-"+gpzMoney(appliedDiscount),sumProductGst:gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
     sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:volumetricKg.toFixed(2)+"kg",
     sumChargeable:chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
