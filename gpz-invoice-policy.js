@@ -3,14 +3,15 @@
   const POLICY='No return, replacement or refund. Please inspect the product before purchase. Confirm warranty before purchase. Classic and Chinese items generally carry no warranty.';
   const $=id=>document.getElementById(id);
   function gstOn(){const v=($('gstMode')?.value||$('type')?.value||'').toLowerCase();return v==='yes'||v==='gst'}
-  function qr(){return gstOn()?'GSTcurrentQR.png':'Qr (1).jpg'}
+  function qr(){return gstOn()?'GSTcurrentQR.png':'NonGSTcurrentQR.jpg'}
   function customerNumber(){return (($('mobile')?.value||'').replace(/\D/g,'').slice(-10))}
   function enhance(){
     const root=$('invoiceContent')||$('preview'); if(!root)return;
     root.querySelectorAll('*').forEach(el=>{if(el.children.length===0){el.textContent=el.textContent.replace(/GST\s*EXCLUDED/gi,'ESTIMATED BILL').replace(/GST invoice not requested\.?/gi,'Estimated Bill — not a tax invoice.').replace(/^CASH BILL$/i,'ESTIMATED BILL').replace(/^INVOICE$/i,'ESTIMATED BILL')}});
     let box=root.querySelector('.gpz-payment-policy');
     if(!box){box=document.createElement('section');box.className='gpz-payment-policy';root.appendChild(box)}
-    box.innerHTML='<div><b>'+(gstOn()?'GST Included':'Estimated Bill')+'</b><br><span>'+POLICY+'</span></div><img src="'+qr()+'" alt="Payment QR">';
+    const markup='<div><b>'+(gstOn()?'GST Included':'Estimated Bill')+'</b><br><span>'+POLICY+'</span></div><img src="'+qr()+'" alt="Payment QR">';
+    if(box.innerHTML!==markup) box.innerHTML=markup;
   }
   const originalOpen=window.open.bind(window);
   window.open=function(url,target,features){

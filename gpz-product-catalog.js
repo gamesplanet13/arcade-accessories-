@@ -79,7 +79,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "Black Switch Button",
-    "price": 15,
+    "price": 20,
     "weight": 0,
     "size": ""
   },
@@ -103,7 +103,13 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "Coin Drop Switch Button",
-    "price": 45,
+    "price": 60,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Zippy Coin Drop Switch",
+    "price": 99,
     "weight": 0,
     "size": ""
   },
@@ -217,7 +223,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "MD Switch Button",
-    "price": 50,
+    "price": 60,
     "weight": 0,
     "size": ""
   },
@@ -409,13 +415,13 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "Rasila Handle (With Switch)",
-    "price": 260,
+    "price": 230,
     "weight": 0,
     "size": ""
   },
   {
     "name": "Rasila Handle (Without Switch)",
-    "price": 200,
+    "price": 210,
     "weight": 0,
     "size": ""
   },
@@ -426,8 +432,8 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Remote Plate",
-    "price": 300,
+    "name": "Remote Plate (Red Colour)",
+    "price": 200,
     "weight": 0,
     "size": ""
   },

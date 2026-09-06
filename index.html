@@ -913,6 +913,24 @@ img,canvas{
   display:block;
   align-items:center;
 }
+.community-join{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  min-height:44px;
+  margin:8px 0 0;
+  padding:10px 16px;
+  border:1px solid rgba(74,222,128,.45);
+  border-radius:13px;
+  background:linear-gradient(90deg,#128c4e,#25d366);
+  color:#fff;
+  box-shadow:0 9px 24px rgba(37,211,102,.22);
+  font-weight:950;
+  text-decoration:none;
+}
+.community-join:hover{filter:brightness(1.07)}
 .catalog-brand{
   min-width:0;
   display:flex;
@@ -1067,6 +1085,7 @@ img,canvas{
   .catalog-logo{width:36px;height:36px;border-radius:10px;font-size:21px}
   .catalog-brand-name{font-size:21px;letter-spacing:-.7px}
   .catalog-brand-tagline{font-size:8px;margin-top:3px}
+  .community-join{min-height:38px;margin-top:5px;padding:8px 10px;font-size:12px;border-radius:10px}
   .top-cart-tools{top:34px;right:4px;gap:2px;padding:2px;border-radius:8px}
   .top-cart-count,.top-reset{
     min-height:22px;
@@ -1199,6 +1218,7 @@ img,canvas{
       <button type="button" class="top-reset" onclick="clearCart()">Reset Cart</button>
     </div>
   </div>
+  <a class="community-join" href="https://chat.whatsapp.com/GTijcd8dr1NIqfW9stBDCw" target="_blank" rel="noopener noreferrer">💬 Join Games Planet WhatsApp Community</a>
 </div>
 
 <div id="securityOverlay">
@@ -1444,23 +1464,27 @@ images:[
 "images/jpeg/old-raisla-pursh-button.jpeg"
 ]},
 
-{name:"MD Switch Button",category:"Arcade Box Accessories",price:50,weight:5,dimensions:[5,3,1],images:[
+{name:"MD Switch Button",category:"Arcade Box Accessories",price:60,weight:5,dimensions:[5,3,1],images:[
 "images/jpeg/mdswitch.jpeg"
 ]},
 
-{name:"Black Switch Button",category:"Arcade Box Accessories",price:15,weight:5,dimensions:[5,3,1],images:[
+{name:"Black Switch Button",category:"Arcade Box Accessories",price:20,weight:5,dimensions:[5,3,1],images:[
 "images/jpeg/normal-switch-button.jpeg"
 ]},
 
-{name:"Coin Drop Switch Button",category:"Arcade Box Accessories",price:45,weight:12,dimensions:[11,4,2],images:[
+{name:"Coin Drop Switch Button",category:"Arcade Box Accessories",price:60,weight:12,dimensions:[11,4,2],images:[
 "images/jpeg/coindropswitch.jpeg"
 ]},
 
-{name:"Rasila Handle (Without Switch)",category:"Arcade Box Accessories",price:200,weight:280,dimensions:[14,11,8],images:[
+{name:"Zippy Coin Drop Switch",category:"Arcade Box Accessories",price:99,weight:12,dimensions:[11,4,2],images:[
+"images/jpeg/zippy-coin-drop-switch.jpg"
+]},
+
+{name:"Rasila Handle (Without Switch)",category:"Arcade Box Accessories",price:210,weight:280,dimensions:[14,11,8],images:[
 "images/jpeg/rasila-handle.jpeg"
 ]},
 
-{name:"Rasila Handle (With Switch)",category:"Arcade Box Accessories",price:260,weight:300,dimensions:[14,11,8],images:[
+{name:"Rasila Handle (With Switch)",category:"Arcade Box Accessories",price:230,weight:300,dimensions:[14,11,8],images:[
 "images/jpeg/rasila-handle.jpeg",
 "images/jpeg/normal-switch-button.jpeg"
 ]},
@@ -1495,7 +1519,7 @@ images:[
 "images/jpeg/coindropswitch.jpeg"
 ]},
 
-{name:"Remote Plate",category:"Arcade Box Accessories",price:300,weight:15,dimensions:[10,10,2],images:[
+{name:"Remote Plate (Red Colour)",category:"Arcade Box Accessories",price:200,weight:15,dimensions:[10,10,2],images:[
 "images/jpeg/ps2plate.jpeg"
 ]},
 
@@ -2127,16 +2151,17 @@ function courierBaseRate(courier){
 const QUANTITY_PRICE_RULES={
  "Push Button":{min:50,price:30},
  "Push Button (Imported)":{min:50,price:44},
- "Black Switch Button":{min:50,price:14},
- "MD Switch Button":{min:50,price:48},
- "Coin Drop Switch Button":{min:50,price:43},
- "Rasila Handle (Without Switch)":{min:20,price:195},
- "Rasila Handle (With Switch)":{min:20,price:251},
+ "Black Switch Button":{min:50,price:20},
+ "MD Switch Button":{min:50,price:60},
+ "Coin Drop Switch Button":{min:50,price:60},
+ "Zippy Coin Drop Switch":{min:50,price:99},
+ "Rasila Handle (Without Switch)":{min:20,price:210},
+ "Rasila Handle (With Switch)":{min:20,price:230},
  "MD Handle (With Switch)":{min:20,price:550},
  "Coin Acrylic Machine":{min:20,price:190},
  "10 Core Wire (Per Meter)":{min:20,price:48},
  "Remote Lead":{min:20,price:95},
- "Remote Plate":{min:20,price:290},
+ "Remote Plate (Red Colour)":{min:20,price:200},
  "USB Gamepad":{min:10,price:350},
  "PS2 Wired Controller (Replica)":{min:10,price:350},
  "PS2 Wireless Controller":{min:10,price:480},

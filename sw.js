@@ -1,4 +1,4 @@
-const CACHE_NAME="games-planet-live-v11";
+const CACHE_NAME="games-planet-live-v15";
 const APP_SHELL=[
   "./","./index.html","./Simple.html","./order-prefill.html","./invoice.html","./manifest.webmanifest",
   "./assets/html2canvas.min.js","./assets/jspdf.umd.min.js",

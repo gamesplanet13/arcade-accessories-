@@ -1296,7 +1296,10 @@ function computeTotals(){
   const boxDimensions=gpzBox(items,totalWeight);
   const actualKg=packedWeight/1000;
   const volumetricKg=(boxDimensions[0]*boxDimensions[1]*boxDimensions[2])/5000;
-  const chargeableKg=Math.max(.5,Math.max(actualKg,volumetricKg));
+  const courier=document.getElementById("courier").value||"Trackon.in";
+  // Volumetric weight is charged only by these courier partners.
+  const usesVolumetric=["Delhivery.com","BlueDart","Ecom Express"].includes(courier);
+  const chargeableKg=Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
   let payment=gpzMode();
   if(payment==="cod"&&productTotal<GPZ_COD_MIN){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
@@ -1305,7 +1308,6 @@ function computeTotals(){
   if(payment==="cod") discountValue=0;
   const appliedDiscount=payment==="prepaid"?Math.min(productTotal,Math.max(0,Number(discountValue)||0)):0;
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
-  const courier=document.getElementById("courier").value||"Trackon.in";
   const speed=gpzSpeed();
   const courierBaseCharge=gpzCourierRate(courier,speed,payment,chargeableKg);
   const courierGst=0;
@@ -1324,7 +1326,7 @@ function computeTotals(){
   const advanceAmount=payment==="cod"?Math.min(grandTotal,Math.max(500,Math.ceil(grandTotal*.10))):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
-    boxDimensions,actualKg,volumetricKg,chargeableKg,paymentMode:payment,deliverySpeed:speed,courier,
+    boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,deliverySpeed:speed,courier,
     courierBaseCharge,courierGst,courierCharge,gstInvoiceIncluded:invoiceIncluded,productGst,
     discountApplied:appliedDiscount,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
@@ -1357,7 +1359,7 @@ function computeTotals(){
     return `<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${details.join("<br>")}</div>`;
   }).join("");
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:"-"+gpzMoney(appliedDiscount),sumProductGst:gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
-    sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:volumetricKg.toFixed(2)+"kg",
+    sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:usesVolumetric?volumetricKg.toFixed(2)+"kg":"Not applicable for "+courier,
     sumChargeable:chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
     sumCourier:gpzMoney(courierCharge),sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
     sumPaid:gpzMoney(advanceAmount),sumRest:gpzMoney(restAmount)};
@@ -1470,7 +1472,7 @@ function buildWhatsAppTemplate(){
     `Packed Weight: ${o.packedWeight}g`,
     `Recommended Box: ${o.boxDimensions.join(" × ")} cm`,
     `Actual Weight: ${o.actualKg.toFixed(2)}kg`,
-    `Volumetric Weight: ${o.volumetricKg.toFixed(2)}kg`,
+    `Volumetric Weight: ${o.usesVolumetric?o.volumetricKg.toFixed(2)+'kg':'Not applicable for '+o.courier}`,
     `Chargeable Weight: ${o.chargeableKg.toFixed(2)}kg`,"",
     "━━━━━━━━━━━━━━━━━━━━",
     "💰 PAYMENT BREAKDOWN",
