@@ -114,6 +114,30 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
+    "name": "PS4 / PC / Android Red PCB",
+    "price": 2000,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "USB Arcade PCB",
+    "price": 450,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Battery Operated Vacuum Cleaner",
+    "price": 230,
+    "weight": 300,
+    "size": "17 × 7 × 13 cm"
+  },
+  {
+    "name": "Sofa Set with Air Pump",
+    "price": 1100,
+    "weight": 1400,
+    "size": "14 × 22 × 28 cm"
+  },
+  {
     "name": "Coin Packet",
     "price": 210,
     "weight": 0,
@@ -348,7 +372,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "PS4 Controller Black (Replica)",
+    "name": "Wireless Controller for PS4 / PC / Android",
     "price": 999,
     "weight": 0,
     "size": ""
@@ -432,10 +456,16 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
+    "name": "Remote Plate (White Colour)",
+    "price": 300,
+    "weight": 15,
+    "size": "10 × 10 × 2 cm"
+  },
+  {
     "name": "Remote Plate (Red Colour)",
-    "price": 200,
-    "weight": 0,
-    "size": ""
+    "price": 199,
+    "weight": 15,
+    "size": "10 × 10 × 2 cm"
   },
   {
     "name": "SATA Network Adapter / Converter for PlayStation 2 Fat",
@@ -522,7 +552,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "USB Gamepad",
+    "name": "2.4G Wireless Double Gamepad with USB Dongle",
     "price": 364,
     "weight": 0,
     "size": ""

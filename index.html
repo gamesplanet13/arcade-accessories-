@@ -1477,7 +1477,8 @@ images:[
 ]},
 
 {name:"Zippy Coin Drop Switch",category:"Arcade Box Accessories",price:99,weight:12,dimensions:[11,4,2],images:[
-"images/jpeg/zippy-coin-drop-switch.jpg"
+"images/jpeg/zippy-coin-drop-switch.jpg",
+"images/jpeg/zippy-coin-drop-switch-2.jpg"
 ]},
 
 {name:"Rasila Handle (Without Switch)",category:"Arcade Box Accessories",price:210,weight:280,dimensions:[14,11,8],images:[
@@ -1519,8 +1520,29 @@ images:[
 "images/jpeg/coindropswitch.jpeg"
 ]},
 
-{name:"Remote Plate (Red Colour)",category:"Arcade Box Accessories",price:200,weight:15,dimensions:[10,10,2],images:[
+{name:"Remote Plate (White Colour)",category:"Arcade Box Accessories",price:300,weight:15,dimensions:[10,10,2],images:[
 "images/jpeg/ps2plate.jpeg"
+]},
+
+{name:"Remote Plate (Red Colour)",category:"Arcade Box Accessories",price:199,weight:15,dimensions:[10,10,2],images:[
+"images/jpeg/red-arcade-plate.jpg"
+]},
+
+{name:"PS4 / PC / Android Red PCB",category:"Arcade Box Accessories",price:2000,weight:0,dimensions:[],images:[
+"images/jpeg/ps4-pc-android-red-pcb.jpg"
+]},
+
+{name:"USB Arcade PCB",category:"Arcade Box Accessories",price:450,weight:0,dimensions:[],images:[
+"images/jpeg/usb-arcade-pcb.jpg"
+]},
+
+{name:"Battery Operated Vacuum Cleaner",category:"Electrical Items",price:230,weight:300,dimensions:[17,7,13],containsBattery:true,features:["Built-in rechargeable battery","Micro USB charging"],images:[
+"images/jpeg/battery-vacuum-cleaner-labelled.jpg"
+]},
+
+{name:"Sofa Set with Air Pump",category:"Electrical Items",price:1100,weight:1400,dimensions:[14,22,28],images:[
+"images/jpeg/inflatable-sofa-box.jpg",
+"images/jpeg/inflatable-sofa-set.jpg"
 ]},
 
 
@@ -1532,8 +1554,8 @@ images:[
 "images/jpeg/10-core-wire.jpg"
 ]},
 
-{name:"USB Gamepad",category:"Gaming Accessories",price:364,weight:220,dimensions:[19,20,10],images:[
-"images/usb-gamepad.svg"
+{name:"2.4G Wireless Double Gamepad with USB Dongle",category:"Gaming Accessories",price:364,weight:220,dimensions:[19,20,10],images:[
+"images/jpeg/wireless-double-gamepad.jpg"
 ]},
 
 {
@@ -1604,8 +1626,8 @@ images:[
 "images/jpeg/ps3gamepad.jpeg"
 ]},
 
-{name:"PS4 Controller Black (Replica)",category:"PS4",price:999,weight:450,dimensions:[15,20,8],containsBattery:true,images:[
-"images/jpeg/ps4gamepad.jpeg"
+{name:"Wireless Controller for PS4 / PC / Android",category:"PS4",price:999,weight:450,dimensions:[15,20,8],containsBattery:true,variants:["Blue","Black"],variantImages:{"Blue":"images/jpeg/ps4-pc-android-wireless-controller.jpg","Black":"images/jpeg/ps4-pc-android-wireless-controller.jpg"},images:[
+"images/jpeg/ps4-pc-android-wireless-controller.jpg"
 ]},
 
 {name:"PS3 Controller Charging Cable",category:"PS3",price:119,weight:65,dimensions:[15,5,5],images:[
@@ -2161,8 +2183,9 @@ const QUANTITY_PRICE_RULES={
  "Coin Acrylic Machine":{min:20,price:190},
  "10 Core Wire (Per Meter)":{min:20,price:48},
  "Remote Lead":{min:20,price:95},
- "Remote Plate (Red Colour)":{min:20,price:200},
- "USB Gamepad":{min:10,price:350},
+ "Remote Plate (White Colour)":{min:20,price:300},
+ "Remote Plate (Red Colour)":{min:20,price:199},
+ "2.4G Wireless Double Gamepad with USB Dongle":{min:10,price:350},
  "PS2 Wired Controller (Replica)":{min:10,price:350},
  "PS2 Wireless Controller":{min:10,price:480},
  "Matrix Modbo 5.0 Modchip":{min:10,price:530}
@@ -2710,7 +2733,7 @@ function getSelectedPhysicalItems(){
       qty=0;
       p.variants.forEach(v=>qty += state['v_'+i+'_'+v]||0);
     }
-    if(qty>0 && p.dimensions){
+    if(qty>0 && Array.isArray(p.dimensions) && p.dimensions.length===3){
       for(let n=0;n<qty;n++){
         items.push({name:p.name,dims:[...p.dimensions],weight:p.weight});
       }
