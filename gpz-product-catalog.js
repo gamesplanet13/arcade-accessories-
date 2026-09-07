@@ -90,14 +90,14 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Coin Acrylic Machine",
-    "price": 195,
+    "name": "Acrylic Coin Machine",
+    "price": 200,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "Coin Acrylic Machine with Switch",
-    "price": 240,
+    "name": "Acrylic Coin Machine with Switch",
+    "price": 260,
     "weight": 0,
     "size": ""
   },
@@ -438,8 +438,8 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Rasila Handle (With Switch)",
-    "price": 230,
+    "name": "Rasila Handle with 4 Black Switches",
+    "price": 290,
     "weight": 0,
     "size": ""
   },
