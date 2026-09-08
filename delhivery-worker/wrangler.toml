@@ -1,0 +1,7 @@
+name = "games-planet-delhivery-rate"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://gamesplanet13.github.io"
+DELHIVERY_RATE_URL = "https://track.delhivery.com/api/kinko/v1/invoice/charges/.json"
