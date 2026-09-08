@@ -1041,6 +1041,7 @@ postOfficeManualEl?.addEventListener('input',()=>{
 document.getElementById("postoffice").addEventListener("change",()=>{ updatePrimeCourierAvailability(); });
 </script>
 
+<script src="delhivery-config.js"></script>
 <script id="gpz-fmcb-final-calculator">
 /* Correct FMCB/USB/Combo + PS2 Accessories checkout calculator */
 const GPZ_PARAMS=new URLSearchParams(location.search);
@@ -1048,8 +1049,11 @@ const GPZ_GST_COURIERS=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
 const GPZ_SURFACE=["Trackon.in","ShreeMaruti.com","DTDC.in","Speed Post",...GPZ_GST_COURIERS];
 const GPZ_AIR=["Trackon.in","ShreeMaruti.com"];
 const GPZ_PRIME=["Trackon.in","ShreeMaruti.com"];
-const GPZ_COD=["Delhivery.com","BlueDart"];
+const GPZ_COD=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
 const GPZ_VAS_COURIERS=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
+const GPZ_FIVE_STATES=["delhi","rajasthan","uttarakhand","uttar pradesh","punjab"];
+let gpzLiveDelhiveryQuote=null;
+let gpzLiveQuoteTimer=0;
 // Payment accounts: Non-GST and GST MUST remain separate.
 const GPZ_NON_GST_UPI_ID="paytmqr5hyx5o@ptys";
 const GPZ_NON_GST_UPI_NAME="Surender Kaur";
@@ -1210,12 +1214,29 @@ function gpzUpdatePaymentQr(invoiceIncluded){
   badge.textContent=invoiceIncluded?"GST Payment QR":"Non-GST Payment QR";
 }
 function gpzCourierRate(courier,speed,payment,kg){
-  if(payment==="cod") return 299;
   const billedKg=Math.max(1,Math.ceil(kg));
   if(speed==="prime") return billedKg*(courier==="ShreeMaruti.com"?250:200);
   if(speed==="air") return billedKg*150;
   if(["Trackon.in","ShreeMaruti.com","DTDC.in"].includes(courier)) return billedKg*99;
-  return Math.max(1,Math.ceil(kg/.5))*100;
+  const state=(document.getElementById("state")?.value||"").trim().toLowerCase();
+  const prepaidPer500=GPZ_FIVE_STATES.includes(state)?100:200;
+  return Math.max(1,Math.ceil(kg/.5))*prepaidPer500*(payment==="cod"?2:1);
+}
+function gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg){return [courier,payment,document.getElementById("pincode")?.value||"",actualKg.toFixed(3),volumetricKg.toFixed(3)].join("|")}
+function gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions){
+  const proxy=String(window.GPZ_DELHIVERY_PROXY_URL||"").trim();
+  if(courier!=="Delhivery.com"||!proxy)return;
+  const destination=(document.getElementById("pincode")?.value||"").replace(/\D/g,"");
+  if(destination.length!==6)return;
+  const key=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
+  if(gpzLiveDelhiveryQuote?.key===key||gpzLiveDelhiveryQuote?.pendingKey===key)return;
+  clearTimeout(gpzLiveQuoteTimer);gpzLiveDelhiveryQuote={pendingKey:key};
+  gpzLiveQuoteTimer=setTimeout(async()=>{try{
+    const q=new URLSearchParams({origin:"244901",destination,weight_grams:String(Math.ceil(actualKg*1000)),length:String(boxDimensions[0]),width:String(boxDimensions[1]),height:String(boxDimensions[2]),payment_mode:payment});
+    const response=await fetch(proxy.replace(/\/$/,"")+"/rate?"+q.toString());
+    const data=await response.json();if(!response.ok||!Number(data.amount))throw new Error(data.error||"Live rate unavailable");
+    gpzLiveDelhiveryQuote={key,amount:Math.ceil(Number(data.amount)),source:"live"};computeTotals();
+  }catch(error){console.warn("Delhivery live rate fallback:",error);gpzLiveDelhiveryQuote={key,error:true}}},450);
 }
 function getSubtotal(){return gpzAllItems().reduce((s,i)=>s+i.lineTotal,0);}
 function recomputeAddons(){
@@ -1237,7 +1258,7 @@ function syncCourierOptions(){
   }
   const speed=gpzSpeed();
   const allowed=rural
-    ? (productValue>3000?["Delhivery.com"]:["Delhivery.com","Speed Post"])
+    ? (payment==="cod"?["Delhivery.com"]:(productValue>3000?["Delhivery.com"]:["Delhivery.com","Speed Post"]))
     : (payment==="cod"?GPZ_COD:(speed==="air"?GPZ_AIR:(speed==="prime"?GPZ_PRIME:GPZ_SURFACE)));
   const select=document.getElementById("courier");
   const old=select.value;
@@ -1277,15 +1298,15 @@ function gpzRenderRateGuide(kg){
     <thead><tr><th>Mode</th><th>Courier charge</th><th>VAS</th></tr></thead>
     <tbody>
       <tr><td>Surface: Trackon / Shree Maruti / DTDC</td><td><b>₹99/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Surface: Delhivery / BlueDart / Ecom / XpressBees</td><td><b>₹100/500g</b></td><td>VAS 2%</td></tr>
+      <tr><td>Prepaid: Delhivery / BlueDart / Ecom / XpressBees</td><td><b>5 states ₹100/500g; others ₹200/500g</b></td><td>VAS 2%</td></tr>
       <tr><td>Surface: Speed Post</td><td><b>₹100/500g</b></td><td>No VAS</td></tr>
       <tr><td>Air: Trackon / Shree Maruti</td><td><b>₹150/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Trackon</td><td><b>₹200/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Shree Maruti</td><td><b>₹250/kg</b></td><td>No VAS</td></tr>
-      <tr><td>COD: Delhivery / BlueDart</td><td><b>₹299</b></td><td>VAS 2%</td></tr>
+      <tr><td>COD: Delhivery / BlueDart / Ecom / XpressBees</td><td><b>Prepaid rate × 2</b></td><td>VAS 2%</td></tr>
     </tbody>
   </table></div>
-  <div class="hint">COD में केवल Delhivery और BlueDart उपलब्ध हैं। COD केवल ₹1,300 या अधिक product value पर उपलब्ध है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
+  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. Delhivery/BlueDart/Ecom/XpressBees में actual और volumetric में जो अधिक हो वही chargeable है। COD में prepaid courier charge double है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
 }
 function computeTotals(){
   const items=gpzAllItems();
@@ -1298,7 +1319,7 @@ function computeTotals(){
   const volumetricKg=(boxDimensions[0]*boxDimensions[1]*boxDimensions[2])/5000;
   const courier=document.getElementById("courier").value||"Trackon.in";
   // Volumetric weight is charged only by these courier partners.
-  const usesVolumetric=["Delhivery.com","BlueDart","Ecom Express"].includes(courier);
+  const usesVolumetric=GPZ_VAS_COURIERS.includes(courier);
   const chargeableKg=Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
   let payment=gpzMode();
   if(payment==="cod"&&productTotal<GPZ_COD_MIN){
@@ -1309,7 +1330,10 @@ function computeTotals(){
   const appliedDiscount=payment==="prepaid"?Math.min(productTotal,Math.max(0,Number(discountValue)||0)):0;
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
   const speed=gpzSpeed();
-  const courierBaseCharge=gpzCourierRate(courier,speed,payment,chargeableKg);
+  const liveKey=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
+  gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);
+  const liveRate=courier==="Delhivery.com"&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
+  const courierBaseCharge=liveRate||gpzCourierRate(courier,speed,payment,chargeableKg);
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
@@ -1327,7 +1351,7 @@ function computeTotals(){
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,deliverySpeed:speed,courier,
-    courierBaseCharge,courierGst,courierCharge,gstInvoiceIncluded:invoiceIncluded,productGst,
+    courierBaseCharge,courierGst,courierCharge,courierRateSource:liveRate?"Delhivery Live API":"Configured fallback",gstInvoiceIncluded:invoiceIncluded,productGst,
     discountApplied:appliedDiscount,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
     // User-facing Base Price is deliberately GST-exclusive and follows:

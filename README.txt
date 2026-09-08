@@ -16,3 +16,8 @@ Notes:
 - Supplied product photos are locally bundled in sharpened 1200 x 1200 catalog format.
 - L01, SL-20 and DY26 use a clearly marked image-pending placeholder because an exact source photo was not supplied.
 - HDD cover, laptop sleeve, laptop stand and several phone-cooler packed dimensions/weights are approximate and should be confirmed before live courier billing.
+DELHIVERY LIVE RATE
+-------------------
+Secure Cloudflare Worker files are inside delhivery-worker/. Deploy that Worker,
+save a newly generated Delhivery token as DELHIVERY_API_TOKEN, then paste only
+the Worker URL in delhivery-config.js. Never put the API token in website files.

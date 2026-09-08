@@ -1,6 +1,6 @@
-const CACHE_NAME="games-planet-live-v18";
+const CACHE_NAME="games-planet-live-v19";
 const APP_SHELL=[
-  "./","./index.html","./Simple.html","./order-prefill.html","./invoice.html","./manifest.webmanifest",
+  "./","./index.html","./Simple.html","./order-prefill.html","./delhivery-config.js","./invoice.html","./manifest.webmanifest",
   "./assets/html2canvas.min.js","./assets/jspdf.umd.min.js",
   "./games-planet-logo-transparent.png","./games-planet-icon-192.png","./games-planet-icon-512.png",
   "./NonGSTcurrentQR.jpg","./GSTcurrentQR.png","./pincode_merged_final.json"
