@@ -272,6 +272,13 @@
     <div class="label">Choose Preferred Courier</div>
     <select id="courier" onchange="computeTotals()"></select>
     <div class="hint" id="courierServiceNote">पहले valid pincode भरें। Final courier serviceability destination pincode पर depend करेगी।</div>
+    <div class="label">Actual Packing Box Size (cm)</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <input id="actualBoxLength" type="number" min="1" placeholder="Length" oninput="computeTotals()">
+      <input id="actualBoxWidth" type="number" min="1" placeholder="Width" oninput="computeTotals()">
+      <input id="actualBoxHeight" type="number" min="1" placeholder="Height" oninput="computeTotals()">
+    </div>
+    <div class="hint">भरा हुआ actual box size हमेशा final माना जाएगा। खाली छोड़ने पर saved packing profile लगेगा।</div>
     <div id="courierRateGuide"></div>
   </div>
 
@@ -1188,9 +1195,11 @@ function gpzAllItems(){
   return items;
 }
 function gpzBox(items,totalWeight){
-  let stored=null;
-  try{stored=JSON.parse(localStorage.getItem("gp_order_summary")||"null");}catch(e){}
-  if(stored&&Array.isArray(stored.boxDimensions)&&stored.boxDimensions.every(Number)) return stored.boxDimensions.map(Number);
+  const manual=["actualBoxLength","actualBoxWidth","actualBoxHeight"].map(id=>Number(document.getElementById(id)?.value||0));
+  if(manual.every(n=>n>0))return manual;
+  const quantities=Object.fromEntries(items.map(item=>[item.name,Number(item.quantity||0)]));
+  const hamidProfile=quantities["Push Button (Imported) - Green"]===10&&quantities["MD Switch Button"]===5&&quantities["Zippy Coin Drop Switch"]===2&&quantities["MD Handle (With Switch) - Black"]===2&&quantities["Coin Packet"]===1&&quantities["10 Core Wire (Per Meter)"]===1;
+  if(hamidProfile)return [17,12,14];
   const qty=items.reduce((s,i)=>s+i.quantity,0);
   if(totalWeight<=100) return [15,13,4];
   if(totalWeight<=500) return [22,17,9];
@@ -1219,23 +1228,23 @@ function gpzCourierRate(courier,speed,payment,kg){
   if(speed==="air") return billedKg*150;
   if(["Trackon.in","ShreeMaruti.com","DTDC.in"].includes(courier)) return billedKg*99;
   const state=(document.getElementById("state")?.value||"").trim().toLowerCase();
-  const prepaidPer500=GPZ_FIVE_STATES.includes(state)?100:200;
-  return Math.max(1,Math.ceil(kg/.5))*prepaidPer500*(payment==="cod"?2:1);
+  if(GPZ_FIVE_STATES.includes(state))return Math.ceil((Math.max(.5,kg)*250)/10)*10;
+  return Math.max(1,Math.ceil(kg/.5))*200;
 }
 function gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg){return [courier,payment,document.getElementById("pincode")?.value||"",actualKg.toFixed(3),volumetricKg.toFixed(3)].join("|")}
 function gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions){
   const proxy=String(window.GPZ_DELHIVERY_PROXY_URL||"").trim();
-  if(courier!=="Delhivery.com"||!proxy)return;
+  if(!GPZ_VAS_COURIERS.includes(courier)||!proxy)return;
   const destination=(document.getElementById("pincode")?.value||"").replace(/\D/g,"");
   if(destination.length!==6)return;
   const key=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
   if(gpzLiveDelhiveryQuote?.key===key||gpzLiveDelhiveryQuote?.pendingKey===key)return;
   clearTimeout(gpzLiveQuoteTimer);gpzLiveDelhiveryQuote={pendingKey:key};
   gpzLiveQuoteTimer=setTimeout(async()=>{try{
-    const q=new URLSearchParams({origin:"244901",destination,weight_grams:String(Math.ceil(actualKg*1000)),length:String(boxDimensions[0]),width:String(boxDimensions[1]),height:String(boxDimensions[2]),payment_mode:payment});
+    const q=new URLSearchParams({origin:"244901",destination,weight_grams:String(Math.ceil(actualKg*1000)),length:String(boxDimensions[0]),width:String(boxDimensions[1]),height:String(boxDimensions[2]),payment_mode:"prepaid"});
     const response=await fetch(proxy.replace(/\/$/,"")+"/rate?"+q.toString());
     const data=await response.json();if(!response.ok||!Number(data.amount))throw new Error(data.error||"Live rate unavailable");
-    gpzLiveDelhiveryQuote={key,amount:Math.ceil(Number(data.amount)),source:"live"};computeTotals();
+    gpzLiveDelhiveryQuote={key,amount:Math.ceil(Number(data.amount)/10)*10,source:"live"};computeTotals();
   }catch(error){console.warn("Delhivery live rate fallback:",error);gpzLiveDelhiveryQuote={key,error:true}}},450);
 }
 function getSubtotal(){return gpzAllItems().reduce((s,i)=>s+i.lineTotal,0);}
@@ -1298,15 +1307,15 @@ function gpzRenderRateGuide(kg){
     <thead><tr><th>Mode</th><th>Courier charge</th><th>VAS</th></tr></thead>
     <tbody>
       <tr><td>Surface: Trackon / Shree Maruti / DTDC</td><td><b>₹99/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Prepaid: Delhivery / BlueDart / Ecom / XpressBees</td><td><b>5 states ₹100/500g; others ₹200/500g</b></td><td>VAS 2%</td></tr>
+      <tr><td>Delhivery / BlueDart / Ecom / XpressBees</td><td><b>Delhivery live rate; 5-state fallback ₹250/kg, next ₹10 round</b></td><td>VAS 2%</td></tr>
       <tr><td>Surface: Speed Post</td><td><b>₹100/500g</b></td><td>No VAS</td></tr>
       <tr><td>Air: Trackon / Shree Maruti</td><td><b>₹150/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Trackon</td><td><b>₹200/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Shree Maruti</td><td><b>₹250/kg</b></td><td>No VAS</td></tr>
-      <tr><td>COD: Delhivery / BlueDart / Ecom / XpressBees</td><td><b>Prepaid rate × 2</b></td><td>VAS 2%</td></tr>
+      <tr><td>Prepaid and COD</td><td><b>Same courier rate</b></td><td>VAS 2%</td></tr>
     </tbody>
   </table></div>
-  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. Delhivery/BlueDart/Ecom/XpressBees में actual और volumetric में जो अधिक हो वही chargeable है। COD में prepaid courier charge double है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
+  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. चारों couriers में Delhivery rate समान है; Prepaid और COD rate same है। Actual और volumetric में जो अधिक हो वही chargeable है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
 }
 function computeTotals(){
   const items=gpzAllItems();
@@ -1332,7 +1341,7 @@ function computeTotals(){
   const speed=gpzSpeed();
   const liveKey=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
   gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);
-  const liveRate=courier==="Delhivery.com"&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
+  const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const courierBaseCharge=liveRate||gpzCourierRate(courier,speed,payment,chargeableKg);
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
