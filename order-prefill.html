@@ -258,7 +258,7 @@
       <label class="choice"><input type="radio" name="paymentMode" value="prepaid" checked onchange="setMode('prepaid')"> 🟢 Prepaid</label>
       <label class="choice" id="codChoice"><input type="radio" name="paymentMode" value="cod" onchange="setMode('cod')"> 🟠 Cash on Delivery</label>
     </div>
-    <div class="hint" id="codNote">COD केवल ₹1,300 या अधिक product value पर उपलब्ध है। Advance: ₹500 या final total का 10%, जो भी अधिक हो।</div>
+    <div class="hint" id="codNote">COD केवल ₹1,300 या अधिक product value पर उपलब्ध है। Advance: ₹500 या courier charge का 2×, जो भी अधिक हो।</div>
   </div>
 
   <div class="card">
@@ -1307,7 +1307,7 @@ function gpzRenderRateGuide(kg){
     <thead><tr><th>Mode</th><th>Courier charge</th><th>VAS</th></tr></thead>
     <tbody>
       <tr><td>Surface: Trackon / Shree Maruti / DTDC</td><td><b>₹99/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Delhivery / BlueDart / Ecom / XpressBees</td><td><b>Delhivery live rate; 5-state fallback ₹250/kg, next ₹10 round</b></td><td>VAS 2%</td></tr>
+      <tr><td>Delhivery / BlueDart / Ecom / XpressBees</td><td><b>Delhivery live rate; courier next ₹10 round</b></td><td>VAS 2%</td></tr>
       <tr><td>Surface: Speed Post</td><td><b>₹100/500g</b></td><td>No VAS</td></tr>
       <tr><td>Air: Trackon / Shree Maruti</td><td><b>₹150/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Trackon</td><td><b>₹200/kg</b></td><td>No VAS</td></tr>
@@ -1356,7 +1356,7 @@ function computeTotals(){
   const vasApplies=GPZ_VAS_COURIERS.includes(courier);
   const vasCharge=vasApplies?Math.ceil(totalBeforeVas*.02):0;
   const grandTotal=totalBeforeVas+vasCharge;
-  const advanceAmount=payment==="cod"?Math.min(grandTotal,Math.max(500,Math.ceil(grandTotal*.10))):grandTotal;
+  const advanceAmount=payment==="cod"?Math.min(grandTotal,Math.max(500,Math.ceil(courierCharge*2))):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,deliverySpeed:speed,courier,
