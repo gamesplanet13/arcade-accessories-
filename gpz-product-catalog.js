@@ -552,10 +552,28 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "2.4G Wireless Double Gamepad with USB Dongle",
-    "price": 364,
-    "weight": 0,
-    "size": ""
+    "name": "Generic 2.4G Wireless Double Gamepad - White (With USB Receiver)",
+    "price": 869,
+    "weight": 220,
+    "size": "19 × 20 × 10 cm"
+  },
+  {
+    "name": "Generic 2.4G Wireless Double Gamepad - Black (With USB Receiver)",
+    "price": 799,
+    "weight": 220,
+    "size": "19 × 20 × 10 cm"
+  },
+  {
+    "name": "Generic 2.4G Wireless Single Gamepad - Black (Without Receiver) — S2 Compatible",
+    "price": 300,
+    "weight": 110,
+    "size": "15 × 10 × 6 cm"
+  },
+  {
+    "name": "Generic 2.4G Wireless Single Gamepad - White (Without Receiver) — YC6/YC5/Y6C/Y5C Compatible",
+    "price": 350,
+    "weight": 110,
+    "size": "15 × 10 × 6 cm"
   },
   {
     "name": "USB to PS2 / PS3 / PC Controller Converter",
