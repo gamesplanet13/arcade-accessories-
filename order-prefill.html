@@ -279,6 +279,11 @@
       <input id="actualBoxHeight" type="number" min="1" placeholder="Height" oninput="computeTotals()">
     </div>
     <div class="hint">भरा हुआ actual box size हमेशा final माना जाएगा। खाली छोड़ने पर saved packing profile लगेगा।</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button type="button" class="ghost" onclick="openBigshipCalculator()">🚚 Bigship Rate Calculator</button>
+      <button type="button" class="ghost" onclick="clearBigshipRate()">Clear Bigship Rate</button>
+    </div>
+    <div class="hint" id="bigshipRateStatus">Bigship calculator order का PIN, box, weight, payment mode और invoice amount अपने आप लेगा।</div>
     <div id="courierRateGuide"></div>
   </div>
 
@@ -300,6 +305,7 @@
       <span>Courier Base Charge</span><b id="sumCourierBase">₹0</b>
       <span>Extra Courier GST</span><b id="sumCourierGst">₹0</b>
       <span>Courier Total</span><b id="sumCourier">₹0</b>
+      <span>Courier Rate Source</span><b id="sumRateSource">Configured rate</b>
       <span class="grand-row">Grand Total</span><b class="grand-row" id="sumGrand">₹0</b>
       <span>Pay Now / Advance</span><b id="sumPaid">₹0</b>
       <span id="restLabel">Rest on Delivery</span><b id="sumRest">₹0</b>
@@ -1061,6 +1067,7 @@ const GPZ_VAS_COURIERS=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
 const GPZ_FIVE_STATES=["delhi","rajasthan","uttarakhand","uttar pradesh","punjab"];
 let gpzLiveDelhiveryQuote=null;
 let gpzLiveQuoteTimer=0;
+let gpzBigshipQuote=null;
 // Payment accounts: Non-GST and GST MUST remain separate.
 const GPZ_NON_GST_UPI_ID="paytmqr5hyx5o@ptys";
 const GPZ_NON_GST_UPI_NAME="Surender Kaur";
@@ -1232,6 +1239,21 @@ function gpzCourierRate(courier,speed,payment,kg){
   return Math.max(1,Math.ceil(kg/.5))*200;
 }
 function gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg){return [courier,payment,document.getElementById("pincode")?.value||"",actualKg.toFixed(3),volumetricKg.toFixed(3)].join("|")}
+function gpzLoadBigshipQuote(){
+  try{gpzBigshipQuote=JSON.parse(localStorage.getItem("gpz_bigship_rate_v1")||"null")}catch(e){gpzBigshipQuote=null}
+  return gpzBigshipQuote;
+}
+function clearBigshipRate(){
+  localStorage.removeItem("gpz_bigship_rate_v1");gpzBigshipQuote=null;computeTotals();
+}
+function openBigshipCalculator(){
+  computeTotals();
+  const o=gpzCurrentOrder;if(!o)return;
+  const q=new URLSearchParams({source:"244901",destination:(document.getElementById("pincode")?.value||"").replace(/\D/g,""),payment:o.paymentMode,invoice:String(Math.ceil(o.productTotal)),weight:String(Math.ceil(o.actualKg*1000)),length:String(o.boxDimensions[0]),width:String(o.boxDimensions[1]),height:String(o.boxDimensions[2]),courier:o.courier});
+  window.open("bigship-rate-calculator.html?"+q.toString(),"gpzBigshipCalculator","width=760,height=900,noopener=no");
+}
+window.addEventListener("storage",event=>{if(event.key==="gpz_bigship_rate_v1"){gpzLoadBigshipQuote();computeTotals()}});
+window.addEventListener("focus",()=>{gpzLoadBigshipQuote();computeTotals()});
 function gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions){
   const proxy=String(window.GPZ_DELHIVERY_PROXY_URL||"").trim();
   if(!GPZ_VAS_COURIERS.includes(courier)||!proxy)return;
@@ -1340,9 +1362,11 @@ function computeTotals(){
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
   const speed=gpzSpeed();
   const liveKey=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
+  gpzLoadBigshipQuote();
   gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
-  const courierBaseCharge=liveRate||gpzCourierRate(courier,speed,payment,chargeableKg);
+  const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
+  const courierBaseCharge=bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg);
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
@@ -1360,7 +1384,7 @@ function computeTotals(){
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,deliverySpeed:speed,courier,
-    courierBaseCharge,courierGst,courierCharge,courierRateSource:liveRate?"Delhivery Live API":"Configured fallback",gstInvoiceIncluded:invoiceIncluded,productGst,
+    courierBaseCharge,courierGst,courierCharge,courierRateSource:bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),gstInvoiceIncluded:invoiceIncluded,productGst,
     discountApplied:appliedDiscount,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
     // User-facing Base Price is deliberately GST-exclusive and follows:
@@ -1394,9 +1418,11 @@ function computeTotals(){
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:"-"+gpzMoney(appliedDiscount),sumProductGst:gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
     sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:usesVolumetric?volumetricKg.toFixed(2)+"kg":"Not applicable for "+courier,
     sumChargeable:chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
-    sumCourier:gpzMoney(courierCharge),sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
+    sumCourier:gpzMoney(courierCharge),sumRateSource:gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
     sumPaid:gpzMoney(advanceAmount),sumRest:gpzMoney(restAmount)};
   Object.entries(values).forEach(([id,value])=>document.getElementById(id).textContent=value);
+  const bigshipStatus=document.getElementById("bigshipRateStatus");
+  if(bigshipStatus)bigshipStatus.textContent=bigshipRate?`✅ Bigship rate ${gpzMoney(bigshipRate)} लागू है (अगले ₹10 में round).`:`Bigship calculator order का PIN, box, weight, payment mode और invoice amount अपने आप लेगा।`;
   document.getElementById("restLabel").style.display=payment==="cod"?"":"none";
   document.getElementById("sumRest").style.display=payment==="cod"?"":"none";
   document.getElementById("modeBadge").textContent=payment==="cod"?"Mode: COD":"Mode: Prepaid";
