@@ -252,6 +252,12 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
+    "name": "ZING Crystal Switch",
+    "price": 38,
+    "weight": 5,
+    "size": "5 × 3 × 1 cm"
+  },
+  {
     "name": "Old Rasila Push Button",
     "price": 13,
     "weight": 0,

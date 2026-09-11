@@ -19,6 +19,17 @@
     return originalOpen(url,target,features);
   };
   const css=document.createElement('style');css.textContent='.gpz-payment-policy{margin-top:12px;padding-top:10px;border-top:1px dashed #789;display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:10px;line-height:1.35}.gpz-payment-policy img{width:82px;height:82px;object-fit:contain;background:#fff;border:1px solid #ccd;border-radius:6px}@media print{.gpz-payment-policy{break-inside:avoid}.gpz-payment-policy img{width:70px;height:70px}}';document.head.appendChild(css);
-  new MutationObserver(enhance).observe(document.documentElement,{subtree:true,childList:true});
-  document.addEventListener('change',enhance);setTimeout(enhance,300);
+  let queued=false;
+  function schedule(){
+    if(queued)return;
+    queued=true;
+    requestAnimationFrame(()=>{queued=false;enhance()});
+  }
+  function start(){
+    const root=$('invoiceContent')||$('preview');
+    if(root)new MutationObserver(schedule).observe(root,{subtree:true,childList:true});
+    schedule();
+  }
+  document.addEventListener('change',schedule);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
