@@ -1471,7 +1471,7 @@ images:[
 "images/jpeg/mdswitch.jpeg"
 ]},
 
-{name:"ZING Crystal Switch",category:"Arcade Box Accessories",price:38,weight:5,dimensions:[5,3,1],images:[
+{name:"ZING Crystal Switch",category:"Arcade Box Accessories",price:40,weight:5,dimensions:[5,3,1],images:[
 "images/jpeg/crystal-switch-front.jpg",
 "images/jpeg/crystal-switch-back.jpg"
 ]},
@@ -1646,12 +1646,20 @@ images:[
 "images/jpeg/ps3gamepad.jpeg"
 ]},
 
-{name:"Wireless Controller for PS4 / PC / Android",category:"PS4",price:999,weight:450,dimensions:[15,20,8],containsBattery:true,variants:["Blue","FC25","Camouflage Green","GTA 6","Wooden","Black"],variantPrices:{"Blue":999,"FC25":999,"Camouflage Green":999,"GTA 6":999,"Wooden":999,"Black":899},variantImages:{"Blue":"images/jpeg/ps4-pc-android-wireless-controller.jpg","FC25":"images/jpeg/fc25-controller-for-ps4.jpg","Camouflage Green":"images/jpeg/camouflage-green-controller-for-ps4.jpg","GTA 6":"images/jpeg/gta-6-controller-for-ps4.jpg","Wooden":"images/jpeg/wooden-controller-for-ps4.jpg","Black":"images/jpeg/ps4-pc-android-wireless-controller.jpg"},images:[
-"images/jpeg/ps4-pc-android-wireless-controller.jpg",
+{name:"Wireless Controller for PS4 / PC / Android — Special Designs",category:"PS4",price:999,weight:450,dimensions:[15,20,8],containsBattery:true,variants:["FC25","Camouflage Green","GTA 6","Wooden"],variantPrices:{"FC25":999,"Camouflage Green":999,"GTA 6":999,"Wooden":999},variantImages:{"FC25":"images/jpeg/fc25-controller-for-ps4.jpg","Camouflage Green":"images/jpeg/camouflage-green-controller-for-ps4.jpg","GTA 6":"images/jpeg/gta-6-controller-for-ps4.jpg","Wooden":"images/jpeg/wooden-controller-for-ps4.jpg"},images:[
 "images/jpeg/fc25-controller-for-ps4.jpg",
 "images/jpeg/camouflage-green-controller-for-ps4.jpg",
 "images/jpeg/gta-6-controller-for-ps4.jpg",
 "images/jpeg/wooden-controller-for-ps4.jpg"
+]},
+
+{name:"P5 Look Wireless Controller for PS4 / PC / Android",category:"PS4",price:1500,weight:450,dimensions:[15,20,8],containsBattery:true,variants:["Blue","Black"],variantPrices:{"Blue":1500,"Black":1500},variantImages:{"Blue":"images/png/p5-look-blue.png","Black":"images/png/p5-look-black.png"},images:[
+"images/png/p5-look-blue.png",
+"images/png/p5-look-black.png"
+]},
+
+{name:"PS4 Wireless Controller True Replica — Black",category:"PS4",price:899,weight:450,dimensions:[15,20,8],containsBattery:true,images:[
+"images/jpeg/ps4gamepad.jpeg"
 ]},
 
 {name:"PS3 Controller Charging Cable",category:"PS3",price:119,weight:65,dimensions:[15,5,5],images:[
@@ -2234,7 +2242,8 @@ function getCourierCalculation(chargeableKg){
  const meta=DELIVERY_SPEEDS[speed];
  const paymentMode=getPaymentMode();
  const speedMultiplier=paymentMode==="cod" ? 1 : meta.multiplier;
- const courierCharge=Math.round(chargeableKg*courierBaseRate(courier)*speedMultiplier);
+ const calculatedCourierCharge=Math.round(chargeableKg*courierBaseRate(courier)*speedMultiplier);
+ const courierCharge=paymentMode==="cod"?Math.max(200,calculatedCourierCharge):calculatedCourierCharge;
  return {speed,courier,courierCharge,label:meta.label,paymentMode};
 }
 

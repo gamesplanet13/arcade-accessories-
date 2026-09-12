@@ -253,7 +253,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "ZING Crystal Switch",
-    "price": 38,
+    "price": 40,
     "weight": 5,
     "size": "5 × 3 × 1 cm"
   },
@@ -378,10 +378,22 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Wireless Controller for PS4 / PC / Android",
+    "name": "Wireless Controller for PS4 / PC / Android — Special Designs",
     "price": 999,
-    "weight": 0,
-    "size": ""
+    "weight": 450,
+    "size": "15 × 20 × 8 cm"
+  },
+  {
+    "name": "P5 Look Wireless Controller for PS4 / PC / Android",
+    "price": 1500,
+    "weight": 450,
+    "size": "15 × 20 × 8 cm"
+  },
+  {
+    "name": "PS4 Wireless Controller True Replica — Black",
+    "price": 899,
+    "weight": 450,
+    "size": "15 × 20 × 8 cm"
   },
   {
     "name": "PS4 Controller Charging Cable",
