@@ -121,7 +121,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "USB Arcade PCB",
-    "price": 450,
+    "price": 999,
     "weight": 0,
     "size": ""
   },
