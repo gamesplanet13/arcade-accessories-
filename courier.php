@@ -6,7 +6,8 @@ $pin=$_GET["pin"];
 $weight=$_GET["weight"];
 $mode=$_GET["mode"];
 
-$token="f8620bed164a4e642ef837713aabe79d838135f5";
+$token=getenv("DELHIVERY_API_TOKEN") ?: "";
+if (!$token) { http_response_code(503); echo json_encode(["error"=>"Courier service is not configured"]); exit; }
 
 $service_url="https://track.delhivery.com/c/api/pin-codes/json/?filter_codes=$pin";
 

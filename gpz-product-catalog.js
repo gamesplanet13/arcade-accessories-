@@ -205,7 +205,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "HDMI Converter for PS2",
-    "price": 319,
+    "price": 340,
     "weight": 0,
     "size": ""
   },
@@ -324,20 +324,8 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "PS2 Console Black",
-    "price": 6800,
-    "weight": 0,
-    "size": ""
-  },
-  {
-    "name": "PS2 Console Silver",
-    "price": 7800,
-    "weight": 0,
-    "size": ""
-  },
-  {
-    "name": "PS2 Console White",
-    "price": 7300,
+    "name": "PS2 Console Black — Without Accessories",
+    "price": 8500,
     "weight": 0,
     "size": ""
   },
@@ -361,7 +349,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "PS2 Wireless Controller",
-    "price": 499,
+    "price": 525,
     "weight": 0,
     "size": ""
   },

@@ -166,7 +166,7 @@
     return lines.join("\n");
   };
 
-  if (kind !== "arcade") {
+  if (KIND !== "arcade") {
     const addon = document.getElementById("addonSelect");
     if (addon) {
       const panel = addon.closest(".card, .section, .panel") || addon.parentElement;

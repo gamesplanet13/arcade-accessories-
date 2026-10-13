@@ -1197,7 +1197,7 @@ img,canvas{
 
 </style>
 
-</head>
+<link rel="stylesheet" href="storefront.css"></head>
 
 <body>
 
@@ -1222,7 +1222,7 @@ img,canvas{
   <a class="community-join" href="https://chat.whatsapp.com/GTijcd8dr1NIqfW9stBDCw" target="_blank" rel="noopener noreferrer">💬 Join Games Planet WhatsApp Community</a>
 </div>
 
-<div id="securityOverlay">
+<nav class="store-nav"><a href="#products">☰ All products</a><a href="Simple.html">PS2 &amp; Game Drives</a><a href="customize-box.html">Build your Arcade</a><a href="invoice-manager.html">Invoices</a><a href="https://wa.me/917983624797" target="_blank" rel="noopener">WhatsApp support</a></nav><section class="store-hero"><div class="store-hero-copy"><div class="store-eyebrow">GAMES PLANET / THE GAMING STORE</div><h1>Everything for<br>your next level.</h1><p>Controllers, retro gaming, arcade parts and everyday essentials. Find your setup, all in one place.</p><a class="store-cta" href="#products">Explore the store →</a></div><div class="hero-products"><img src="images/png/pxn-v3-pro-black.png" alt="PXN steering wheel"><img src="images/png/ps4gamepad.png" alt="PS4 controller"></div></section><div class="store-benefits"><div><b>Checked before dispatch</b><span>Carefully packed products</span></div><div><b>Delivery across India</b><span>Prepaid &amp; COD options</span></div><div><b>Real product guidance</b><span>Talk to Games Planet</span></div><div><b>Build your own arcade</b><span>Parts to complete setups</span></div></div><section class="store-categories"><button class="store-category" data-shop-category="Arcade Box Accessories"><h3>Arcade essentials</h3><img src="images/jpeg/md-handle-black.jpeg" alt="Arcade essentials"><span>Shop collection →</span></button><button class="store-category" data-shop-category="Gaming Accessories"><h3>Controllers & gaming</h3><img src="images/png/wireless-double-gamepad.png" alt="Controllers & gaming"><span>Shop collection →</span></button><button class="store-category" data-shop-category="PS2"><h3>PlayStation accessories</h3><img src="images/jpeg/ps2wire.jpeg" alt="PlayStation accessories"><span>Shop collection →</span></button><button class="store-category" data-shop-category="Mobile Phone Coolers"><h3>Phone cooling</h3><img src="images/jpeg/phone-cooler-sl16.jpg" alt="Phone cooling"><span>Shop collection →</span></button></section><div class="store-section-heading">Find your gaming essentials<small id="storeCount"></small></div><div class="store-empty" id="storeEmpty">No products found. Try a different search.</div><div id="securityOverlay">
   <div class="security-box">
     <h2>🔒 Protected Games Planet Page</h2>
     <p>This page is protected against unauthorized copying and source reuse.</p>
@@ -1626,7 +1626,7 @@ images:[
 "images/jpeg/hdmicable.jpeg"
 ]},
 
-{name:"HDMI Converter for PS2",category:"PS2",price:319,weight:80,dimensions:[14,9,3],images:[
+{name:"HDMI Converter for PS2",category:"PS2",price:340,weight:80,dimensions:[14,9,3],images:[
 "images/jpeg/ps2hdmi.jpeg"
 ]},
 
@@ -1638,7 +1638,7 @@ images:[
 "images/jpeg/ps2wire.jpeg"
 ]},
 
-{name:"PS2 Wireless Controller",category:"PS2",price:499,weight:250,dimensions:[8,13,17],images:[
+{name:"PS2 Wireless Controller",category:"PS2",price:525,weight:250,dimensions:[8,13,17],images:[
 "images/jpeg/ps2wireless.jpeg"
 ]},
 
@@ -2720,8 +2720,8 @@ function goDetails(){
  summary.source="cart";
  localStorage.setItem("gp_order_summary",JSON.stringify(summary));
 
- // Carry the complete cart in the URL as well. This keeps checkout sync working
- // even when browser storage is blocked, cleared or contains an older order.
+ // Send the complete cart in the URL and keep localStorage as a backup.
+ // This prevents stale/generic checkout data when storage is blocked or cleared.
  const params=new URLSearchParams({
    source:"cart",
    cart:JSON.stringify(summary.items),
@@ -4273,5 +4273,5 @@ document.getElementById("optionalGameModal")?.addEventListener("click",function(
 
 
 
-</body>
+<script src="storefront.js"></script></body>
 </html>
