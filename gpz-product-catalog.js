@@ -1,11 +1,5 @@
 window.GPZ_PRODUCT_CATALOG = [
   {
-    "name": "10 Core Wire (Per Meter)",
-    "price": 50,
-    "weight": 0,
-    "size": ""
-  },
-  {
     "name": "10 Socket Extension Board",
     "price": 170,
     "weight": 0,
@@ -102,12 +96,6 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Zippy Coin Drop Switch",
-    "price": 99,
-    "weight": 0,
-    "size": ""
-  },
-  {
     "name": "PS4 / PC / Android Red PCB",
     "price": 2000,
     "weight": 0,
@@ -133,7 +121,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "Coin Packet",
-    "price": 210,
+    "price": 220,
     "weight": 0,
     "size": ""
   },
@@ -234,7 +222,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "MD Handle (With Switch)",
+    "name": "MD Handle (With Switch) — Red Only",
     "price": 585,
     "weight": 0,
     "size": ""
@@ -396,8 +384,8 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Push Button",
-    "price": 32,
+    "name": "Push Button — Red Only",
+    "price": 35,
     "weight": 0,
     "size": ""
   },
@@ -1064,6 +1052,18 @@ window.GPZ_PRODUCT_CATALOG = [
   {
     "name": "Samsung Type-C Audio Cable",
     "price": 49,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "4.8mm Handle Switch Connector Pin",
+    "price": 5,
+    "weight": 0,
+    "size": "4.8 mm"
+  },
+  {
+    "name": "10 Core Wire — ₹35 per Meter",
+    "price": 35,
     "weight": 0,
     "size": ""
   }
