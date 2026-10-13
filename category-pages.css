@@ -1,3 +1,22 @@
 .gp-category-nav{padding:16px;margin:14px auto;max-width:1400px;background:#102137;border:1px solid #47627b;border-radius:12px;color:white}.gp-category-nav h1{font-size:24px;margin:10px 0}.gp-category-links{display:flex;flex-wrap:wrap;gap:8px}.gp-category-links a,.gp-page-tools a,.gp-page-tools button{display:inline-block;padding:10px 13px;border:1px solid #526b82;border-radius:8px;background:#19334c;color:white;text-decoration:none;font:inherit;cursor:pointer}.gp-category-links a[aria-current=page]{background:#ffd079;color:#112031;border-color:#ffd079;font-weight:bold}.gp-page-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.gp-category-nav p{font-size:13px;color:#c0d1e1}.store-hero,.store-benefits,.store-categories,.store-nav,.view-switch,.catalog-filter-bar,.latest-products-window{display:none!important}.category-panel[hidden],.product[hidden]{display:none!important}.gp-toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);z-index:99999;background:#143524;color:white;padding:12px 20px;border:1px solid #4faa70;border-radius:10px;max-width:90vw;text-align:center}.gp-checkout-browse{padding:12px;border:1px solid #57738a;border-radius:8px;margin:15px 0}.gp-checkout-browse a{display:inline-block;margin:5px;color:#73d5ff} @media(max-width:600px){.gp-category-nav{margin:8px;border-radius:8px;padding:12px}.gp-category-links a{font-size:12px;padding:9px}.gp-category-nav h1{font-size:20px}}
 
 *{box-sizing:border-box}img{max-width:100%}.product-title{overflow-wrap:anywhere}.gp-category-nav,.gp-checkout-browse{min-width:0}@media(max-width:600px){.product{min-width:0!important}.gp-page-tools button{min-height:44px}.gp-category-links a{min-height:44px}.order-row{flex-wrap:wrap}input,select,textarea{max-width:100%}}
+
+/* Shared card layout: applies to copied category pages and both store views. */
+.product .product-specs{display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin:8px 0!important;font-size:10px!important;line-height:1.4!important}
+.product .product-specs span{font-size:10px!important;padding:3px 6px!important;border-radius:6px!important;min-width:0!important}
+.product .product-specs b{font-size:inherit!important}
+.product .info{display:flex!important;flex-wrap:wrap!important;gap:12px!important;align-items:center!important}
+.product.has-variants .info{display:block!important}
+.product.has-variants .info>div:first-child{display:none!important}
+.product .variant-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;min-width:0!important;gap:8px!important}
+.product .variant-row{display:grid!important;grid-template-columns:minmax(0,1fr) 112px!important;align-items:center!important;gap:10px!important;padding:10px!important;min-width:0!important}
+.product .variant-label{display:grid!important;grid-template-columns:44px minmax(0,1fr)!important;align-items:center!important;gap:8px!important;min-width:0!important;white-space:normal!important}
+.product .variant-thumb{position:static!important;width:44px!important;height:44px!important;max-width:44px!important;object-fit:contain!important;transform:none!important}
+.product .variant-label>span{min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.4!important;font-size:12px!important}
+.product .variant-row .qty{display:flex!important;position:static!important;width:112px!important;justify-content:space-between!important;gap:4px!important}
+.product .variant-row .qty button{position:static!important;width:34px!important;height:34px!important;min-width:34px!important;font-size:20px!important;transform:none!important}
+.product .variant-row .qty span{font-size:14px!important}
+.product .price{position:static!important;transform:none!important;float:none!important}
+.top-cart-tools{position:static!important;inset:auto!important;float:none!important;display:flex!important;flex-wrap:wrap!important;width:fit-content!important;max-width:100%!important;margin:10px auto!important;z-index:auto!important}
+@media(max-width:420px){.product .variant-row{grid-template-columns:minmax(0,1fr)!important}.product .variant-row .qty{justify-self:end!important}.product .info>div{min-width:0!important}.product .info small{white-space:normal!important}}
