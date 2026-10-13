@@ -14,15 +14,34 @@ function group(p){
  return ({'Gaming Accessories':'gaming','Mobile & Audio':'mobile','Mobile Phone Coolers':'coolers','Cables':'cables','Electrical Items':'electrical','Batteries and Charger':'batteries','Decoration':'decoration'})[c]||'gaming';
 }
 window.GPShop={pages,group,prepare(products){
+ const usb=products.findIndex(p=>p.name==='PS5 Controller Charging Cable (USB to C)');
+ const h110=products.findIndex(p=>p.name==='Consistent H110 DDR4 Motherboard');
  const best=products.findIndex(p=>p.name==='Best AV Cable for PS2');
  products.forEach(p=>{
+  if(p.name==='HDMI Cable'){p.name='Normal HDMI Cable — 1.5 Meter';p.price=100;}
+  if(/Honeycom/i.test(p.name)){p.name='HDMI Cable — 2.2 Meter';p.price=200;}
+  if(p.name==='PS5 Controller Charging Cable (USB to C)')p.name='PS5 USB-A to USB-C Cable';
+  if(p.name==='PS5 Controller Charging Cable (C to C)')p.name='PS5 USB-C to USB-C Cable';
+  if(p.name==='HDMI Cable PS5'&&usb>=0){p.aliasOf=usb;p.price=149;}
+  if(p.name==='Zebronics H110 Motherboard'&&h110>=0)p.aliasOf=h110;
+  if(p.name==='Consistent H110 DDR4 Motherboard')p.name='H110 DDR4 Motherboard';
+  if(p.name==='DDR3 8GB RAM')p.name='Consistent DDR3 8GB RAM';
+  if(p.name==='64GB Pendrive')p.name='SanDisk Ultra 64GB USB 3.0 Pendrive';
+  if(/^(Normal Cabinet without SMPS|Cabinet \+ SMPS)$/.test(p.name)){p.images=['images/cpu-box-zebronics.png'];p.name=p.name.replace('Normal Cabinet','Zebronics Basic Cabinet').replace(/^Cabinet/,'Zebronics Basic Cabinet');}
+  if(p.customType==='ps2')p.images=['images/ps2-black-70000.jpg'];
+  if(p.name==='Assembling')p.images=['images/assembling.svg'];
+  if(p.name==='Windows Setup')p.images=['images/windows-setup.svg'];
+  if(/Game Setup/.test(p.name))p.images=['images/game-setup.svg'];
+  if(p.name==='Laptop Power Cable')p.images=['images/jpeg/laptopcable.jpeg'];
+  if(p.name==='ANT Esports RGB Cabinet'){p.name='ANT Esports Elite 1100 RGB Cabinet';p.price=2649;p.images=['images/ant-esports-elite-1100.png'];}
+
   if(p.name==='AV Cable OG'&&best>=0)p.aliasOf=best;
   if(p.name==='HDMI Cable PS5'){p.legacyName=p.name;p.name='PS5 USB Cable';p.category='PS5';p.images=['images/jpeg/ps5usb.jpeg'];p.compatibility='PS5 controller USB cable';}
   if(window.GP_CPU_IMAGES?.[p.name])p.images=[GP_CPU_IMAGES[p.name]];
   p.shopPage=group(p);
  });
  // These cables fit several consoles; keep one product and one cart identity.
- products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(p.name==='HDMI Cable')p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
+ products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
 },migrate(state,products){
  products.forEach((p,i)=>{if(p.aliasOf!==undefined){state[p.aliasOf]=(Number(state[p.aliasOf])||0)+(Number(state[i])||0);state[i]=0;}});
  localStorage.setItem('gp_cart',JSON.stringify(state));return state;
