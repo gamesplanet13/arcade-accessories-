@@ -1,11 +1,5 @@
 window.GPZ_PRODUCT_CATALOG = [
   {
-    "name": "${d.storage} USB for PS2 — Top ${d.count} Games",
-    "price": 179,
-    "weight": 0,
-    "size": ""
-  },
-  {
     "name": "10 Core Wire (Per Meter)",
     "price": 50,
     "weight": 0,
@@ -49,7 +43,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "AL02 RGB Mobile Phone Cooler",
-    "price": 749,
+    "price": 1049,
     "weight": 0,
     "size": ""
   },
@@ -151,13 +145,13 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "DY26 Mobile Phone Cooler",
-    "price": 631,
+    "price": 883,
     "weight": 0,
     "size": ""
   },
   {
     "name": "DY58 / SL09 Dual Semiconductor Mobile Phone Cooler",
-    "price": 1020,
+    "price": 1428,
     "weight": 0,
     "size": ""
   },
@@ -217,7 +211,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "L01 Mobile Phone Cooler",
-    "price": 666,
+    "price": 932,
     "weight": 0,
     "size": ""
   },
@@ -355,7 +349,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "PS3 Controller (Replica)",
-    "price": 600,
+    "price": 620,
     "weight": 0,
     "size": ""
   },
@@ -415,7 +409,7 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "PXN V3 Pro Steering Wheel and Pedal Set",
-    "price": 4999,
+    "price": 6380,
     "weight": 0,
     "size": ""
   },
@@ -487,49 +481,49 @@ window.GPZ_PRODUCT_CATALOG = [
   },
   {
     "name": "SL-14 Rechargeable Battery Mobile Phone Cooler",
-    "price": 1221,
+    "price": 1709,
     "weight": 0,
     "size": ""
   },
   {
     "name": "SL-16 Semiconductor Mobile Phone Cooler",
-    "price": 690,
+    "price": 966,
     "weight": 0,
     "size": ""
   },
   {
     "name": "SL-20 Mobile Phone Cooler",
-    "price": 1221,
+    "price": 1709,
     "weight": 0,
     "size": ""
   },
   {
     "name": "SL-21 Semiconductor Mobile Phone Cooler",
-    "price": 1162,
+    "price": 1627,
     "weight": 0,
     "size": ""
   },
   {
     "name": "SL-22 Dual-Fan Mobile Phone Cooler",
-    "price": 1162,
+    "price": 1627,
     "weight": 0,
     "size": ""
   },
   {
     "name": "SL-25 15W Semiconductor Mobile Phone Cooler",
-    "price": 985,
+    "price": 1379,
     "weight": 0,
     "size": ""
   },
   {
     "name": "SL-31 Compact Mobile Phone Cooler",
-    "price": 690,
+    "price": 966,
     "weight": 0,
     "size": ""
   },
   {
     "name": "SL01 Mobile Phone Cooler",
-    "price": 690,
+    "price": 966,
     "weight": 0,
     "size": ""
   },
@@ -596,6 +590,480 @@ window.GPZ_PRODUCT_CATALOG = [
   {
     "name": "Zebronics ZEB-CSH-01 2.5-inch SATA HDD / SSD Enclosure",
     "price": 380,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "M22-SD",
+    "price": 2590,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "M88",
+    "price": 7540,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "M23",
+    "price": 3920,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "M33",
+    "price": 2110,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "M66 Neon",
+    "price": 2690,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "GD30",
+    "price": 3480,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "GD30 without Memory Card",
+    "price": 3050,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "GD20",
+    "price": 3340,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "G11 Pro",
+    "price": 4500,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "G10",
+    "price": 2180,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "G90",
+    "price": 5220,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "M15 Gamestick",
+    "price": 1600,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "R36 Ultra",
+    "price": 3920,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "X7M Remote",
+    "price": 990,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "X9",
+    "price": 2760,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "K12",
+    "price": 430,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "SEGA",
+    "price": 1310,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "GS5 Pro 32GB",
+    "price": 3999,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PlayX PS4 Controller",
+    "price": 1600,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PlayX Army Controller",
+    "price": 1740,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PlayX Spiderman Controller",
+    "price": 1450,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PlayX Joy Bagncontroller",
+    "price": 1240,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Xbox Wired Controller",
+    "price": 870,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Xbox Wireless Controller",
+    "price": 1820,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PC Controller",
+    "price": 250,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Turbo PC Controller",
+    "price": 400,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "HDMI Cable PS5",
+    "price": 240,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "AV Cable OG",
+    "price": 90,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PS4 Silicone Cover",
+    "price": 130,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PS5 Silicone Cover",
+    "price": 130,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PS5 Bag",
+    "price": 2110,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Xbox HDD Casing",
+    "price": 160,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PS4 Pro Console",
+    "price": 32630,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Intel Core i3 3rd Gen",
+    "price": 660,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Intel Core i5 3rd Gen",
+    "price": 1740,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Intel Core i5 6th Gen",
+    "price": 2470,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Intel Core i7 6th Gen",
+    "price": 9860,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Consistent H61 Motherboard",
+    "price": 2610,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "H81 Motherboard",
+    "price": 3630,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Consistent H110 DDR4 Motherboard",
+    "price": 6530,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Zebronics H110 Motherboard",
+    "price": 6380,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Consistent DDR3 4GB RAM",
+    "price": 1020,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "DDR3 8GB RAM",
+    "price": 2180,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Consistent DDR4 8GB RAM",
+    "price": 5660,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Zebronics SMPS 450",
+    "price": 700,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Lapcare CPU Fan",
+    "price": 220,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Normal Cabinet without SMPS",
+    "price": 690,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Cabinet + SMPS",
+    "price": 1380,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "ANT Esports RGB Cabinet",
+    "price": 3480,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "ANT Esports RX550 PSU",
+    "price": 4640,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Zebronics GT740 DDR3 4GB",
+    "price": 5370,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "TAG GTX 1660 Super 6GB",
+    "price": 27550,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "MSI RTX 3050 6GB",
+    "price": 40600,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Gigabyte RTX 3050 8GB",
+    "price": 58000,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Geonix 256GB SSD",
+    "price": 3200,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "64GB Pendrive",
+    "price": 930,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "64GB Game Setup",
+    "price": 300,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "64GB Game Setup — H61 Package",
+    "price": 480,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "256GB Game Setup",
+    "price": 800,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Assembling",
+    "price": 500,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Windows Setup",
+    "price": 350,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "TYPE C OTG Cable",
+    "price": 21,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Rocker LIGHT BIG BAR SPEAKER",
+    "price": 504,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "2 IN 1 TYPE C + Audio",
+    "price": 49,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "iPhone OTG Cable",
+    "price": 98,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "MZ 204 Bluetooth Speaker",
+    "price": 392,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Car Washer BAT",
+    "price": 1190,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "MZ LONG BAR",
+    "price": 504,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Rock LIGHT SPEAKER",
+    "price": 476,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "MZ Speaker",
+    "price": 322,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "4 IN 1 USB Charging Cable",
+    "price": 49,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "ULTRA Smart Watch Charger",
+    "price": 364,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "MARSHEL SAMSUNG Earbuds",
+    "price": 350,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "REAL ME Neckband",
+    "price": 182,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Crystal TWS Earbuds",
+    "price": 154,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "MINI BOOST 4 Bluetooth Speaker",
+    "price": 168,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Walkie Talkie Set",
+    "price": 1540,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "PRO 2 Pods TWS Earbuds",
+    "price": 308,
+    "weight": 0,
+    "size": ""
+  },
+  {
+    "name": "Samsung Type-C Audio Cable",
+    "price": 49,
     "weight": 0,
     "size": ""
   }
