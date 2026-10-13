@@ -1,5 +1,11 @@
 window.GPZ_PRODUCT_CATALOG = [
   {
+    "name": "10 Core Wire (Per Meter)",
+    "price": 50,
+    "weight": 0,
+    "size": ""
+  },
+  {
     "name": "10 Socket Extension Board",
     "price": 170,
     "weight": 0,
@@ -96,6 +102,12 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
+    "name": "Zippy Coin Drop Switch",
+    "price": 99,
+    "weight": 0,
+    "size": ""
+  },
+  {
     "name": "PS4 / PC / Android Red PCB",
     "price": 2000,
     "weight": 0,
@@ -111,17 +123,17 @@ window.GPZ_PRODUCT_CATALOG = [
     "name": "Battery Operated Vacuum Cleaner",
     "price": 230,
     "weight": 300,
-    "size": "17 × 7 × 13 cm"
+    "size": "17 \u00d7 7 \u00d7 13 cm"
   },
   {
     "name": "Sofa Set with Air Pump",
     "price": 1100,
     "weight": 1400,
-    "size": "14 × 22 × 28 cm"
+    "size": "14 \u00d7 22 \u00d7 28 cm"
   },
   {
     "name": "Coin Packet",
-    "price": 220,
+    "price": 210,
     "weight": 0,
     "size": ""
   },
@@ -144,13 +156,13 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "FMCB Memory Card — PS2 Fat",
+    "name": "FMCB Memory Card \u2014 PS2 Fat",
     "price": 600,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "FMCB Memory Card — PS2 Slim 7xxxx",
+    "name": "FMCB Memory Card \u2014 PS2 Slim 7xxxx",
     "price": 600,
     "weight": 0,
     "size": ""
@@ -162,13 +174,13 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "FunTuna Memory Card — PS2 Slim 9xxxx",
+    "name": "FunTuna Memory Card \u2014 PS2 Slim 9xxxx",
     "price": 600,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "HDMI 2.0 Male to Female Extension Cable — 1.5 Meter",
+    "name": "HDMI 2.0 Male to Female Extension Cable \u2014 1.5 Meter",
     "price": 150,
     "weight": 0,
     "size": ""
@@ -192,7 +204,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Honeycom HDMI 2.0 Male to Male Cable — 2.2 Meter",
+    "name": "Honeycom HDMI 2.0 Male to Male Cable \u2014 2.2 Meter",
     "price": 200,
     "weight": 0,
     "size": ""
@@ -210,7 +222,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Laptop Sleeve — 15.6 Inch",
+    "name": "Laptop Sleeve \u2014 15.6 Inch",
     "price": 120,
     "weight": 0,
     "size": ""
@@ -222,7 +234,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "MD Handle (With Switch) — Red Only",
+    "name": "MD Handle (With Switch)",
     "price": 585,
     "weight": 0,
     "size": ""
@@ -237,7 +249,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "name": "ZING Crystal Switch",
     "price": 40,
     "weight": 5,
-    "size": "5 × 3 × 1 cm"
+    "size": "5 \u00d7 3 \u00d7 1 cm"
   },
   {
     "name": "Old Rasila Push Button",
@@ -282,19 +294,19 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "PS2 8MB FMCB Memory Card — PS2 Fat 3XXXX / 5XXXX",
+    "name": "PS2 8MB FMCB Memory Card \u2014 PS2 Fat 3XXXX / 5XXXX",
     "price": 600,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "PS2 8MB FMCB Memory Card — PS2 Slim 7XXXX",
+    "name": "PS2 8MB FMCB Memory Card \u2014 PS2 Slim 7XXXX",
     "price": 600,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "PS2 8MB FunTuna Memory Card — PS2 Slim 9XXXX",
+    "name": "PS2 8MB FunTuna Memory Card \u2014 PS2 Slim 9XXXX",
     "price": 600,
     "weight": 0,
     "size": ""
@@ -306,7 +318,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "PS2 Console Black — Without Accessories",
+    "name": "PS2 Console Black \u2014 Without Accessories",
     "price": 8500,
     "weight": 0,
     "size": ""
@@ -348,22 +360,22 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Wireless Controller for PS4 / PC / Android — Special Designs",
+    "name": "Wireless Controller for PS4 / PC / Android \u2014 Special Designs",
     "price": 999,
     "weight": 450,
-    "size": "15 × 20 × 8 cm"
+    "size": "15 \u00d7 20 \u00d7 8 cm"
   },
   {
     "name": "P5 Look Wireless Controller for PS4 / PC / Android",
     "price": 1500,
     "weight": 450,
-    "size": "15 × 20 × 8 cm"
+    "size": "15 \u00d7 20 \u00d7 8 cm"
   },
   {
-    "name": "PS4 Wireless Controller True Replica — Black",
+    "name": "PS4 Wireless Controller True Replica \u2014 Black",
     "price": 899,
     "weight": 450,
-    "size": "15 × 20 × 8 cm"
+    "size": "15 \u00d7 20 \u00d7 8 cm"
   },
   {
     "name": "PS4 Controller Charging Cable",
@@ -384,8 +396,8 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Push Button — Red Only",
-    "price": 35,
+    "name": "Push Button",
+    "price": 32,
     "weight": 0,
     "size": ""
   },
@@ -402,25 +414,25 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "RANZ CAT-6 LAN Patch Cord — 10 Meter",
+    "name": "RANZ CAT-6 LAN Patch Cord \u2014 10 Meter",
     "price": 130,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "RANZ CAT-6 LAN Patch Cord — 2 Meter",
+    "name": "RANZ CAT-6 LAN Patch Cord \u2014 2 Meter",
     "price": 49,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "RANZ CAT-6 LAN Patch Cord — 20 Meter",
+    "name": "RANZ CAT-6 LAN Patch Cord \u2014 20 Meter",
     "price": 261,
     "weight": 0,
     "size": ""
   },
   {
-    "name": "RANZ CAT-6 LAN Patch Cord — 5 Meter",
+    "name": "RANZ CAT-6 LAN Patch Cord \u2014 5 Meter",
     "price": 80,
     "weight": 0,
     "size": ""
@@ -447,13 +459,13 @@ window.GPZ_PRODUCT_CATALOG = [
     "name": "Remote Plate (White Colour)",
     "price": 300,
     "weight": 15,
-    "size": "10 × 10 × 2 cm"
+    "size": "10 \u00d7 10 \u00d7 2 cm"
   },
   {
     "name": "Remote Plate (Red Colour)",
     "price": 199,
     "weight": 15,
-    "size": "10 × 10 × 2 cm"
+    "size": "10 \u00d7 10 \u00d7 2 cm"
   },
   {
     "name": "SATA Network Adapter / Converter for PlayStation 2 Fat",
@@ -543,25 +555,25 @@ window.GPZ_PRODUCT_CATALOG = [
     "name": "Generic 2.4G Wireless Double Gamepad - White (With USB Receiver)",
     "price": 869,
     "weight": 220,
-    "size": "19 × 20 × 10 cm"
+    "size": "19 \u00d7 20 \u00d7 10 cm"
   },
   {
     "name": "Generic 2.4G Wireless Double Gamepad - Black (With USB Receiver)",
     "price": 799,
     "weight": 220,
-    "size": "19 × 20 × 10 cm"
+    "size": "19 \u00d7 20 \u00d7 10 cm"
   },
   {
-    "name": "Generic 2.4G Wireless Single Gamepad - Black (Without Receiver) — S2 Compatible",
+    "name": "Generic 2.4G Wireless Single Gamepad - Black (Without Receiver) \u2014 S2 Compatible",
     "price": 300,
     "weight": 110,
-    "size": "15 × 10 × 6 cm"
+    "size": "15 \u00d7 10 \u00d7 6 cm"
   },
   {
-    "name": "Generic 2.4G Wireless Single Gamepad - White (Without Receiver) — YC6/YC5/Y6C/Y5C Compatible",
+    "name": "Generic 2.4G Wireless Single Gamepad - White (Without Receiver) \u2014 YC6/YC5/Y6C/Y5C Compatible",
     "price": 350,
     "weight": 110,
-    "size": "15 × 10 × 6 cm"
+    "size": "15 \u00d7 10 \u00d7 6 cm"
   },
   {
     "name": "USB to PS2 / PS3 / PC Controller Converter",
@@ -738,14 +750,8 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "HDMI Cable PS5",
+    "name": "PS5 USB Cable",
     "price": 240,
-    "weight": 0,
-    "size": ""
-  },
-  {
-    "name": "AV Cable OG",
-    "price": 90,
     "weight": 0,
     "size": ""
   },
@@ -924,7 +930,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "64GB Game Setup — H61 Package",
+    "name": "64GB Game Setup \u2014 H61 Package",
     "price": 480,
     "weight": 0,
     "size": ""
@@ -1052,18 +1058,6 @@ window.GPZ_PRODUCT_CATALOG = [
   {
     "name": "Samsung Type-C Audio Cable",
     "price": 49,
-    "weight": 0,
-    "size": ""
-  },
-  {
-    "name": "4.8mm Handle Switch Connector Pin",
-    "price": 5,
-    "weight": 0,
-    "size": "4.8 mm"
-  },
-  {
-    "name": "10 Core Wire — ₹35 per Meter",
-    "price": 35,
     "weight": 0,
     "size": ""
   }

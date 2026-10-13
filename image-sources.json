@@ -1,0 +1,70 @@
+{
+  "Consistent H61 Motherboard": {
+    "image": "images/cpu/consistent-h61-motherboard.jpg",
+    "source": "https://static-01.daraz.com.np/p/346669fd335402bba05d8fa6cc23732e.jpg"
+  },
+  "Consistent DDR3 4GB RAM": {
+    "image": "images/cpu/consistent-ddr3-4gb-ram.jpg",
+    "source": "https://www.bestomart.com/cdn/shop/products/1000077421_large.jpg?v=1632369949"
+  },
+  "Geonix 256GB SSD": {
+    "image": "images/cpu/geonix-256gb-ssd.jpg",
+    "source": "https://www.geonix.in/cdn/shop/files/2e5ff835776de4fba8381bf6c9950c59_930a7ad5-5ccb-4515-b757-c64681714fb8.jpg?v=1762407998"
+  },
+  "Zebronics H110 Motherboard": {
+    "image": "images/cpu/zebronics-h110-motherboard.jpg",
+    "source": "https://zebronics.com/cdn/shop/products/ZEB-H110-D4-pic2.jpg?v=1624941660&width=1200"
+  },
+  "Zebronics SMPS 450": {
+    "image": "images/cpu/zebronics-smps-450.jpg",
+    "source": "https://zebronics.com/cdn/shop/products/ZEB-450W-Black-gold-pic3.jpg?v=1678690090&width=1000"
+  },
+  "Lapcare CPU Fan": {
+    "image": "images/cpu/lapcare-cpu-fan.jpg",
+    "source": "https://www.lapcare.com/cdn/shop/products/1_f45748e0-e5e1-4d5c-9a37-250f77672cc7.jpg?v=1757326628&width=500"
+  },
+  "Consistent DDR4 8GB RAM": {
+    "image": "images/cpu/consistent-ddr4-8gb-ram.jpg",
+    "source": "https://qualitycomputer.com.np/web/image/product.template/52249/image_1024?unique=374cc47"
+  },
+  "Consistent H110 DDR4 Motherboard": {
+    "image": "images/cpu/consistent-h110-ddr4-motherboard.jpg",
+    "source": "https://golchhacomputer.com/uploads/products/6839bffbdcab6.jpg"
+  },
+  "MSI RTX 3050 6GB": {
+    "image": "images/cpu/msi-rtx-3050-6gb.jpg",
+    "source": "https://img.terabyteshop.com.br/produto/m/placa-de-video-msi-nvidia-geforce-rtx-3050-ventus-2x-oc-6gb-gddr6-dlss-ray-tracing-912-v812-016_192724.jpg"
+  },
+  "Gigabyte RTX 3050 8GB": {
+    "image": "images/cpu/gigabyte-rtx-3050-8gb.jpg",
+    "source": "https://www.bigw.com.au/medias/sys_master/images/images/h4c/h08/80130030075934.jpg"
+  },
+  "Intel Core i3 3rd Gen": {
+    "image": "images/cpu/intel-core-i3-3rd-gen.jpg",
+    "source": "https://systemsettings.in/wp-content/uploads/2024/12/1-6-1-1-scaled.jpg"
+  },
+  "Intel Core i5 6th Gen": {
+    "image": "images/cpu/intel-core-i5-6th-gen.jpg",
+    "source": "https://img.modxcomputers.com/modx/1753702277347-Intel-Core-i5-6th-Gen-LGA1151-Socket.webp"
+  },
+  "Intel Core i7 6th Gen": {
+    "image": "images/cpu/intel-core-i7-6th-gen.jpg",
+    "source": "https://media.cdn.kaufland.de/product-images/1024x1024/0e6d94d45649d8c5ff7c9771ae7e8e8b.jpg"
+  },
+  "H81 Motherboard": {
+    "image": "images/cpu/h81-motherboard.jpg",
+    "source": "https://static.digit.in/NPN_consistent-cmb-h81-nvme-motherboard-1757115786.webp"
+  },
+  "Zebronics GT740 DDR3 4GB": {
+    "image": "images/cpu/zebronics-gt740-ddr3-4gb.jpg",
+    "source": "https://zebronics.com/cdn/shop/files/Zeb-GT740-4GD3-pic1.jpg?v=1727180674&width=1920"
+  },
+  "ANT Esports RX550 PSU": {
+    "image": "images/cpu/ant-esports-rx550-psu.jpg",
+    "source": "https://vishalperipherals.com/cdn/shop/files/71jC7t515GL._SL1500.jpg?v=1763635604"
+  },
+  "Intel Core i5 3rd Gen": {
+    "image": "images/cpu/intel-core-i5-3rd-gen.jpg",
+    "source": "https://i.ebayimg.com/images/g/87kAAOSwzRhgdTjZ/s-l1200.jpg"
+  }
+}
