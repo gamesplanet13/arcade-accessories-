@@ -1,6 +1,6 @@
-const CACHE_NAME="games-planet-live-v37";
+const CACHE_NAME="games-planet-live-v38";
 const APP_SHELL=[
-  "./","./index.html","./Simple.html","./order-prefill.html","./bigship-rate-calculator.html","./delhivery-config.js","./invoice.html","./manifest.webmanifest",
+  "./","./index.html","./classic.html","./new.html","./store-navigation.js","./configure.html","./configure.js","./configure.css","./setup-data.js","./setup-engine.js","./configured-cart.js","./setup-checkout.js","./game-selector.html","./selector-order.js","./Simple.html","./order-prefill.html","./bigship-rate-calculator.html","./delhivery-config.js","./invoice.html","./manifest.webmanifest",
   "./assets/html2canvas.min.js",
   "./games-planet-logo-transparent.png","./games-planet-icon-192.png","./games-planet-icon-512.png",
   "./NonGSTcurrentQR.jpg","./GSTcurrentQR.png","./pincode_merged_final.json"
