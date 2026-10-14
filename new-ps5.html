@@ -1222,6 +1222,19 @@ body.modern-view #products .product[hidden],body.modern-view #products .product[
 @media(max-width:900px){body.modern-view #products .category-products{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:600px){body.modern-view #products .category-products{grid-template-columns:minmax(0,1fr)!important;padding:8px!important;gap:12px!important}body.modern-view #products .product .image-row img{width:145px!important;height:145px!important}}
 @media(max-width:340px){body.modern-view #products .product .variant-row{grid-template-columns:minmax(0,1fr)!important}body.modern-view #products .product .variant-row .qty{grid-row:auto!important;grid-column:1!important;justify-self:end!important}}
+</style><style id="modern-natural-card-height">
+/* New view only: prevent inherited spans, flex bases and stretched grid rows. */
+body.modern-view #products .category-products{align-items:start!important;grid-auto-rows:auto!important}
+body.modern-view #products .product{grid-column:auto!important;grid-row:auto!important;align-self:start!important;height:auto!important;max-height:none!important}
+body.modern-view #products .product .image-row{order:0!important;flex:0 0 auto!important;min-height:0!important;height:auto!important;overflow:visible!important;padding:0!important}
+body.modern-view #products .product .image-row img{flex:0 0 145px!important;width:145px!important;height:145px!important}
+body.modern-view #products .product .image-row.multi-image img{flex:0 0 100px!important;width:100px!important;height:100px!important}
+body.modern-view #products .product .product-title{order:-1!important;min-height:0!important}
+body.modern-view #products .product .info{flex:0 0 auto!important;margin:0!important;padding-top:0!important}
+body.modern-view #products .product .info>div:first-child{flex:0 1 auto!important}
+body.modern-view #products .product.has-variants .info{display:block!important}
+body.modern-view #products .product .variant-row{height:auto!important;min-height:0!important}
+body.modern-view #products .category-panel:not(.is-open) .category-products{display:none!important}
 </style></head>
 
 <body class="modern-view" data-shop-page="ps5"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
