@@ -1582,7 +1582,7 @@ function submitOrder(){
   let orders=[];try{orders=JSON.parse(localStorage.getItem("gp_customer_orders_v1")||"[]")}catch(e){}
   const at=orders.findIndex(x=>x.orderId===saved.orderId);if(at>=0)orders[at]=saved;else orders.unshift(saved);
   localStorage.setItem("gp_customer_orders_v1",JSON.stringify(orders.slice(0,100)));
-  window.open(`https://wa.me/917983624797?text=${encodeURIComponent(message)}`,"_blank","noopener,noreferrer");
+  GPOrderRecords.send(message, gpzCurrentOrder);
   // Keep checkout open after WhatsApp submission; orders.html is not part of this project.
 }
 function gpzInitialize(){
@@ -1643,5 +1643,5 @@ document.querySelectorAll('input[name="gstInvoice"]').forEach(el=>el.addEventLis
 }));
 gpzInitialize();
 </script>
-<script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script></body>
+<script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/orders-config.js"></script><script src="order-records.js"></script></body>
 </html>
