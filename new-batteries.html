@@ -1197,9 +1197,34 @@ img,canvas{
 
 </style>
 
-<link rel="stylesheet" href="storefront.css"><script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js"></script><link rel="stylesheet" href="category-pages.css"></head>
+<link rel="stylesheet" href="storefront.css"><script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js"></script><link rel="stylesheet" href="category-pages.css"><style id="modern-large-mobile">
+body.modern-view{overflow-x:hidden}
+body.modern-view #products .category-products{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important;padding:12px!important}
+body.modern-view #products .product,body.modern-view #products .product:not(.has-variants){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:12px!important;padding:16px!important;min-width:0!important;min-height:0!important;border-radius:14px!important}
+body.modern-view #products .product .product-title,body.modern-view #products .product:not(.has-variants) .product-title{font-size:18px!important;line-height:1.4!important;margin:0!important}
+body.modern-view #products .product .image-row,body.modern-view #products .product:not(.has-variants) .image-row{display:flex!important;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important;width:100%!important;gap:8px!important;margin:8px 0!important}
+body.modern-view #products .product .image-row img,body.modern-view #products .product:not(.has-variants) .image-row img{width:130px!important;height:130px!important;object-fit:contain!important;max-width:100%!important}
+body.modern-view #products .product .image-row.multi-image img{width:100px!important;height:100px!important}
+body.modern-view #products .product .info,body.modern-view #products .product:not(.has-variants) .info{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;width:100%!important;margin:auto 0 0!important}
+body.modern-view #products .product .price,body.modern-view #products .product:not(.has-variants) .price{font-size:21px!important;padding:8px 12px!important;line-height:1.3!important}
+body.modern-view #products .product .info>div:first-child{width:auto!important;flex:0 1 auto!important}
+body.modern-view #products .product.has-variants .info>div:first-child{display:none!important}
+body.modern-view #products .product .qty,body.modern-view #products .product:not(.has-variants) .qty{display:flex!important;width:130px!important;min-width:130px!important;align-items:center!important;justify-content:space-between!important;height:44px!important;gap:5px!important}
+body.modern-view #products .product .qty button,body.modern-view #products .product:not(.has-variants) .qty button{width:42px!important;min-width:42px!important;height:44px!important;min-height:44px!important;max-height:44px!important;font-size:22px!important;border-radius:10px!important;padding:0!important}
+body.modern-view #products .product .qty span{font-size:17px!important}
+body.modern-view #products .product .variant-list{width:100%!important;gap:10px!important}
+body.modern-view #products .product .variant-row{grid-template-columns:minmax(0,1fr) 130px!important;gap:10px!important;padding:10px!important}
+body.modern-view #products .product .variant-label{grid-template-columns:48px minmax(0,1fr)!important;gap:8px!important}
+body.modern-view #products .product .variant-thumb{width:48px!important;height:48px!important;max-width:48px!important}
+body.modern-view #products .product .variant-label>span{font-size:13px!important}
+body.modern-view #products .product .product-features,body.modern-view #products .product:not(.has-variants) .product-features{font-size:12px!important;padding:9px!important;line-height:1.5!important}
+body.modern-view #products .product[hidden],body.modern-view #products .product[style*="display: none"]{display:none!important}
+@media(max-width:900px){body.modern-view #products .category-products{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:600px){body.modern-view #products .category-products{grid-template-columns:minmax(0,1fr)!important;padding:8px!important;gap:12px!important}body.modern-view #products .product .image-row img{width:145px!important;height:145px!important}}
+@media(max-width:340px){body.modern-view #products .product .variant-row{grid-template-columns:minmax(0,1fr)!important}body.modern-view #products .product .variant-row .qty{grid-row:auto!important;grid-column:1!important;justify-self:end!important}}
+</style></head>
 
-<body data-shop-page="batteries"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
+<body class="modern-view" data-shop-page="batteries"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
 
 <div class="gpz-ticker" aria-label="Games Planet services">
   <div class="gpz-ticker-track">🎮 आपका Games Planet में स्वागत है। हमारे पास Classic Retro Gaming Consoles, Arcade Machines, Commercial &amp; Non-Commercial Game Boxes, Coin Machines, Parts, Spare Parts, Repair Services, New &amp; Used PlayStation Consoles, Game Sticks, Controllers और Gaming Accessories उपलब्ध हैं। अधिक जानकारी के लिए हमारी WhatsApp Profile Catalog देखें या हमसे संपर्क करें।</div>
