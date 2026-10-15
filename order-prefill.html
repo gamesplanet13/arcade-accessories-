@@ -59,7 +59,7 @@
   @media(max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
   @media(max-width:720px){.grid2,.grid3,.choice-grid{grid-template-columns:1fr}}
 </style>
-</head>
+<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style></head>
 <body>
 <div class="wrap">
   <h1>Games Planet — Quick Order</h1>
@@ -165,7 +165,7 @@
     <div class="hint" id="ruleNote"></div>
   </div>
 
-  <div class="card" id="couponCard">
+  <div class="card" id="couponCard" hidden>
     <span class="badge">Discount Coupon</span>
     <div class="inline">
       <div style="flex:1 1 220px">
@@ -178,7 +178,7 @@
     </div>
     <div class="hint" id="couponNote">Coupon discount लागू होने पर total में अपने आप घट जाएगा।</div>
   </div>
-  <div class="card" id="couponCodNotice" style="display:none">
+  <div class="card" id="couponCodNotice" hidden style="display:none">
     <b>Coupon is only valid for prepaid orders, not for COD.</b>
   </div>
 
@@ -292,7 +292,7 @@
     <div id="itemBreakdown"></div>
     <div class="summary-grid">
       <span>Products Amount</span><b id="sumProducts">₹0</b>
-      <span>Discount Applied</span><b id="sumDiscount">₹0</b>
+      <span hidden>Discount Applied</span><b id="sumDiscount">₹0</b>
       <span>Product GST (optional 18%)</span><b id="sumProductGst">₹0</b>
       <span>Product Weight</span><b id="sumWeight">0g</b>
       <span>Packaging Weight</span><b>250g</b>
@@ -451,44 +451,9 @@ function updatePrimeCourierAvailability(){
 /* ===== Coupon helpers & logic ===== */
 function norm(s){return (s||"").toString().trim().toUpperCase();}
 function getBaseProduct(){ return norm(document.getElementById("product").value); }
-function couponDiscountCap(){
-  const items=(typeof gpzAllItems==="function")?gpzAllItems():[];
-  const description=items.length
-    ? items.map(i=>`${i.name||""} ${i.product||""} ${i.variant||""}`).join(" ")
-    : `${document.getElementById("product").value||""} ${document.getElementById("variant").value||""}`;
-  const caps=[];
-  if(/500\s*GB/i.test(description)) caps.push(100);
-  if(/256\s*GB/i.test(description)) caps.push(60);
-  if(/128\s*GB/i.test(description)) caps.push(50);
-  if(/64\s*GB/i.test(description)) caps.push(30);
-  if(/32\s*GB/i.test(description)) caps.push(20);
-  if(/FMCB|FUNTUNA/i.test(description)) caps.push(20);
-  return caps.length?Math.max(...caps):0;
-}
-function computeCouponDiscount(subtotal){
-  const cap=couponDiscountCap();
-  return cap?Math.min(Math.round(subtotal*.05),cap):0;
-}
-function applyCoupon(){
-  const code=(document.getElementById("couponCode").value||"").trim().toUpperCase();
-  if(code!=="GPZ2026"){
-    discountValue=0;
-    document.getElementById("couponNote").innerText="❌ Invalid coupon";
-    computeTotals(); return;
-  }
-  if(mode!=="prepaid"){
-    discountValue=0;
-    document.getElementById("couponNote").innerText="❌ Coupon only valid on Prepaid";
-    computeTotals(); return;
-  }
-  const subtotal=getSubtotal();
-  const d=computeCouponDiscount(subtotal);
-  discountValue=Math.max(0, Math.min(d, subtotal));
-  document.getElementById("couponNote").innerText=discountValue>0
-    ? `✅ Coupon applied: -₹${discountValue}`
-    : "ℹ️ Coupon is not applicable to the selected product.";
-  computeTotals();
-}
+function couponDiscountCap(){return 0;}
+function computeCouponDiscount(){return 0;}
+function applyCoupon(){discountValue=0;computeTotals();}
 
 /* ===== Add-ons sum & totals helpers ===== */
 function sumAddons(){
@@ -573,7 +538,6 @@ function buildWhatsAppTemplate(forMode){
       "",
       ...common,
       `Courier Company: ${document.getElementById("prepaidCourier").value || "Not selected"}`,
-      `Discount Applied:${(typeof discountValue==='number' && discountValue>0) ? " "+rs(discountValue) : ""}`,
       `Amount Paid: ${rs(paid)}`,
       "",
       `📏 Distance: ${document.getElementById("distance").value || ""}`,
@@ -587,7 +551,6 @@ function buildWhatsAppTemplate(forMode){
       "🔴 COD Order on WhatsApp",
       "",
       ...common,
-      `Discount Applied:`,
       `Amount Paid: ${rs(paid)}`,
       `Rest on Delivery: ${rs(rest)}`,
       "",
@@ -1358,7 +1321,7 @@ function computeTotals(){
     payment="prepaid"; mode="prepaid";
   }
   if(payment==="cod") discountValue=0;
-  const appliedDiscount=payment==="prepaid"?Math.min(productTotal,Math.max(0,Number(discountValue)||0)):0;
+  const appliedDiscount=0;discountValue=0;
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
   const speed=gpzSpeed();
   const liveKey=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
@@ -1514,7 +1477,6 @@ function buildWhatsAppTemplate(){
     `Variant: ${simpleVariants}`,
     `Base Price: ${gpzMoney(o.basePriceDisplay||0)}`,
     `Courier Company: ${o.courier}`,
-    `Discount Applied: ${o.discountApplied?gpzMoney(o.discountApplied):""}`,
     gstTop,
     `Amount Paid: ${gpzMoney(o.advanceAmount)}`,
     ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[]),"",
@@ -1540,9 +1502,6 @@ function buildWhatsAppTemplate(){
     `Products + Add-ons: ${gpzMoney(o.productTotal)}`,
     `Courier Charges: +${gpzMoney(o.courierCharge)}`,
     `Products + Courier: ${gpzMoney(o.productTotal+o.courierCharge)}`,
-    `Discount Coupon: ${o.discountCode||"Not used"}`,
-    `Discount Applied: -${gpzMoney(o.discountApplied)}`,
-    `Amount After Discount: ${gpzMoney(o.amountBeforeGst)}`,
     `GST Invoice (18%): ${o.gstInvoiceIncluded?"+"+gpzMoney(o.productGst):gpzMoney(0)+" (Excluded)"}`,
     ...gstCustomerLines,
     `Total Before VAS: ${gpzMoney(o.totalBeforeVas)}`,
