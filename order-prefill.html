@@ -59,12 +59,13 @@
   @media(max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
   @media(max-width:720px){.grid2,.grid3,.choice-grid{grid-template-columns:1fr}}
 </style>
-<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style></head>
+<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style><script src="cpu-shipping.js?v=2"></script></head>
 <body>
 <div class="wrap">
   <h1>Games Planet — Quick Order</h1>
   <div class="sub">Prefilled from main page • Offline India pincode autofill • Payment rules applied here</div>
 
+<div class="card" id="fulfillmentCard" hidden><span class="badge">Delivery / Shop Pickup</span><div class="label">Receive your order</div><select id="fulfillment" onchange="computeTotals()"><option value="courier">Courier Delivery — size / weight based</option><option value="pickup">Shop Pickup — Courier ₹0</option></select><div class="hint">Shop pickup पर courier और VAS ₹0। Delivery packing size और weight अनुमानित हैं; final packed measurements से पुष्टि होगी।</div></div>
   <!-- Customer -->
   <div class="card">
     <span class="badge">Customer</span>
@@ -563,7 +564,7 @@ function buildWhatsAppTemplate(forMode){
 
 /* ===== Single action: Submit this order ===== */
 function submitOrder(){
-  const required=["name","mobile","address","pincode"];
+  const required=gpzCurrentOrder?.fulfillment==="pickup"?["name","mobile"]:["name","mobile","address","pincode"];
   const missing=required.find(id=>!String(document.getElementById(id)?.value||"").trim());
   if(missing){
     const labels={name:"Name",mobile:"Mobile Number",address:"Address",pincode:"Pincode"};
@@ -1096,12 +1097,12 @@ function gpzIncomingCartItems(){
 function gpzNormalizeIncomingItem(i){
   const quantity=Math.max(1,Number(i?.quantity)||1);
   const unitPrice=Number(i?.unitPrice)||0;
-  const unitWeight=Number(i?.unitWeight)||gpzInferWeight(i?.product||i?.name||"",i?.variant||"");
+  const unitWeight=Number.isFinite(Number(i?.unitWeight))?Math.max(0,Number(i.unitWeight)):gpzInferWeight(i?.product||i?.name||"",i?.variant||"");
   const product=String(i?.product||"").trim();
   const variant=String(i?.variant||"").trim();
   const name=String(i?.name||((variant&&variant!=="PS2")?`${product} — ${variant}`:product)||"PS2 Product");
   return {
-    name,product,variant,pack:String(i?.pack||""),quantity,unitPrice,
+    ...i,name,product,variant,pack:String(i?.pack||""),quantity,unitPrice,
     lineTotal:Number(i?.lineTotal)||(unitPrice*quantity),
     unitWeight,lineWeight:Number(i?.lineWeight)||(unitWeight*quantity),
     dimensions:i?.dimensions||i?.unitDimensions||i?.size||""
@@ -1126,6 +1127,7 @@ function gpzInferWeight(product,variant){
   return weight;
 }
 function gpzItemDimensions(item){
+  if(item?.shippingIgnoreDimensions&&!(item?.dimensions?.length))return "Mounted inside Full Body Arcade — no separate TV carton";
   if(item&&item.dimensions){
     if(Array.isArray(item.dimensions)) return item.dimensions.join(" × ")+" cm";
     return String(item.dimensions);
@@ -1167,6 +1169,7 @@ function gpzAllItems(){
 function gpzBox(items,totalWeight){
   const manual=["actualBoxLength","actualBoxWidth","actualBoxHeight"].map(id=>Number(document.getElementById(id)?.value||0));
   if(manual.every(n=>n>0))return manual;
+  if(items.some(i=>i.cpuBuild)){const computed=GPCPUShipping.pack(items,manual).dimensions;if(computed)return computed;}
   const quantities=Object.fromEntries(items.map(item=>[item.name,Number(item.quantity||0)]));
   const hamidProfile=quantities["Push Button (Imported) - Green"]===10&&quantities["MD Switch Button"]===5&&quantities["Zippy Coin Drop Switch"]===2&&quantities["MD Handle (With Switch) - Black"]===2&&quantities["Coin Packet"]===1&&quantities["10 Core Wire (Per Meter)"]===1;
   if(hamidProfile)return [17,12,14];
@@ -1176,6 +1179,7 @@ function gpzBox(items,totalWeight){
   if(totalWeight<=1000) return [28,22,12];
   return [32,26,Math.min(30,12+Math.ceil(qty/2)*3)];
 }
+function gpzPickup(items){const select=document.getElementById("fulfillment"),hasCPU=items.some(i=>i.cpuBuild);document.getElementById("fulfillmentCard").hidden=!hasCPU;if(!select.dataset.ready){select.value=items.some(i=>i.fulfillment==="pickup")?"pickup":"courier";select.dataset.ready="1";}return hasCPU&&select.value==="pickup";}
 function gpzMode(){return gpzSelected("paymentMode","prepaid");}
 function gpzSpeed(){return gpzSelected("deliverySpeed","surface");}
 function gpzInvoice(){return gpzSelected("gstInvoice","excluded")==="included";}
@@ -1306,16 +1310,18 @@ function computeTotals(){
   const items=gpzAllItems();
   const productTotal=items.reduce((s,i)=>s+i.lineTotal,0);
   const totalWeight=items.reduce((s,i)=>s+i.lineWeight,0);
-  const packingWeight=250;
+  const pickup=gpzPickup(items);
+  const packingWeight=GPCPUShipping.pack(items).packingWeight;
   const packedWeight=totalWeight+packingWeight;
   const boxDimensions=gpzBox(items,totalWeight);
   const actualKg=packedWeight/1000;
   const volumetricKg=(boxDimensions[0]*boxDimensions[1]*boxDimensions[2])/5000;
   const courier=document.getElementById("courier").value||"Trackon.in";
   // Volumetric weight is charged only by these courier partners.
-  const usesVolumetric=GPZ_VAS_COURIERS.includes(courier);
-  const chargeableKg=Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
+  const usesVolumetric=!pickup&&(items.some(i=>i.cpuBuild)||GPZ_VAS_COURIERS.includes(courier));
+  const chargeableKg=pickup?0:Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
   let payment=gpzMode();
+  if(pickup){document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;payment="prepaid";mode="prepaid";}
   if(payment==="cod"&&productTotal<GPZ_COD_MIN){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     payment="prepaid"; mode="prepaid";
@@ -1325,11 +1331,10 @@ function computeTotals(){
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
   const speed=gpzSpeed();
   const liveKey=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
-  gpzLoadBigshipQuote();
-  gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);
+  if(!pickup){gpzLoadBigshipQuote();gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);}
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
-  const courierBaseCharge=bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg);
+  const courierBaseCharge=pickup?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg));
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
@@ -1340,14 +1345,14 @@ function computeTotals(){
   const amountBeforeGst=Math.max(0,productTotal+courierCharge-appliedDiscount);
   const productGst=invoiceIncluded?Math.ceil(amountBeforeGst*.18):0;
   const totalBeforeVas=amountBeforeGst+productGst;
-  const vasApplies=GPZ_VAS_COURIERS.includes(courier);
+  const vasApplies=!pickup&&GPZ_VAS_COURIERS.includes(courier);
   const vasCharge=vasApplies?Math.ceil(totalBeforeVas*.02):0;
   const grandTotal=totalBeforeVas+vasCharge;
   const advanceAmount=payment==="cod"?Math.min(grandTotal,Math.max(500,Math.ceil(courierCharge*2))):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
-    boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,deliverySpeed:speed,courier,
-    courierBaseCharge,courierGst,courierCharge,courierRateSource:bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),gstInvoiceIncluded:invoiceIncluded,productGst,
+    boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":"courier",deliverySpeed:pickup?"Shop Pickup":speed,courier:pickup?"Shop Pickup":courier,
+    courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),gstInvoiceIncluded:invoiceIncluded,productGst,
     discountApplied:appliedDiscount,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
     // User-facing Base Price is deliberately GST-exclusive and follows:
@@ -1359,7 +1364,7 @@ function computeTotals(){
   document.getElementById("addonsTotal").value=sumAddons();
   document.getElementById("subtotal").value=productTotal;
   document.getElementById("gstDetails").style.display=invoiceIncluded?"block":"none";
-  const codAvailable=productTotal>=GPZ_COD_MIN;
+  const codAvailable=!pickup&&productTotal>=GPZ_COD_MIN;
   document.getElementById("codChoice").style.display=codAvailable?"":"none";
   document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
   document.getElementById("codNote").textContent=codAvailable
@@ -1480,9 +1485,9 @@ function buildWhatsAppTemplate(){
     gstTop,
     `Amount Paid: ${gpzMoney(o.advanceAmount)}`,
     ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[]),"",
-    `📏 Distance: ${document.getElementById("distance").value||""}`,
-    `⏳ ${isCod?"COD":"Prepaid"} Order ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`,
-    `📅 Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`,"",
+    ...(o.fulfillment==="pickup"?["Delivery: Shop Pickup — Courier ₹0"]:[`📏 Distance: ${document.getElementById("distance").value||""}`]),
+    ...(o.fulfillment==="pickup"?[]:[`⏳ ${isCod?"COD":"Prepaid"} Order ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`]),
+    ...(o.fulfillment==="pickup"?[]:[`📅 Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`]),"",
     "━━━━━━━━━━━━━━━━━━━━",
     "🧾 COMPLETE ORDER BREAKDOWN",
     "━━━━━━━━━━━━━━━━━━━━","",
@@ -1516,7 +1521,7 @@ function buildWhatsAppTemplate(){
 }
 function submitOrder(){
   // Only these four customer fields are compulsory. Everything else is optional.
-  const required=["name","mobile","address","pincode"];
+  const required=gpzCurrentOrder?.fulfillment==="pickup"?["name","mobile"]:["name","mobile","address","pincode"];
   const labels={name:"Name",mobile:"Mobile Number",address:"Address",pincode:"Pincode"};
   const missing=required.find(id=>!String(document.getElementById(id)?.value||"").trim());
   if(missing){
@@ -1604,3 +1609,4 @@ gpzInitialize();
 </script>
 <script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/orders-config.js"></script><script src="order-records.js"></script></body>
 </html>
+

@@ -18,6 +18,7 @@ window.GPShop={pages,group,prepare(products){
  const h110=products.findIndex(p=>p.name==='Consistent H110 DDR4 Motherboard');
  const best=products.findIndex(p=>p.name==='Best AV Cable for PS2');
  products.forEach(p=>{
+  if(p.name==='PC Controller'){p.name='Ucom PC USB Controller — 1.4m Cable';p.price=365;p.weight=250;p.dimensions=[17,12,8];p.images=['images/ucom-usb-controller.jpg'];p.containsBattery=false;}
   if(p.name==='HDMI Cable'){p.name='Normal HDMI Cable — 1.5 Meter';p.price=100;}
   if(/Honeycom/i.test(p.name)){p.name='HDMI Cable — 2.2 Meter';p.price=200;}
   if(p.name==='PS5 Controller Charging Cable (USB to C)')p.name='PS5 USB-A to USB-C Cable';
@@ -41,7 +42,7 @@ window.GPShop={pages,group,prepare(products){
   p.shopPage=group(p);
  });
  // These cables fit several consoles; keep one product and one cart identity.
- products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
+ products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name.startsWith('Ucom PC USB Controller'))p.shopPages.push('cpu');if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
 },migrate(state,products){
  products.forEach((p,i)=>{if(p.aliasOf!==undefined){state[p.aliasOf]=(Number(state[p.aliasOf])||0)+(Number(state[i])||0);state[i]=0;}});
  localStorage.setItem('gp_cart',JSON.stringify(state));return state;
