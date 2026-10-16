@@ -6,7 +6,7 @@ function init(){
  const hide=el=>{if(el){el.hidden=true;el.style.setProperty('display','none','important');}};
  document.querySelectorAll('.footer-card').forEach(hide);
  document.querySelectorAll('h2,h3,h4').forEach(el=>{
-  if(['Our YouTube Channels','Watch Product Demo','Contact Us'].includes(el.textContent.trim()))hide(el.parentElement);
+  if(['Our YouTube Channels','Watch Product Demo','Contact Us'].includes(el.textContent.trim())){const p=el.parentElement;if(p&&!['BODY','MAIN','HTML'].includes(p.tagName)&&p.childElementCount<=3&&!p.querySelector('form,input,select,#products,.product,.grid,.container'))hide(p);}
  });
  document.querySelectorAll('a[href*="instagram.com/singhtech1"]').forEach(el=>{const p=el.parentElement;if(p?.tagName==='DIV'&&p.children.length===1)hide(p);});
  document.querySelectorAll('iframe[src*="28.7831285"],iframe[src*="Games%20Planet%20Gurudwara"]').forEach(hide);
