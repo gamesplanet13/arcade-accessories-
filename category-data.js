@@ -1,14 +1,15 @@
 (function(){'use strict';
-const pages=[['arcade','Arcade Accessories'],['ps2','PS2'],['ps3','PS3'],['ps4','PS4'],['ps5','PS5'],['cpu','CPU & Computer Parts'],['gamebox','Game Stick & Game Box'],['gaming','Gaming Accessories'],['mobile','Mobile & Audio'],['coolers','Phone Coolers'],['cables','Cables'],['electrical','Electrical Items'],['batteries','Batteries & Chargers'],['decoration','Decoration']];
+const pages=[['arcade','Arcade Accessories'],['ps2','PS2'],['ps3','PS3'],['ps4','PS4'],['ps5','PS5'],['cpu','CPU & Computer Parts'],['arcade-box','Arcade Box'],['gamebox','Game Stick & Game Boxes'],['gaming','Gaming Accessories'],['mobile','Mobile & Audio'],['coolers','Phone Coolers'],['cables','Cables'],['electrical','Electrical Items'],['batteries','Batteries & Chargers'],['decoration','Decoration']];
 function group(p){
  const n=p.name,c=p.category;
  if(p.customType==='cpu'||/Computer Parts|Computer & Network/.test(c))return 'cpu';
- if(p.customType==='arcade'||c==='Arcade Box Accessories')return 'arcade';
+ if(p.customType==='arcade')return 'arcade-box';
+ if(c==='Arcade Box Accessories')return 'arcade';
  if(p.customType==='ps2'||c.startsWith('PS2'))return 'ps2';
  if(c==='PS3'||c==='PS4'||c==='PS5')return c.toLowerCase();
  if(c==='New Gaming Products'){
   if(/PS5/.test(n))return 'ps5';if(/PS4|PlayX/.test(n))return 'ps4';
-  if(/^(M22-SD|M88|M23|M33|M66 Neon|GD30|GD20|G11 Pro|G10|G90|M15 Gamestick|R36 Ultra|X7M Remote|X9|K12|SEGA|GS5 Pro)/.test(n))return 'gamebox';
+  if(/^(M22|M88|M23|M33|M66|GD\d+|G11 Pro|G10|G90|M15 Gamestick|R36 Ultra|X7M Remote|X9|K12|SEGA|GS5 Pro)/.test(n))return 'gamebox';
   return 'gaming';
  }
  return ({'Gaming Accessories':'gaming','Mobile & Audio':'mobile','Mobile Phone Coolers':'coolers','Cables':'cables','Electrical Items':'electrical','Batteries and Charger':'batteries','Decoration':'decoration'})[c]||'gaming';
