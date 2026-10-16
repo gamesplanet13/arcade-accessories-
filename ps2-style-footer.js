@@ -1,6 +1,7 @@
 (function(){
 'use strict';
 function init(){
+ if(!document.getElementById('gp-menu-toggle')&&!document.getElementById('gp-navigation-loader')){document.getElementById('gp-global-navigation')?.remove();const menuScript=document.createElement('script');menuScript.id='gp-navigation-loader';menuScript.src='https://gamesplanet13.github.io/arcade-accessories-/site-navigation.js?v=20261017-drawer';document.head.append(menuScript);}
  if(document.getElementById('gp-ps2-style-footer'))return;
  document.getElementById('gp-global-footer')?.remove();
  const hide=el=>{if(el){el.hidden=true;el.style.setProperty('display','none','important');}};
