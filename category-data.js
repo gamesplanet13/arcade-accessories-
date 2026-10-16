@@ -46,7 +46,7 @@ window.GPShop={pages,group,prepare(products){
   p.shopPage=group(p);
  });
  // These cables fit several consoles; keep one product and one cart identity.
- products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name.startsWith('Ucom PC USB Controller'))p.shopPages.push('cpu');if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
+ products.forEach(p=>{p.shopPages=[p.shopPage];if((p.shopPage==='ps4'&&!/Console/i.test(p.name))||/HDMI Cable|Power Cable for PS2 \/ PS3 \/ PS4 \/ PS5|CPU \/ PS4 Pro Power Cable/.test(p.name))p.shopPages.push('consoles');if(p.name.startsWith('Ucom PC USB Controller'))p.shopPages.push('cpu');if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
 },migrate(state,products){
  products.forEach((p,i)=>{if(p.aliasOf!==undefined){state[p.aliasOf]=(Number(state[p.aliasOf])||0)+(Number(state[i])||0);state[i]=0;}});
  localStorage.setItem('gp_cart',JSON.stringify(state));return state;
