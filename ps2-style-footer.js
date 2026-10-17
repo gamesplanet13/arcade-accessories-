@@ -40,11 +40,12 @@ function init(){
  '<a class="gp-channel" href="https://youtube.com/@gamesvallah" target="_blank" rel="noopener">Games Vallah</a>'+
  '<a class="gp-channel" href="https://youtube.com/@gamingtechindi" target="_blank" rel="noopener">Gaming Tech India</a></div>'+
  '<a class="gp-instagram" href="https://www.instagram.com/singhtech1/" target="_blank" rel="noopener">Follow us on Instagram</a></section>'+
- '<section><h3>Watch Product Demo</h3><div class="gp-video-frame"><iframe title="GAMES PLANET Product Demo" src="https://www.youtube.com/embed/py-V7CQjcYM" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></section>'+
+ '<section id="gp-related-product-videos" hidden></section>'+
  '<section><h3>Contact Us</h3><div class="gp-contact-buttons"><a href="tel:+917983624797">Call · 7983624797</a><a href="https://wa.me/917983624797" target="_blank" rel="noopener">WhatsApp</a><a href="mailto:gamesplanet.7983624797@gmail.com">Email</a></div></section>'+
  '<section><h3>Our Shop Location</h3><p>Near JK’s Tyre, Front of Raza Sugar Mill Gate,<br>Gurudwara Road, Civil Lines, Rampur, U.P. 244901</p><a class="gp-map-link" href="https://maps.app.goo.gl/JTaBzF9TTqFH9X2L9" target="_blank" rel="noopener">Open Google Map Location ↗</a><iframe class="gp-map-frame" title="GAMES PLANET shop location — Rampur" src="https://www.google.com/maps?q=28.7831285,79.0245045&z=21&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></section>'+
  '<p class="gp-rights">All rights reserved © 2017–'+new Date().getFullYear()+' · GAMES PLANET</p>';
  document.body.append(footer);
+ if(!document.getElementById('gp-related-videos-loader')){const videoScript=document.createElement('script');videoScript.id='gp-related-videos-loader';videoScript.src='https://gamesplanet13.github.io/arcade-accessories-/related-product-videos.js?v=20261017-topic';document.head.append(videoScript);}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
