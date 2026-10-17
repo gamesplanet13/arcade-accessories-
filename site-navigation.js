@@ -5,7 +5,7 @@ function init(){
  const base='https://gamesplanet13.github.io/',shop=base+'arcade-accessories-/';
  const groups=[
  ['Consoles & Game Systems',[
- ['Game Stick & Game Boxes',shop+'gamebox.html'],
+ ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
  ['Game Consoles · PS4',shop+'consoles.html'],
  ['PS2 Console',base+'ps2/'],
  ['PS2 FMCB & USB',base+'ps2fmcb/'],
