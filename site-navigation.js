@@ -53,6 +53,19 @@ function init(){
  const drawer=document.createElement('aside');drawer.id='gp-site-drawer';drawer.hidden=true;drawer.setAttribute('role','dialog');drawer.setAttribute('aria-modal','true');drawer.setAttribute('aria-labelledby','gp-drawer-title');
  drawer.innerHTML='<div class="gp-drawer-head"><div><h2 id="gp-drawer-title">Browse Pages</h2><p>अपनी कैटेगरी चुनें</p></div><button type="button" id="gp-menu-close" aria-label="Close menu">×</button></div><nav aria-label="Product pages">'+groups.map(([title,items])=>'<section><h3>'+title+'</h3>'+items.map(link).join('')+'</section>').join('')+'</nav>';
  const account=document.createElement('a');account.id='gp-account-link';account.href=shop+'customer-orders.html';account.textContent='Login / My Orders';header.insertBefore(account,header.lastElementChild);document.body.prepend(header);document.body.append(shade,drawer);document.body.classList.add('gp-site-navigation');
+ 
+ const repo=location.pathname.split('/')[1]?.toLowerCase(),file=location.pathname.split('/').pop()||'index.html';
+ const productRepo=['arcade-accessories-','arcadeaccessories-','ps2','ps2fmcb','fmcbusb','products','renewedconsole','arcadebox','ps2now'].includes(repo);
+ const utility=/prefill|checkout|invoice|orders|selector|pincode|bigship/i.test(file);
+ if(productRepo&&!utility&&!document.getElementById('gp-page-enquiry')){
+  const panel=document.createElement('div');panel.id='gp-page-enquiry';
+  panel.style.cssText='box-sizing:border-box;display:flex;justify-content:flex-end;max-width:1100px;width:calc(100% - 12px);margin:8px auto 12px;padding:0 4px';
+  const enquiry=document.createElement('a');enquiry.textContent='Enquiry / जानकारी पूछें';enquiry.target='_blank';enquiry.rel='noopener noreferrer';
+  enquiry.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:9px;background:#08783a;color:#fff;text-decoration:none;font:700 14px/1.4 system-ui;box-shadow:none';
+  function refreshEnquiry(){const title=document.title.replace(/\s*[|—–-]\s*GAMES PLANET.*$/i,'').trim()||'Products';enquiry.href='https://wa.me/917983624797?text='+encodeURIComponent('GAMES PLANET — Product Enquiry\nPage: '+title+'\n'+location.href+'\nमुझे इस पेज के प्रोडक्ट के बारे में जानकारी चाहिए।');}
+  refreshEnquiry();enquiry.addEventListener('click',refreshEnquiry);panel.append(enquiry);header.after(panel);
+ }
+
  const toggle=document.getElementById('gp-menu-toggle'),close=document.getElementById('gp-menu-close');let previousOverflow='',returnFocus=null;
  function setOpen(open){
   if(open===!drawer.hidden)return;
