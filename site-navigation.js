@@ -4,6 +4,7 @@ function init(){
  if(document.getElementById('gp-global-navigation'))return;
  const base='https://gamesplanet13.github.io/',shop=base+'arcade-accessories-/';
  const groups=[
+ ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'order-prefill.html?source=cart&shared=1'],['Owner Dashboard',shop+'admin-orders.html']]],
  ['Consoles & Game Systems',[
  ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
  ['Game Consoles · PS4',shop+'consoles.html'],
@@ -45,13 +46,13 @@ function init(){
  '#gp-site-drawer a:hover{background:#eaf2fb;border-color:#b7cde1}#gp-site-drawer a[aria-current]{background:#153c5a;color:#fff;border-color:#153c5a}'+
  'body.gp-site-navigation .gp-category-links,body.gp-site-navigation .gp-checkout-browse,body.gp-site-navigation .gp-related-mobile,body.gp-site-navigation .gp-category-nav .gp-page-tools a{display:none!important}'+
  '@media print{#gp-global-navigation,#gp-site-drawer,#gp-menu-shade{display:none!important}}';
- document.head.append(css);
+ css.textContent+='#gp-account-link{font:650 12px/1.4 system-ui;color:#17324c;text-decoration:none;margin-left:auto;margin-right:10px;padding:8px;border:1px solid #dce4ee;border-radius:8px}';document.head.append(css);
  const header=document.createElement('header');header.id='gp-global-navigation';
  header.innerHTML='<span class="gp-menu-brand">GAMES PLANET</span><button type="button" id="gp-menu-toggle" aria-label="Open pages menu / सभी पेज" aria-haspopup="dialog" aria-controls="gp-site-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>';
  const shade=document.createElement('div');shade.id='gp-menu-shade';shade.hidden=true;
  const drawer=document.createElement('aside');drawer.id='gp-site-drawer';drawer.hidden=true;drawer.setAttribute('role','dialog');drawer.setAttribute('aria-modal','true');drawer.setAttribute('aria-labelledby','gp-drawer-title');
  drawer.innerHTML='<div class="gp-drawer-head"><div><h2 id="gp-drawer-title">Browse Pages</h2><p>अपनी कैटेगरी चुनें</p></div><button type="button" id="gp-menu-close" aria-label="Close menu">×</button></div><nav aria-label="Product pages">'+groups.map(([title,items])=>'<section><h3>'+title+'</h3>'+items.map(link).join('')+'</section>').join('')+'</nav>';
- document.body.prepend(header);document.body.append(shade,drawer);document.body.classList.add('gp-site-navigation');
+ const account=document.createElement('a');account.id='gp-account-link';account.href=shop+'customer-orders.html';account.textContent='Login / My Orders';header.insertBefore(account,header.lastElementChild);document.body.prepend(header);document.body.append(shade,drawer);document.body.classList.add('gp-site-navigation');
  const toggle=document.getElementById('gp-menu-toggle'),close=document.getElementById('gp-menu-close');let previousOverflow='',returnFocus=null;
  function setOpen(open){
   if(open===!drawer.hidden)return;
@@ -67,6 +68,8 @@ function init(){
   if(event.key==='Tab'){const nodes=[close,...drawer.querySelectorAll('a[href]')],first=nodes[0],last=nodes[nodes.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}
  });
  window.addEventListener('pageshow',()=>setOpen(false));
+ if(!window.GPSharedStore&&!document.getElementById('gp-shared-store-loader')){const script=document.createElement('script');script.id='gp-shared-store-loader';script.src=shop+'shared-store.js?v=20261019';document.head.append(script)}
+ drawer.querySelectorAll('a').forEach(a=>{if(a.href===shop+'order-prefill.html?source=cart&shared=1')a.addEventListener('click',e=>{if(window.GPSharedStore){e.preventDefault();GPSharedStore.checkout()}})});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

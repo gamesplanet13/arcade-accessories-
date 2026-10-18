@@ -2,6 +2,9 @@
 'use strict';
 function init(){
  if(!document.getElementById('gp-menu-toggle')&&!document.getElementById('gp-navigation-loader')){document.getElementById('gp-global-navigation')?.remove();const menuScript=document.createElement('script');menuScript.id='gp-navigation-loader';menuScript.src='https://gamesplanet13.github.io/arcade-accessories-/site-navigation.js?v=20261017-drawer';document.head.append(menuScript);}
+ const repo=location.pathname.split('/')[1]?.toLowerCase(),file=location.pathname.split('/').pop().toLowerCase();
+ const internal=/prefill|checkout|invoice|admin-orders|customer-orders|bigship-rate|pincode-autofill/i.test(file)||['lablemaker','lablecombiner','combiner','delhiveryordermaker','dukaan','dukaanorder','dukaanor','dukaanthanks','msgtoorder','morder','deliveryinfo','dispatch','ocrdtdc','paytool','calco','servicereceipt','invoice','invoice1','imageconverter','bgtool','registerw'].includes(repo);
+ if(internal){document.querySelectorAll('#gp-ps2-style-footer,#gp-global-footer,#gp-related-product-videos,.footer-card').forEach(el=>el.remove());return;}
  if(document.getElementById('gp-ps2-style-footer'))return;
  document.getElementById('gp-global-footer')?.remove();
  const hide=el=>{if(el){el.hidden=true;el.style.setProperty('display','none','important');}};

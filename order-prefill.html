@@ -59,11 +59,11 @@
   @media(max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
   @media(max-width:720px){.grid2,.grid3,.choice-grid{grid-template-columns:1fr}}
 </style>
-<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style><script src="cpu-shipping.js?v=2"></script></head>
+<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style><script src="cpu-shipping.js?v=2"></script><script src="shared-store.js?v=20261019"></script></head>
 <body>
 <div class="wrap">
   <h1>Games Planet — Quick Order</h1>
-  <div class="sub">Prefilled from main page • Offline India pincode autofill • Payment rules applied here</div>
+  <div class="sub">One checkout for PS2, FMCB, CPU, consoles and accessories • आपका साझा कार्ट</div>
 
 <div class="card" id="fulfillmentCard" hidden><span class="badge">Delivery / Shop Pickup</span><div class="label">Receive your order</div><select id="fulfillment" onchange="computeTotals()"><option value="courier">Courier Delivery — size / weight based</option><option value="pickup">Shop Pickup — Courier ₹0</option></select><div class="hint">Shop pickup पर courier और VAS ₹0। Delivery packing size और weight अनुमानित हैं; final packed measurements से पुष्टि होगी।</div></div>
   <!-- Customer -->
@@ -1607,6 +1607,6 @@ document.querySelectorAll('input[name="gstInvoice"]').forEach(el=>el.addEventLis
 }));
 gpzInitialize();
 </script>
-<script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/orders-config.js"></script><script src="order-records.js"></script><script src="site-navigation.js?v=20261016-nav"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/ps2-style-footer.js?v=20261016-ps2-view"></script></body>
+<script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/orders-config.js"></script><script src="order-records.js"></script><script src="site-navigation.js?v=20261016-nav"></script></body>
 </html>
 
