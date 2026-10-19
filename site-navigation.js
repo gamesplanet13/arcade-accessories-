@@ -78,8 +78,8 @@ function init(){
    enquiry.href='https://wa.me/917983624797?text='+encodeURIComponent('GAMES PLANET — Selected Products Enquiry\nPage: '+document.title+'\n'+location.href+'\n\n'+details+'\n\nकृपया इस चुने हुए सामान की जानकारी और उपलब्धता बताएँ।');
   });
   panel.append(enquiry);
-  const selection=document.querySelector('#ps2CartPreview')||document.querySelector('#orderDetailsSection')||document.querySelector('#preview')?.closest('section')||document.querySelector('#preview');
-  if(selection)selection.after(panel);else{const footer=document.querySelector('#gp-ps2-style-footer');if(footer)footer.before(panel);else document.body.append(panel)}
+  function placeEnquiry(){const selection=document.querySelector('#ps2CartPreview')||document.querySelector('#orderDetailsSection')||document.querySelector('#summary')?.closest('section')||document.querySelector('#preview')?.closest('section')||document.querySelector('#preview');if(selection){if(selection.nextElementSibling!==panel)selection.after(panel)}else{const footer=document.querySelector('#gp-ps2-style-footer');if(footer)footer.before(panel);else if(!panel.isConnected)document.body.append(panel)}}
+  placeEnquiry();window.addEventListener('load',placeEnquiry,{once:true});
 
  }
 
