@@ -1168,7 +1168,7 @@ function gpzAllItems(){
   const consoles=items.filter(i=>/\bPS2\b/i.test(i.name||'')&&/console|complete (?:setup|set)/i.test(i.name||'')&&!/warranty|inspection/i.test(i.name||''));
   const inspectionQty=consoles.reduce((n,i)=>n+(Number(i.quantity)||0),0);
   if(inspectionQty&&!items.some(i=>i.serviceCode==='PS2_INSPECTION')){
-    items.push({name:'Inspection and verification charges of product',product:'PS2 console testing and verification before dispatch',serviceCode:'PS2_INSPECTION',quantity:inspectionQty,unitPrice:150,lineTotal:150*inspectionQty,unitWeight:0,lineWeight:0,dimensions:[],service:true});
+    items.push({name:'Inspection and verification charges of product',product:'PS2 product inspection, verification and full testing before dispatch',serviceCode:'PS2_INSPECTION',quantity:inspectionQty,unitPrice:150,lineTotal:150*inspectionQty,unitWeight:0,lineWeight:0,dimensions:[],service:true});
   }
   return items;
 }
