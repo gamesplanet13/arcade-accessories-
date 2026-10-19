@@ -1154,7 +1154,7 @@ function gpzBaseItems(){
   return [{name:variant?`${product} — ${variant}`:product,product,variant,quantity,unitPrice,lineTotal:base,unitWeight,lineWeight:unitWeight*quantity,dimensions:GPZ_PARAMS.get("dimensions")||""}];
 }
 function gpzAllItems(){
-  const items=gpzBaseItems();
+  const items=gpzBaseItems().filter(i=>i.serviceCode!=='PS2_INSPECTION'&&i.name!=='Inspection and verification charges of product');
   document.querySelectorAll("#items .addon-row").forEach(row=>{
     const name=row.querySelector(".i-name").value;
     const unitPrice=Number(row.querySelector(".i-price").value||0);
@@ -1164,6 +1164,12 @@ function gpzAllItems(){
       items.push({name,quantity,unitPrice,lineTotal:unitPrice*quantity,unitWeight,lineWeight:unitWeight*quantity,dimensions:""});
     }
   });
+
+  const consoles=items.filter(i=>/\bPS2\b/i.test(i.name||'')&&/console|complete (?:setup|set)/i.test(i.name||'')&&!/warranty|inspection/i.test(i.name||''));
+  const inspectionQty=consoles.reduce((n,i)=>n+(Number(i.quantity)||0),0);
+  if(inspectionQty&&!items.some(i=>i.serviceCode==='PS2_INSPECTION')){
+    items.push({name:'Inspection and verification charges of product',product:'PS2 console testing and verification before dispatch',serviceCode:'PS2_INSPECTION',quantity:inspectionQty,unitPrice:150,lineTotal:150*inspectionQty,unitWeight:0,lineWeight:0,dimensions:[],service:true});
+  }
   return items;
 }
 function gpzBox(items,totalWeight){

@@ -62,8 +62,25 @@ function init(){
   panel.style.cssText='box-sizing:border-box;display:flex;justify-content:flex-end;max-width:1100px;width:calc(100% - 12px);margin:8px auto 12px;padding:0 4px';
   const enquiry=document.createElement('a');enquiry.textContent='Enquiry / जानकारी पूछें';enquiry.target='_blank';enquiry.rel='noopener noreferrer';
   enquiry.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:9px;background:#08783a;color:#fff;text-decoration:none;font:700 14px/1.4 system-ui;box-shadow:none';
-  function refreshEnquiry(){const title=document.title.replace(/\s*[|—–-]\s*GAMES PLANET.*$/i,'').trim()||'Products';enquiry.href='https://wa.me/917983624797?text='+encodeURIComponent('GAMES PLANET — Product Enquiry\nPage: '+title+'\n'+location.href+'\nमुझे इस पेज के प्रोडक्ट के बारे में जानकारी चाहिए।');}
-  refreshEnquiry();enquiry.addEventListener('click',refreshEnquiry);panel.append(enquiry);header.after(panel);
+
+  enquiry.textContent='Selected products enquiry / चुने हुए सामान की जानकारी';
+  enquiry.addEventListener('click',event=>{
+   let selected=[],details='';
+   try{
+    if(typeof window.completeSummary==='function')selected=window.completeSummary().items;
+    else if(typeof window.ps2Summary==='function')selected=window.ps2Summary().items;
+    else if(typeof window.buildOrderSummary==='function')selected=window.buildOrderSummary().items;
+    else if(typeof window.gpzCartRead==='function')selected=window.gpzCartRead().map(i=>({...i,name:i.name||i.product,lineTotal:Number(i.unitPrice)*Number(i.quantity)}));
+   }catch(_){}
+   if(selected.length)details=selected.map(i=>(i.name||i.product)+(i.variant?' — '+i.variant:'')+'\nQty: '+i.quantity+' × ₹'+i.unitPrice+' = ₹'+i.lineTotal).join('\n\n')+'\n\nProducts total: ₹'+selected.reduce((n,i)=>n+Number(i.lineTotal||0),0);
+   else details=document.querySelector('#preview')?.innerText.trim()||'';
+   if(!details){event.preventDefault();alert('पहले प्रोडक्ट / सेटअप चुनें या cart में जोड़ें।');return}
+   enquiry.href='https://wa.me/917983624797?text='+encodeURIComponent('GAMES PLANET — Selected Products Enquiry\nPage: '+document.title+'\n'+location.href+'\n\n'+details+'\n\nकृपया इस चुने हुए सामान की जानकारी और उपलब्धता बताएँ।');
+  });
+  panel.append(enquiry);
+  const selection=document.querySelector('#ps2CartPreview')||document.querySelector('#orderDetailsSection')||document.querySelector('#preview')?.closest('section')||document.querySelector('#preview');
+  if(selection)selection.after(panel);else{const footer=document.querySelector('#gp-ps2-style-footer');if(footer)footer.before(panel);else document.body.append(panel)}
+
  }
 
  const toggle=document.getElementById('gp-menu-toggle'),close=document.getElementById('gp-menu-close');let previousOverflow='',returnFocus=null;
