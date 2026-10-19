@@ -44,7 +44,18 @@ function escape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 function item(name,variant,price,quantity=1,battery=false){return {name,product:name,variant,quantity,unitPrice:price,baseUnitPrice:price,lineTotal:price*quantity,unitWeight:0,lineWeight:0,dimensions:[],containsBattery:battery,configured:true,courierConfirm:true}}
 function calculate(data,type,state){if(type==='cpu'&&state.buildVersion===2)return root.GPCPU.calculate(state);let items=[];
 if(type==='cpu'){const c=data.cpu.find(x=>x.id===state.cpu);if(!c)throw Error('Choose a CPU version');items.push(item(c.name,c.spec,c.price))}
-if(type==='arcade'){const a=data.arcade.find(x=>x.id===state.box);if(!a)throw Error('Choose a box');const mode=state.system||'base';if(!['base','gamebox','ps2'].includes(mode))throw Error('Choose a system');items.push(item(a.name,mode==='base'?'Without game system':mode==='gamebox'?'GameBox with connectors':'PS2 gaming system',a[mode]))}
+if(type==='arcade'){
+ const a=data.arcade.find(x=>x.id===state.box);if(!a)throw Error('Choose a box');const mode=state.system||'base';
+ const cpuMatch=/^cpu-([1-6])$/.exec(mode);
+ if(cpuMatch){
+  const cpuState=root.GPCPU.preset(cpuMatch[1]),cpu=root.GPCPU.calculate(cpuState);
+  items.push(item(a.name,'Prepared arcade box • CPU gaming system listed separately'+(a.id==='full'?' • TV included':''),a.base));
+  items.push(...cpu.items.map(x=>({...x,arcadeCpuVersion:cpuMatch[1]})));
+ }else{
+  if(!['base','gamebox','ps2'].includes(mode))throw Error('Choose a system');
+  items.push(item(a.name,mode==='base'?'Without game system':mode==='gamebox'?'GameBox with connectors':'PS2 gaming system',a[mode]));
+ }
+}
 if(type==='ps2'){
  if(state.ps2Mode==='set'){
   const drive=data.ps2Packs.find(x=>x.id===state.storage);if(!drive)throw Error('Choose a storage size');
@@ -65,4 +76,5 @@ root.GPSetup={calculate,money,escape};if(typeof module!=='undefined')module.expo
 
 
 (function(root){'use strict';function pack(items,manual){const cpu=items.some(i=>i.cpuBuild);let packages=[];for(const i of items){if(Array.isArray(i.shippingPackages)){for(const p of i.shippingPackages)packages.push({dimensions:p.dimensions,quantity:p.quantity||1});continue;}if(i.shippingIgnoreDimensions)continue;const d=Array.isArray(i.dimensions)?i.dimensions:[];if(d.length===3&&d.every(x=>Number(x)>0))packages.push({dimensions:d,quantity:Number(i.quantity)||1});else if(cpu&&Number(i.lineWeight)>0)packages.push({dimensions:[20,15,8],quantity:Number(i.quantity)||1});}let dimensions=null;if(manual?.length===3&&manual.every(x=>x>0))dimensions=manual;else if(packages.length){const normalized=packages.map(p=>({d:p.dimensions.map(Number).sort((a,b)=>b-a),q:p.quantity}));const length=Math.max(...normalized.map(p=>p.d[0])),width=Math.max(...normalized.map(p=>p.d[1]));const volume=normalized.reduce((sum,p)=>sum+p.d[0]*p.d[1]*p.d[2]*p.q,0);dimensions=[length,width,Math.max(Math.max(...normalized.map(p=>p.d[2])),Math.ceil(volume/(length*width)))];}return{dimensions,packingWeight:cpu?Math.max(250,items.reduce((sum,i)=>sum+(Number(i.shippingPackingWeight)||0)*(Number(i.quantity)||1),0)):250,estimated:cpu};}root.GPCPUShipping={pack};if(typeof module!=='undefined')module.exports=root.GPCPUShipping;})(typeof window!=='undefined'?window:globalThis);
+
 
