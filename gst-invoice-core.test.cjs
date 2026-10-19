@@ -22,3 +22,26 @@ const csv='order_id,name,mobile,address,state,product,quantity,unit_price,hsn,gs
 x=C.normalise({name:'Test',items:[{name:'CPU',quantity:2,lineTotal:2000}],amountPaid:500});assert.equal(x.lines[0].rate,1000);assert.equal(x.paid,500);
 assert.equal(C.words(123456.78),'Rupees One Lakh Twenty Three Thousand Four Hundred Fifty Six and Seventy Eight Paise Only');
 console.log('PASS: WhatsApp single/multiple orders, detailed products, CSV grouping/quoted addresses, JSON totals, advances, discounts, GST extra/included and inter/intra-state arithmetic.');
+// Anonymised prepaid/COD fixture with the six-line accessory-order structure.
+const six=`Prepaid Order on WhatsApp
+Order ID: DEMO-SIX
+Name: Example Buyer
+Mobile: 9000000000
+Address: Example street
+Landmark: Near market
+Pincode: 244901
+State: Uttar Pradesh
+District/City: Rampur
+Product: Summary must not become an extra line
+Base Price: ₹2,196
+Amount Paid: ₹2,592
+${['Ice Blue','Pink','Green','Black','Yellow','Handle'].map((name,i)=>`${i+1}. ${i?'ADD-ON':'PRODUCT'}\nName / Variant: ${name}\nQuantity: ${i===3?10:2}\nUnit Price: ₹${i===5?585:46}\nLine Total: ₹${i===5?1170:i===3?460:92}`).join('\n')}
+Courier Charges: +₹198
+Customer / Business Name: Example Electricals
+Customer GSTIN: 09ABCDE1234F1Z5
+GST Billing Address: Example billing street
+Final Order Total: ₹2,592
+Payment Method: Prepaid`;
+let sixOrder=C.parse(six)[0];assert.equal(sixOrder.lines.length,6);assert.equal(sixOrder.firm,'Example Electricals');assert.equal(sixOrder.gstin,'09ABCDE1234F1Z5');assert.match(sixOrder.address,/Example billing street/);assert.equal(sixOrder.freight,198);assert.equal(sixOrder.paid,2592);assert.equal(sixOrder.statedTotal,2592);let sixTotals=C.calculate(sixOrder);assert.equal(sixTotals.gross,1998);assert.equal(sixTotals.taxable,2196);assert.equal(sixTotals.tax,395.28);assert.equal(sixTotals.total,2591.28);assert.equal(sixTotals.overpaid,.72);sixOrder.roundoff=.72;assert.equal(C.calculate(sixOrder).total,2592);assert.equal(C.calculate(sixOrder).balance,0);assert.equal(C.calculate(sixOrder).overpaid,0);
+const cod=C.parse(six.replace('Prepaid Order','COD Order').replace('Amount Paid: ₹2,592','Amount Paid: ₹500').replace('Payment Method: Prepaid','Payment Method: COD'))[0];assert.equal(cod.paid,500);assert.equal(cod.paymentMode,'COD');assert.equal(C.calculate(cod).balance,2091.28);
+console.log('PASS: six-line prepaid/COD, buyer GST billing fields, freight, exact GST, stated-total mismatch and explicit round-off.');

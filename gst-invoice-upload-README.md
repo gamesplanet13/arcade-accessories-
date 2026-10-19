@@ -23,3 +23,12 @@ Source reference: CBIC CGST Rules Rule 46
 https://taxinformation.cbic.gov.in/content/html/tax_repository/gst/rules/cgst_rules/active/chapter6/rule46_v1.00.html
 
 Checks: `node gst-invoice-core.test.cjs` tests real imports, line totals, advances, grouping, state selection and GST extra/inclusive calculations. `node --check gst-invoice-upload.js` checks browser code syntax. Browser/PDF checks are reported separately according to actual verification.
+
+## Direct WhatsApp billing
+Paste the complete customer order into the visible message box and choose **Create invoice + 18% GST**. This path adds 18% GST to product rates (and freight); amount paid remains a separate credit. Multiple messages may be pasted together. File uploads retain their editable import settings.
+
+To refresh an existing unissued draft, paste a single revised message with the same Order ID and choose **Update matching draft from message**. It preserves the invoice number/date, requires confirmation, replaces imported customer/product/payment fields, and requires review again. Issued invoices cannot be replaced through this shortcut. HSN/SAC must be checked again.
+
+This local billing page does not publish invoices to the customer portal. The existing customer portal separately offers downloads after payment verification and invoice approval.
+
+Order-message parsing recognises buyer business name, buyer GSTIN, GST billing address, six-line product/add-on breakdowns, courier charges, final order total and prepaid/COD payments. The stated total is compared with calculated GST totals. Differences are visible; the optional round-off field (-₹1 to +₹1) must be entered explicitly and is printed separately, without changing GST.
