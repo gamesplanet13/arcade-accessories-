@@ -10,7 +10,7 @@ parts.ps4Cable=part('PS4 Controller USB Charging Cable',139,'images/jpeg/ps4usb.
 parts.hdmi15=part('Normal HDMI Cable — 1.5 Meter',100,'images/jpeg/hdmicable.jpeg');
 parts.hdmi22=part('Normal HDMI Cable — 2.2 Meter',200,'images/jpeg/honeycom-hdmi-2.2m.jpg');
 const shipping={h61:[550,[24,20,6]],h110:[550,[24,20,6]],i3:[350,[12,12,10]],i5:[350,[12,12,10]],i56:[350,[12,12,10]],ddr3:[25,[17,6,2]],ddr4:[25,[17,6,2]],cabinet:[1400,[38.7,30.1,19.1]],smps:[700,[16,15,10]],usb:[25,[12,8,2]],ssd:[60,[14,10,3]],gpu:[450,[25,18,6]],pc:[250,[17,12,8]],ps3:[250,[22,15,9]],ps4:[450,[20,15,8]],dongle:[20,[12,8,3]],ps3Cable:[65,[15,5,5]],ps4Cable:[65,[15,5,5]],usbGames:[0,[]],ssdGames:[0,[]],assemble:[0,[]],windows:[0,[]]};
-shipping.hdmi15=[99,[10,10,3]];shipping.hdmi22=[150,[12,10,3]];
+shipping.hdmi15=[99,[10,10,3]];shipping.hdmi22=[170,[15,15,3]];
 shipping.ddr3_8=[25,[17,6,2]];shipping.fan=[0,[]];shipping.cabinetSmps=[2100,[38.7,30.1,19.1]];
 for(const [key,[weight,dimensions]] of Object.entries(shipping))Object.assign(parts[key],{weight,dimensions});
 const displays={'24':{name:'24 Inch Non-Smart LCD TV — 1 Year Warranty',price:5200,image:'images/tv-24.svg',weight:2650,dimensions:[61.5,40,14],packingWeight:850},'32':{name:'32 Inch Smart TV — 1 Year Warranty',price:8300,image:'images/tv-32.svg',weight:4000,dimensions:[87.9,50,12.7],packingWeight:1800}};
