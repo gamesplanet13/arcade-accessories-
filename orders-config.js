@@ -1,2 +1,2 @@
-// Public configuration only. Never put passwords or database credentials here.
-window.GP_ORDER_SERVICE={apiUrl:''}; // Set to the deployed games-planet-orders Worker HTTPS URL.
+// Public endpoints only. Customer records and service secrets are server-side.
+window.GP_ORDER_SERVICE={"apiUrl": "https://games-planet-order-intake.gamesplanet.chatgpt.site", "dashboardUrl": "https://games-planet-orders-central.gamesplanet.chatgpt.site", "labelMakerUrl": "https://games-planet-orders-central.gamesplanet.chatgpt.site/labels"};

@@ -1,0 +1,4 @@
+const CACHE='gp-orders-static-v3',ROOT='https://gamesplanet13.github.io/arcade-accessories-/',FILES=['./index.html',ROOT+'orders-config.js?v=20261022-orders',ROOT+'order-records.js?v=20261022-orders',ROOT+'unified-postal.js?v=20261022-orders',ROOT+'pincode_merged_final.json'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(async c=>{await Promise.allSettled(FILES.map(f=>c.add(f)));await self.skipWaiting()})));
+self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==self.location.origin&&!FILES.some(f=>{try{return new URL(f,self.location).href===u.href}catch{return false}}))return;if(/\/api\/|orders-central|order-intake/.test(u.href))return;e.respondWith(fetch(e.request).then(r=>{if(r.ok)caches.open(CACHE).then(c=>c.put(e.request,r.clone()));return r}).catch(()=>caches.match(e.request)))});
