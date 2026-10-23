@@ -5,7 +5,7 @@ function init(){
  if(document.getElementById('gp-global-navigation'))return;
  const base='https://gamesplanet13.github.io/',shop=base+'arcade-accessories-/';
  const groups=[
- ['Explore GAMES PLANET',[[ 'Home · All Collections',shop],['All Website Pages',shop+'pages.html'],['Game Selectors',shop+'game-selectors.html'],['Help & Services',shop+'services.html'],['Contact & Shop Location',shop+'contact.html']]],
+ ['Explore GAMES PLANET',[[ 'Home · All Collections',shop],['All Website Pages',shop+'pages.html'],['Customer Category Links',shop+'share-links.html'],['Game Selectors',shop+'game-selectors.html'],['Help & Services',shop+'services.html'],['Contact & Shop Location',shop+'contact.html']]],
  ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'cart.html'],['Owner Dashboard',shop+'admin-orders.html']]],
  ['Consoles & Game Systems',[
  ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
@@ -16,7 +16,7 @@ function init(){
  ['CPU Models / CPU Box',shop+'cpu-setup.html'],
  ['Arcade Box',shop+'arcade-box.html']]],
  ['Parts & Accessories',[
- ['Arcade Accessories',shop],
+ ['Arcade Accessories',shop+'arcade.html?view=category'],
  ['PS2 Accessories',shop+'ps2.html'],['PS3 Accessories',shop+'ps3.html'],
  ['PS4 Accessories',shop+'ps4.html'],['PS5 Accessories',shop+'ps5.html'],
  ['Gaming Accessories',shop+'gaming.html'],['Computer Parts',shop+'cpu.html']]],
