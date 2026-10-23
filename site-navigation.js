@@ -1,13 +1,15 @@
 (function(){
 'use strict';
 function init(){
+ if(!window.GPImagePaths&&!document.getElementById('gp-image-path-loader')){const im=document.createElement('script');im.id='gp-image-path-loader';im.src='https://gamesplanet13.github.io/arcade-accessories-/image-paths.js?v=20261023';document.head.append(im)}
  if(document.getElementById('gp-global-navigation'))return;
  const base='https://gamesplanet13.github.io/',shop=base+'arcade-accessories-/';
  const groups=[
  ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'order-prefill.html?source=cart&shared=1'],['Owner Dashboard',shop+'admin-orders.html']]],
  ['Consoles & Game Systems',[
  ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
- ['Game Consoles · PS4',shop+'consoles.html'],
+ ['All Consoles · PS2 / PS3 / PS4 / Pro',shop+'console-store.html'],
+ ['Console Accessories & Models',shop+'consoles.html'],
  ['PS2 Console',base+'ps2/'],
  ['PS2 FMCB & USB',base+'ps2fmcb/'],
  ['CPU Models / CPU Box',shop+'cpu-setup.html'],

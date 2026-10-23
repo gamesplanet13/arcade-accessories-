@@ -338,9 +338,9 @@
   <div class="card" style="text-align:center; margin-top:20px;">
     <span class="badge" id="paymentQrBadge">Non-GST Payment QR</span>
     <div style="margin:15px 0;">
-      <img id="paymentQrImage" src="./NonGSTcurrentQR.jpg" alt="Games Planet Zone payment QR Code" style="max-width:260px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.15);" />
+      <img id="paymentQrImage" src="./images/NonGSTcurrentQR.jpg" alt="Games Planet Zone payment QR Code" style="max-width:260px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.15);" />
     </div>
-    <a id="paymentQrDownload" href="./NonGSTcurrentQR.jpg" download="Games_Planet_Zone_Non_GST_QR.jpg" class="btn act">⬇️ Download QR</a>
+    <a id="paymentQrDownload" href="./images/NonGSTcurrentQR.jpg" download="Games_Planet_Zone_Non_GST_QR.jpg" class="btn act">⬇️ Download QR</a>
   </div>
 </div>
 
@@ -1195,7 +1195,7 @@ function gpzUpdatePaymentQr(invoiceIncluded){
   const link=document.getElementById("paymentQrDownload");
   const badge=document.getElementById("paymentQrBadge");
   if(!img||!link||!badge)return;
-  const src=invoiceIncluded?"./GSTcurrentQR.png":"./NonGSTcurrentQR.jpg";
+  const src=invoiceIncluded?"./images/GSTcurrentQR.png":"./images/NonGSTcurrentQR.jpg";
   img.onerror=null;
   img.src=src;
   img.alt=invoiceIncluded?"Games Planet Zone GST payment QR Code":"Games Planet Zone non-GST payment QR Code";
