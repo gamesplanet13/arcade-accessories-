@@ -1,5 +1,6 @@
-const CACHE_NAME="games-planet-images-20261023";
+const CACHE_NAME="games-planet-website-20261023";
 const APP_SHELL=[
+  "./website-theme.css","./website-shell.js","./home.css","./home.js","./home-data.js","./pages.html","./services.html","./help.html","./contact.html","./game-selectors.html","./cart.html","./cart-page.js","./cart-page.css",
   "./console-store.html","./console-store.css","./console-store.js","./console-store-data.js","./image-paths.js",
   "./","./index.html","./layout-safety.css","./classic.html","./new.html","./store-navigation.js","./stock-rules.js","./stock-ui.js","./stock-checkout.js","./images/cpu-box-zebronics.png","./images/switch-pin-4-8mm.png","./configure.html","./configure.js","./configure.css","./setup-data.js","./setup-engine.js","./configured-cart.js","./setup-checkout.js","./game-selector.html","./selector-order.js","./Simple.html","./order-prefill.html","./bigship-rate-calculator.html","./delhivery-config.js","./invoice.html","./manifest.webmanifest",
   "./assets/html2canvas.min.js",

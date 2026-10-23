@@ -5,7 +5,8 @@ function init(){
  if(document.getElementById('gp-global-navigation'))return;
  const base='https://gamesplanet13.github.io/',shop=base+'arcade-accessories-/';
  const groups=[
- ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'order-prefill.html?source=cart&shared=1'],['Owner Dashboard',shop+'admin-orders.html']]],
+ ['Explore GAMES PLANET',[[ 'Home · All Collections',shop],['All Website Pages',shop+'pages.html'],['Game Selectors',shop+'game-selectors.html'],['Help & Services',shop+'services.html'],['Contact & Shop Location',shop+'contact.html']]],
+ ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'cart.html'],['Owner Dashboard',shop+'admin-orders.html']]],
  ['Consoles & Game Systems',[
  ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
  ['All Consoles · PS2 / PS3 / PS4 / Pro',shop+'console-store.html'],

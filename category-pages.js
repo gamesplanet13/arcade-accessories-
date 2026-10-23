@@ -1,6 +1,6 @@
 (function(){'use strict';
 const modern=location.pathname.split('/').pop().startsWith('new'),prefix=modern?'new-':'';
-const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const label=allView?'Arcade Accessories & Electronics':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
+const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&['index.html','catalog.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const label=allView?'Arcade Accessories & Electronics':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
 sessionStorage.setItem('gp_store_view',modern?'new.html':'index.html');sessionStorage.setItem('gp_category_page',page);
 const href=slug=>(['arcade-box','consoles'].includes(slug)?slug+'.html':prefix+slug+'.html')+(slug==='arcade'?'?view=category':'');
 const allHref=prefix+'arcade.html?view=all';
