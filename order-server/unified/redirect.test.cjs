@@ -1,6 +1,6 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
-const source=fs.readFileSync(__dirname+'/order-records.js','utf8');
+const source=fs.readFileSync(__dirname+'/../../order-records.js','utf8');
 function boot({failure=false,denied=false,hung=false}={}){
  const fields={},data=new Map(),timers=[],requests=[];let popupCount=0;
  const location={pathname:'/Ordernow/',search:'',href:'https://example.test/Ordernow/'};
