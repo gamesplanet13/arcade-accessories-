@@ -1931,6 +1931,7 @@ products.push(...[{"name": "CPU Box — 6 Configurations", "price": 7580, "categ
 
 products.push(...[{"name": "4.8mm Handle Switch Connector Pin", "category": "Arcade Box Accessories", "price": 5, "weight": 0, "dimensions": [], "sizeLabel": "4.8 mm", "features": ["Available • ₹5 per pin", "Fits switches on MD and Rasila handles", "Photo shows two sides of one pin"], "images": ["images/switch-pin-4-8mm.png"]}, {"name": "10 Core Wire — ₹35 per Meter", "category": "Arcade Box Accessories", "price": 35, "weight": 0, "dimensions": [], "features": ["Available • Sold per meter", "Selected quantity means total meter length"], "images": ["images/jpeg/10-core-wire.jpg"]}]);
 products.push({name:'Best HDMI Cable',category:'Cables',price:350,weight:0,dimensions:[],images:['images/jpeg/hdmicable.jpeg'],compatibility:'PS2 HDMI converter, PS3, PS4, PS5, PC and Laptop'});
+products.push(...[{"name": "Double Side Tape — 12 mm × 1.2 m", "category": "Electrical Items", "price": 35, "weight": 60, "dimensions": [10, 10, 2], "features": ["For electronics use", "Tape width: 12 mm • Roll length: 1.2 m", "₹35 per roll"], "images": ["images/jpeg/double-side-tape-studio.jpg"]}, {"name": "Glue Gun Stick", "category": "Electrical Items", "price": 15, "weight": 70, "dimensions": [15, 2, 2], "features": ["Hot glue stick for glue guns", "₹15 per stick • Quantity means number of sticks"], "images": ["images/jpeg/glue-gun-stick-studio.jpg"]}, {"name": "Cable Ties for Electronics — 100 pcs Pack", "category": "Electrical Items", "price": 60, "priceLabel": "₹60 / pack (100 pcs)", "weight": 150, "dimensions": [], "sizeLabel": "4.5 mm × 6 inch (each tie)", "packLabel": "100 ties per pack", "features": ["For electronics wire bundling", "₹60 per pack • Quantity 1 = 100 ties", "Pack weight: 150 g"], "images": ["images/jpeg/electronics-cable-ties-studio.jpg"]}]);
 GPShop.prepare(products);
 const state = (()=>{try{return GPShop.migrate(JSON.parse(localStorage.getItem("gp_cart")||"{}"),products)}catch(_){return {}}})();
 const container=document.getElementById("products");
@@ -2004,7 +2005,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
   <div class="info">
    <div>
     <div class="price">${p.priceLabel || ("₹"+p.price)}</div>
-    <small>${p.weight} g / piece${p.compatibility?'<br><b>Compatibility:</b> '+p.compatibility:''}</small>
+    <small>${p.weight} g / ${p.packLabel?"pack":"piece"}${p.compatibility?'<br><b>Compatibility:</b> '+p.compatibility:''}</small>
    </div>
    ${p.variants?`<div class="variant-list">${p.variants.map(v=>{const variantImg=p.variantImages?.[v]||p.images?.[0]||"",variantPrice=p.variantPrices?.[v]??p.price;return `<div class="variant-row"><span class="variant-label">${variantImg?`<img class="variant-thumb" src="${variantImg}" loading="lazy" decoding="async" alt="${p.name} ${v}" onclick="openImg('${variantImg}')">`:`<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999"></span>`}<span>${v} — ₹${variantPrice}</span></span><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><span id="vq${i}_${v.replace(/\s+/g,'_')}">${state['v_'+i+'_'+v]||0}</span><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`}).join('')}</div>`:`<div class="qty">
     <button onclick="updateQty(${i},-1)">−</button>
