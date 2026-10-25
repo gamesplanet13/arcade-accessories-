@@ -1934,6 +1934,7 @@ products.push({name:'Best HDMI Cable',category:'Cables',price:350,weight:0,dimen
 products.push(...[{"name": "Double Side Tape — 12 mm × 1.2 m", "category": "Electrical Items", "price": 35, "weight": 60, "dimensions": [10, 10, 2], "features": ["For electronics use", "Tape width: 12 mm • Roll length: 1.2 m", "₹35 per roll"], "images": ["images/jpeg/double-side-tape-studio.jpg"]}, {"name": "Glue Gun Stick", "category": "Electrical Items", "price": 15, "weight": 70, "dimensions": [15, 2, 2], "features": ["Hot glue stick for glue guns", "₹15 per stick • Quantity means number of sticks"], "images": ["images/jpeg/glue-gun-stick-studio.jpg"]}, {"name": "Cable Ties for Electronics — 100 pcs Pack", "category": "Electrical Items", "price": 60, "priceLabel": "₹60 / pack (100 pcs)", "weight": 150, "dimensions": [], "sizeLabel": "150 × 4.6 mm (approx. 6 inch, each tie)", "packLabel": "100 ties per pack", "features": ["For electronics wire bundling", "Heavier 150S • Nylon cable ties", "Actual packet photo included • Label: 150 × 4.6 mm, 100 PCS", "₹60 per pack • Quantity 1 = 100 ties", "Pack weight: 150 g"], "images": ["images/jpeg/electronics-cable-ties-studio.jpg", "images/jpeg/electronics-cable-ties-actual-pack.jpg"]}]);
 products.push({"name":"PS4 Controller Rubber Set","category":"PS4","price":150,"weight":10,"dimensions":[5,5,1],"packLabel":"1 rubber set","features":["Conductive rubber membrane replacement set for PS4 controllers","₹150 per set","Photos show loose parts and the packed set"],"images":["images/jpeg/ps4-controller-rubber-set-parts.jpg","images/jpeg/ps4-controller-rubber-set-pack.jpg"]});
 products.push(...[{"name":"Ribbon for PS2 Slim — 7XXXX to 9XXXX Series","category":"PS2","price":100,"weight":1,"dimensions":[],"sizeLabel":"Not specified","features":["Compatible with PS2 Slim 7XXXX to 9XXXX series","₹100 per ribbon • Quantity 1 = one ribbon","Ribbon only; reset button PCB is sold separately"],"images":["images/jpeg/ps2-slim-ribbon-contacts.jpg","images/jpeg/ps2-slim-ribbon-back.jpg"]},{"name":"PS2 Slim 90XXX Reset Button with PCB","category":"PS2","price":300,"priceLabel":"₹300 without ribbon / ₹400 with ribbon","weight":10,"dimensions":[2,2,2],"variants":["Without Ribbon","With Ribbon"],"variantPrices":{"Without Ribbon":300,"With Ribbon":400},"features":["For PS2 Slim 90XXX series","Without Ribbon: reset button with PCB only — ₹300","With Ribbon: reset button with PCB + 1 ribbon — ₹400","Both photos show the two sides of the same PCB"],"images":["images/jpeg/ps2-slim-90xxx-reset-front.jpg","images/jpeg/ps2-slim-90xxx-reset-back.jpg"]}]);
+products.push(...[{"name":"PS2 Slim 7XXXX Reset Button with PCB","category":"PS2","price":300,"priceLabel":"₹300 without ribbon / ₹400 with ribbon","weight":10,"dimensions":[2,2,2],"variants":["Without Ribbon","With Ribbon"],"variantPrices":{"Without Ribbon":300,"With Ribbon":400},"features":["For PS2 Slim models starting with 7 (7XXXX series)","Without Ribbon: reset button + PCB only — ₹300","With Ribbon: reset button + PCB + 1 PS2 ribbon — ₹400","Photo shows both sides of one PCB"],"images":["images/jpeg/ps2-7xxxx-reset.jpg"]},{"name":"PS3 Super Slim Power / Reset Button with PCB","category":"PS3","price":800,"priceLabel":"₹800 without ribbon / ₹950 with ribbon","weight":10,"dimensions":[2,2,2],"variants":["Without Ribbon","With Ribbon"],"variantPrices":{"Without Ribbon":800,"With Ribbon":950},"features":["For PS3 Super Slim","Without Ribbon: power/reset button + PCB — ₹800","With Ribbon: PCB + 1 PS3 Super Slim power ribbon — ₹950","Photo shows both sides of one PCB"],"images":["images/jpeg/ps3-super-slim-reset.jpg"]},{"name":"PS3 Super Slim Power Ribbon / Flex Cable","category":"PS3","price":150,"weight":10,"dimensions":[2,2,2],"features":["Ribbon only — PCB sold separately","₹150 per piece"],"images":["images/jpeg/ps3-super-slim-ribbon.jpg"]},{"name":"Controller Analog Mechanism","category":"Gaming Accessories","price":400,"priceLabel":"₹400 without cap • PS4 cap ₹530 • PS5 cap ₹580","weight":50,"dimensions":[5.08,5.08,5.08],"sizeLabel":"2 × 2 × 2 inch","variants":["Without Cap","With PS4 Cap","With PS5 Cap"],"variantPrices":{"Without Cap":400,"With PS4 Cap":530,"With PS5 Cap":580},"variantWeights":{"Without Cap":50,"With PS4 Cap":100,"With PS5 Cap":100},"features":["Replacement analog mechanism for PS4 / PS5 / Xbox controller repairs","Without Cap: 1 mechanism only — ₹400 / 50 g","With PS4 Cap: 1 mechanism + 1 PS4 cap — ₹530 / 100 g","With PS5 Cap: 1 mechanism + 1 PS5 cap — ₹580 / 100 g","Photos are different views of the same mechanism"],"images":["images/jpeg/controller-analog-mechanism.jpg"]},{"name":"PS4 Analog Stick Cap","category":"PS4","price":130,"weight":50,"dimensions":[5.08,5.08,5.08],"sizeLabel":"2 × 2 × 2 inch","features":["₹130 per cap • Quantity 1 = one cap","Cap only — analog mechanism not included","Photo shows different views of one cap"],"images":["images/jpeg/ps4-analog-cap.jpg"]},{"name":"PS5 Analog Stick Cap","category":"PS5","price":180,"weight":50,"dimensions":[5.08,5.08,5.08],"sizeLabel":"2 × 2 × 2 inch","features":["₹180 per cap • Quantity 1 = one cap","Cap only — analog mechanism not included","Photo shows different views of one cap"],"images":["images/jpeg/ps5-analog-cap.jpg"]}]);
 GPShop.prepare(products);
 const state = (()=>{try{return GPShop.migrate(JSON.parse(localStorage.getItem("gp_cart")||"{}"),products)}catch(_){return {}}})();
 const container=document.getElementById("products");
@@ -2009,7 +2010,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
     <div class="price">${p.priceLabel || ("₹"+p.price)}</div>
     <small>${p.weight} g / ${p.packLabel?"pack":"piece"}${p.compatibility?'<br><b>Compatibility:</b> '+p.compatibility:''}</small>
    </div>
-   ${p.variants?`<div class="variant-list">${p.variants.map(v=>{const variantImg=p.variantImages?.[v]||p.images?.[0]||"",variantPrice=p.variantPrices?.[v]??p.price;return `<div class="variant-row"><span class="variant-label">${variantImg?`<img class="variant-thumb" src="${variantImg}" loading="lazy" decoding="async" alt="${p.name} ${v}" onclick="openImg('${variantImg}')">`:`<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999"></span>`}<span>${v} — ₹${variantPrice}</span></span><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><span id="vq${i}_${v.replace(/\s+/g,'_')}">${state['v_'+i+'_'+v]||0}</span><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`}).join('')}</div>`:`<div class="qty">
+   ${p.variants?`<div class="variant-list">${p.variants.map(v=>{const variantImg=p.variantImages?.[v]||p.images?.[0]||"",variantPrice=p.variantPrices?.[v]??p.price;return `<div class="variant-row"><span class="variant-label">${variantImg?`<img class="variant-thumb" src="${variantImg}" loading="lazy" decoding="async" alt="${p.name} ${v}" onclick="openImg('${variantImg}')">`:`<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999"></span>`}<span>${v} — ₹${variantPrice}${p.variantWeights?` • ${effectiveUnitWeight(p,v)} g`:""}</span></span><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><span id="vq${i}_${v.replace(/\s+/g,'_')}">${state['v_'+i+'_'+v]||0}</span><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`}).join('')}</div>`:`<div class="qty">
     <button onclick="updateQty(${i},-1)">−</button>
     <span id="q${i}">${state[i]}</span>
     <button onclick="updateQty(${i},1)">+</button>
@@ -2233,6 +2234,7 @@ function selectedProductQuantity(p,i){
  if(p.variants) p.variants.forEach(v=>quantity+=Number(state['v_'+i+'_'+v]||0));
  return quantity;
 }
+function effectiveUnitWeight(p,variant=""){ return Number(p.variantWeights?.[variant] ?? p.weight) || 0; }
 function effectiveUnitPrice(p,i,variant=""){
  const rule=QUANTITY_PRICE_RULES[p.name];
  return rule&&selectedProductQuantity(p,i)>=rule.min?rule.price:(p.variantPrices?.[variant]??p.price);
@@ -2257,9 +2259,9 @@ function render(){
     p.variants.forEach(v=>{
       const q=state['v_'+i+'_'+v]||0;
       if(q>0){
-        const unitPrice=effectiveUnitPrice(p,i,v), sp=unitPrice*q, sw=p.weight*q;
+        const unitPrice=effectiveUnitPrice(p,i,v), sp=unitPrice*q, unitWeight=effectiveUnitWeight(p,v), sw=unitWeight*q;
         total+=sp; totalWeight+=sw;
-        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>${p.weight}g × ${q} = ${sw}g</div>`;
+        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==(p.variantPrices?.[v]??p.price)?' <small>(quantity price)</small>':''}<br>${unitWeight}g × ${q} = ${sw}g</div>`;
       }
     });
   }
@@ -2564,7 +2566,7 @@ function orderWhatsApp(){
     p.variants.forEach(v=>{
       const q=state['v_'+i+'_'+v]||0;
       if(q>0){
-        const sp=p.price*q, sw=p.weight*q;
+        const sp=effectiveUnitPrice(p,i,v)*q, sw=effectiveUnitWeight(p,v)*q;
         total+=sp;
         totalWeight+=sw;
         lines.push(`${n}) ${p.name} - ${v} x${q} = ₹${sp} (${sw}g)`);
@@ -2657,7 +2659,8 @@ function buildOrderSummary(){
          if(p.containsBattery) hasBatteryItem=true;
          const unitPrice=effectiveUnitPrice(p,i,v);
          const lineTotal=unitPrice*quantity;
-         const lineWeight=p.weight*quantity;
+         const unitWeight=effectiveUnitWeight(p,v);
+         const lineWeight=unitWeight*quantity;
          items.push({
            name:`${p.name} - ${v}`,
            product:p.name,
@@ -2666,10 +2669,10 @@ function buildOrderSummary(){
            unitPrice,
            baseUnitPrice:p.price,
            lineTotal,
-           unitWeight:p.weight,
+           unitWeight,
            lineWeight,
            dimensions:p.dimensions||[],
-           automaticQuantityPrice:unitPrice!==p.price
+           automaticQuantityPrice:unitPrice!==(p.variantPrices?.[v]??p.price)
          });
          productTotal+=lineTotal;
          totalWeight+=lineWeight;
@@ -2683,7 +2686,8 @@ function buildOrderSummary(){
      if(p.containsBattery) hasBatteryItem=true;
      const unitPrice=effectiveUnitPrice(p,i);
      const lineTotal=unitPrice*quantity;
-     const lineWeight=p.weight*quantity;
+     const unitWeight=effectiveUnitWeight(p);
+     const lineWeight=unitWeight*quantity;
      items.push({
        name:p.name,
        product:p.name,
@@ -2692,7 +2696,7 @@ function buildOrderSummary(){
        unitPrice,
        baseUnitPrice:p.price,
        lineTotal,
-       unitWeight:p.weight,
+       unitWeight,
        lineWeight,
        dimensions:p.dimensions||[],
        automaticQuantityPrice:unitPrice!==p.price
@@ -3915,7 +3919,7 @@ function getSelectedPhysicalItems(){
           items.push({
             name:`${p.name} - ${v}`,
             dims:[...p.dimensions],
-            weight:p.weight,
+            weight:effectiveUnitWeight(p,v),
             image
           });
         }
