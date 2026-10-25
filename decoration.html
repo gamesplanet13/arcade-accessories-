@@ -1197,7 +1197,7 @@ img,canvas{
 
 </style>
 
-<script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js"></script><link rel="stylesheet" href="category-pages.css"></head>
+<script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js?v=20261025-products-final"></script><link rel="stylesheet" href="category-pages.css"></head>
 
 <body data-shop-page="decoration"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
 
@@ -2230,6 +2230,7 @@ function selectedProductQuantity(p,i){
  if(p.variants) p.variants.forEach(v=>quantity+=Number(state['v_'+i+'_'+v]||0));
  return quantity;
 }
+function effectiveUnitWeight(p,variant=""){return Number(p.variantWeights?.[variant]??p.weight)||0;}
 function effectiveUnitPrice(p,i,variant=""){
  const rule=QUANTITY_PRICE_RULES[p.name];
  return rule&&selectedProductQuantity(p,i)>=rule.min?rule.price:(p.variantPrices?.[variant]??p.price);
@@ -2254,9 +2255,9 @@ function render(){
     p.variants.forEach(v=>{
       const q=state['v_'+i+'_'+v]||0;
       if(q>0){
-        const unitPrice=effectiveUnitPrice(p,i,v), sp=unitPrice*q, sw=p.weight*q;
+        const unitPrice=effectiveUnitPrice(p,i,v), sp=unitPrice*q, unitWeight=effectiveUnitWeight(p,v), sw=unitWeight*q;
         total+=sp; totalWeight+=sw;
-        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>${p.weight}g × ${q} = ${sw}g</div>`;
+        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==(p.variantPrices?.[v]??p.price)?' <small>(quantity price)</small>':''}<br>${unitWeight}g × ${q} = ${sw}g</div>`;
       }
     });
   }
@@ -2307,8 +2308,6 @@ function render(){
  generateBoxPlanner();
  generatePackingGuide();
 }
-
-
 
 function toTransparentPngAsset(src){
   if(!src) return "";
@@ -2654,7 +2653,8 @@ function buildOrderSummary(){
          if(p.containsBattery) hasBatteryItem=true;
          const unitPrice=effectiveUnitPrice(p,i,v);
          const lineTotal=unitPrice*quantity;
-         const lineWeight=p.weight*quantity;
+         const unitWeight=effectiveUnitWeight(p,v);
+         const lineWeight=unitWeight*quantity;
          items.push({
            name:`${p.name} - ${v}`,
            product:p.name,
@@ -2663,10 +2663,10 @@ function buildOrderSummary(){
            unitPrice,
            baseUnitPrice:p.price,
            lineTotal,
-           unitWeight:p.weight,
+           unitWeight,
            lineWeight,
            dimensions:p.dimensions||[],
-           automaticQuantityPrice:unitPrice!==p.price
+           automaticQuantityPrice:unitPrice!==(p.variantPrices?.[v]??p.price)
          });
          productTotal+=lineTotal;
          totalWeight+=lineWeight;
@@ -2680,7 +2680,8 @@ function buildOrderSummary(){
      if(p.containsBattery) hasBatteryItem=true;
      const unitPrice=effectiveUnitPrice(p,i);
      const lineTotal=unitPrice*quantity;
-     const lineWeight=p.weight*quantity;
+     const unitWeight=effectiveUnitWeight(p);
+     const lineWeight=unitWeight*quantity;
      items.push({
        name:p.name,
        product:p.name,
@@ -2689,7 +2690,7 @@ function buildOrderSummary(){
        unitPrice,
        baseUnitPrice:p.price,
        lineTotal,
-       unitWeight:p.weight,
+       unitWeight,
        lineWeight,
        dimensions:p.dimensions||[],
        automaticQuantityPrice:unitPrice!==p.price
@@ -3912,7 +3913,7 @@ function getSelectedPhysicalItems(){
           items.push({
             name:`${p.name} - ${v}`,
             dims:[...p.dimensions],
-            weight:p.weight,
+            weight:effectiveUnitWeight(p,v),
             image
           });
         }
@@ -3934,6 +3935,7 @@ function getSelectedPhysicalItems(){
 }
 
 /* Override placement creator so image information stays attached */
+
 function getPackingPlacements(items,outerBox){
   const inner=outerBox.map(v=>Math.max(0,v-2));
   const sorted=items
@@ -4272,5 +4274,5 @@ document.getElementById("optionalGameModal")?.addEventListener("click",function(
 
 
 
-<script src="setup-data.js"></script><script src="setup-engine.js?v=20261019-arcade-cpu"></script><script src="stock-rules.js"></script><script src="stock-ui.js"></script><script src="configured-cart.js"></script><script src="category-pages.js"></script><script src="site-navigation.js?v=20261016-nav"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/ps2-style-footer.js?v=20261016-ps2-view"></script></body>
+<script src="setup-data.js"></script><script src="setup-engine.js?v=20261019-arcade-cpu"></script><script src="stock-rules.js"></script><script src="stock-ui.js"></script><script src="configured-cart.js"></script><script src="category-pages.js?v=20261025-products-final"></script><script src="site-navigation.js?v=20261025-products-final"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/ps2-style-footer.js?v=20261016-ps2-view"></script></body>
 </html>

@@ -13,6 +13,7 @@ function init(){
  ['CPU Models / CPU Box',shop+'cpu-setup.html'],
  ['Arcade Box',shop+'arcade-box.html']]],
  ['Parts & Accessories',[
+ ['New Products / नए प्रोडक्ट',shop+'arcade.html?view=new'],
  ['Arcade Accessories',shop],
  ['PS2 Accessories',shop+'ps2.html'],['PS3 Accessories',shop+'ps3.html'],
  ['PS4 Accessories',shop+'ps4.html'],['PS5 Accessories',shop+'ps5.html'],
