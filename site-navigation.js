@@ -1,22 +1,19 @@
 (function(){
 'use strict';
 function init(){
- if(!window.GPImagePaths&&!document.getElementById('gp-image-path-loader')){const im=document.createElement('script');im.id='gp-image-path-loader';im.src='https://gamesplanet13.github.io/arcade-accessories-/image-paths.js?v=20261023';document.head.append(im)}
  if(document.getElementById('gp-global-navigation'))return;
  const base='https://gamesplanet13.github.io/',shop=base+'arcade-accessories-/';
  const groups=[
- ['Explore GAMES PLANET',[[ 'Home · All Collections',shop],['All Website Pages',shop+'pages.html'],['Customer Category Links',shop+'share-links.html'],['Game Selectors',shop+'game-selectors.html'],['Help & Services',shop+'services.html'],['Contact & Shop Location',shop+'contact.html']]],
- ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'cart.html'],['Owner Dashboard',shop+'admin-orders.html']]],
+ ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'order-prefill.html?source=cart&shared=1'],['Owner Dashboard',shop+'admin-orders.html']]],
  ['Consoles & Game Systems',[
  ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
- ['All Consoles · PS2 / PS3 / PS4 / Pro',shop+'console-store.html'],
- ['Console Accessories & Models',shop+'consoles.html'],
+ ['Game Consoles · PS4',shop+'consoles.html'],
  ['PS2 Console',base+'ps2/'],
  ['PS2 FMCB & USB',base+'ps2fmcb/'],
  ['CPU Models / CPU Box',shop+'cpu-setup.html'],
  ['Arcade Box',shop+'arcade-box.html']]],
  ['Parts & Accessories',[
- ['Arcade Accessories',shop+'arcade.html?view=category'],
+ ['Arcade Accessories',shop],
  ['PS2 Accessories',shop+'ps2.html'],['PS3 Accessories',shop+'ps3.html'],
  ['PS4 Accessories',shop+'ps4.html'],['PS5 Accessories',shop+'ps5.html'],
  ['Gaming Accessories',shop+'gaming.html'],['Computer Parts',shop+'cpu.html']]],

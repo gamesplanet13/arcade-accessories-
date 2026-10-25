@@ -59,7 +59,7 @@
   @media(max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
   @media(max-width:720px){.grid2,.grid3,.choice-grid{grid-template-columns:1fr}}
 </style>
-<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style><script src="cpu-shipping.js?v=2"></script><script src="shared-store.js?v=20261019"></script><link rel="stylesheet" href="https://gamesplanet13.github.io/arcade-accessories-/website-theme.css?v=20261023-web"><script defer src="https://gamesplanet13.github.io/arcade-accessories-/website-shell.js?v=20261023-web"></script></head>
+<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style><script src="cpu-shipping.js?v=2"></script><script src="shared-store.js?v=20261019"></script></head>
 <body>
 <div class="wrap">
   <h1>Games Planet — Quick Order</h1>
@@ -338,9 +338,9 @@
   <div class="card" style="text-align:center; margin-top:20px;">
     <span class="badge" id="paymentQrBadge">Non-GST Payment QR</span>
     <div style="margin:15px 0;">
-      <img id="paymentQrImage" src="./images/NonGSTcurrentQR.jpg" alt="Games Planet Zone payment QR Code" style="max-width:260px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.15);" />
+      <img id="paymentQrImage" src="./NonGSTcurrentQR.jpg" alt="Games Planet Zone payment QR Code" style="max-width:260px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.15);" />
     </div>
-    <a id="paymentQrDownload" href="./images/NonGSTcurrentQR.jpg" download="Games_Planet_Zone_Non_GST_QR.jpg" class="btn act">⬇️ Download QR</a>
+    <a id="paymentQrDownload" href="./NonGSTcurrentQR.jpg" download="Games_Planet_Zone_Non_GST_QR.jpg" class="btn act">⬇️ Download QR</a>
   </div>
 </div>
 
@@ -1195,7 +1195,7 @@ function gpzUpdatePaymentQr(invoiceIncluded){
   const link=document.getElementById("paymentQrDownload");
   const badge=document.getElementById("paymentQrBadge");
   if(!img||!link||!badge)return;
-  const src=invoiceIncluded?"./images/GSTcurrentQR.png":"./images/NonGSTcurrentQR.jpg";
+  const src=invoiceIncluded?"./GSTcurrentQR.png":"./NonGSTcurrentQR.jpg";
   img.onerror=null;
   img.src=src;
   img.alt=invoiceIncluded?"Games Planet Zone GST payment QR Code":"Games Planet Zone non-GST payment QR Code";
