@@ -1,16 +1,176 @@
+window.getSelectedPhysicalItems=function getSelectedPhysicalItems(){
+  const items=[];
+  products.forEach((p,i)=>{
+    if(p.variants){
+      p.variants.forEach(v=>{
+        const qty=state['v_'+i+'_'+v]||0;
+        const image=toTransparentPngAsset((p.variantImages&&p.variantImages[v]) || (p.images&&p.images[0]) || "");
+        for(let n=0;n<qty;n++){
+          items.push({
+            name:`${p.name} - ${v}`,
+            dims:[...p.dimensions],
+            weight:effectiveUnitWeight(p,v),
+            image
+          });
+        }
+      });
+    }else{
+      const qty=state[i]||0;
+      const image=toTransparentPngAsset((p.images&&p.images[0])||"");
+      for(let n=0;n<qty;n++){
+        items.push({
+          name:p.name,
+          dims:[...p.dimensions],
+          weight:p.weight,
+          image
+        });
+      }
+    }
+  });
+  return items;
+}
+
+/* Override placement creator so image information stays attached */;
+window.effectiveUnitWeight=function(p,variant=""){return Number(p.variantWeights?.[variant]??p.weight)||0;};
+window.render=function render(){
+ let html="", total=0, totalWeight=0;
+
+ products.forEach((p,i)=>{
+  if(p.variants){
+    p.variants.forEach(v=>{
+      const q=state['v_'+i+'_'+v]||0;
+      if(q>0){
+        const unitPrice=effectiveUnitPrice(p,i,v), sp=unitPrice*q, unitWeight=effectiveUnitWeight(p,v), sw=unitWeight*q;
+        total+=sp; totalWeight+=sw;
+        html+=`<div style="border-bottom:1px dashed #444;margin-bottom:8px"><b>${p.name} - ${v}</b><br>₹${unitPrice} × ${q} = ₹${sp}${unitPrice!==(p.variantPrices?.[v]??p.price)?' <small>(quantity price)</small>':''}<br>${unitWeight}g × ${q} = ${sw}g</div>`;
+      }
+    });
+  }
+  if(state[i]>0){
+   const qty=state[i];
+   const unitPrice=effectiveUnitPrice(p,i), sp=unitPrice*qty;
+   const sw=p.weight*qty;
+   total+=sp; totalWeight+=sw;
+   html+=`
+   <div style="border-bottom:1px dashed #444;margin-bottom:8px">
+    <b>${p.name}</b><br>
+    ₹${unitPrice} × ${qty} = ₹${sp}${unitPrice!==p.price?' <small>(quantity price)</small>':''}<br>
+    ${p.weight}g × ${qty} = ${sw}g
+   </div>`;
+  }
+ });
+
+ document.getElementById("orderList").innerHTML=html||"No items selected";
+ 
+ document.getElementById("total").innerText=total;
+ document.getElementById("totalWeight").innerText=totalWeight;
+
+ let itemCount=0;
+
+ products.forEach((p,i)=>{
+   if(p.variants){
+      p.variants.forEach(v=>{
+         itemCount += state['v_'+i+'_'+v] || 0;
+      });
+   }
+   itemCount += state[i] || 0;
+ });
+
+ const topCartItemCount=document.getElementById("topCartItemCount");
+ if(topCartItemCount) topCartItemCount.innerText=itemCount;
+
+ const packingWeight = itemCount>0 ? Math.ceil(totalWeight/1000)*300 : 0;
+ const packedWeight = totalWeight + packingWeight;
+ const chargeableKg = itemCount>0 ? Math.ceil(packedWeight/1000) : 0;
+ document.getElementById("packingWeight").innerText=packingWeight;
+ const courierKgEl=document.getElementById("courierWeightKg");
+ if(courierKgEl) courierKgEl.innerText=chargeableKg;
+
+ document.getElementById("floatingSummary").innerHTML =
+ `Products: ${itemCount} | Amount: ₹${total} | Weight: ${totalWeight}g | Select payment & delivery on next page`;
+
+ generateCombinedPoster();
+ generateBoxPlanner();
+ generatePackingGuide();
+};
+window.buildOrderSummary=function buildOrderSummary(){
+ const items=[];
+ let productTotal=0;
+ let totalWeight=0;
+ let totalQuantity=0;
+ let hasBatteryItem=false;
+
+ products.forEach((p,i)=>{
+   if(p.variants){
+     p.variants.forEach(v=>{
+       const quantity=state['v_'+i+'_'+v]||0;
+       if(quantity>0){
+         if(p.containsBattery) hasBatteryItem=true;
+         const unitPrice=effectiveUnitPrice(p,i,v);
+         const lineTotal=unitPrice*quantity;
+         const unitWeight=effectiveUnitWeight(p,v);
+         const lineWeight=unitWeight*quantity;
+         items.push({
+           name:`${p.name} - ${v}`,
+           product:p.name,
+           variant:v,
+           quantity,
+           unitPrice,
+           baseUnitPrice:p.price,
+           lineTotal,
+           unitWeight,
+           lineWeight,
+           dimensions:p.dimensions||[],
+           automaticQuantityPrice:unitPrice!==(p.variantPrices?.[v]??p.price)
+         });
+         productTotal+=lineTotal;
+         totalWeight+=lineWeight;
+         totalQuantity+=quantity;
+       }
+     });
+   }
+
+   const quantity=state[i]||0;
+   if(quantity>0){
+     if(p.containsBattery) hasBatteryItem=true;
+     const unitPrice=effectiveUnitPrice(p,i);
+     const lineTotal=unitPrice*quantity;
+     const unitWeight=effectiveUnitWeight(p);
+     const lineWeight=unitWeight*quantity;
+     items.push({
+       name:p.name,
+       product:p.name,
+       variant:"",
+       quantity,
+       unitPrice,
+       baseUnitPrice:p.price,
+       lineTotal,
+       unitWeight,
+       lineWeight,
+       dimensions:p.dimensions||[],
+       automaticQuantityPrice:unitPrice!==p.price
+     });
+     productTotal+=lineTotal;
+     totalWeight+=lineWeight;
+     totalQuantity+=quantity;
+   }
+ });
+
+ return {items,productTotal,totalWeight,totalQuantity,hasBatteryItem};
+};
 (function(){'use strict';
 const modern=location.pathname.split('/').pop().startsWith('new'),prefix=modern?'new-':'';
-const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const label=allView?'Arcade Accessories & Electronics':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
+const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const newView=view==='new';const label=newView?'New Products / नए प्रोडक्ट':allView?'Arcade Accessories & Electronics':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
 sessionStorage.setItem('gp_store_view',modern?'new.html':'index.html');sessionStorage.setItem('gp_category_page',page);
 const href=slug=>(['arcade-box','consoles'].includes(slug)?slug+'.html':prefix+slug+'.html')+(slug==='arcade'?'?view=category':'');
 const allHref=prefix+'arcade.html?view=all';
-const links=()=>`<a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`+GPShop.pages.map(([slug,title])=>`<a href="${href(slug)}" ${slug===page?'aria-current="page"':''}>${title}</a>`).join('');
+const links=()=>`<a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''} style="background:#0e7490;color:white;font-weight:900">🆕 New Products / नए प्रोडक्ट</a>`+`<a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`+GPShop.pages.map(([slug,title])=>`<a href="${href(slug)}" ${slug===page?'aria-current="page"':''}>${title}</a>`).join('');
 const nav=document.createElement('section');nav.className='gp-category-nav';nav.innerHTML=`<div class="gp-page-tools"><button type="button" id="gpBack">← Back / वापस</button><a href="${href('arcade')}">Arcade Home</a><button type="button" id="gpCart">🛒 Cart & Checkout</button><a href="${['arcade-box','consoles'].includes(page)?page+'.html':(modern?'':'new-')+page+'.html'}${allView?'?view=all':''}">${modern?'Classic View':'New View'}</a></div><div class="gp-page-tools" style="margin-top:12px"><a href="https://gamesplanet13.github.io/ps2/" style="background:#ffd079;color:#112031;font-weight:bold">Buy PS2 →</a><a href="cpu-setup.html" style="background:#ffd079;color:#112031;font-weight:bold">Buy CPU Box →</a></div><h1>${label}</h1><p>किसी भी कैटेगरी से प्रोडक्ट जोड़ें — सभी एक ही कार्ट में रहेंगे।</p><nav class="gp-category-links" aria-label="Product categories">${links()}</nav>`;
 const catalog=document.getElementById('products');catalog.before(nav);
 document.getElementById('gpBack').onclick=()=>{let same=false;try{same=new URL(document.referrer).origin===location.origin}catch(_){}if(same&&history.length>1)history.back();else location.href=href('arcade')};
 document.getElementById('gpCart').onclick=()=>scrollToOrderDetails();
 const search=document.getElementById('storeSearch');
-function apply(){let count=0;const q=search?.value.toLowerCase().trim()||'';document.querySelectorAll('#products .category-panel').forEach(panel=>{let visible=0;panel.classList.add('is-open');if(allView){const toggle=panel.querySelector('.category-toggle');if(toggle){toggle.onclick=e=>{e.preventDefault();panel.classList.add('is-open');};toggle.setAttribute('aria-expanded','true');}}panel.querySelectorAll('.product').forEach(card=>{const name=card.querySelector('.product-title')?.textContent;const p=products.find(x=>x.name===name);const arcadeExcluded=p&&(allView||page==='arcade')&&(/xbox/i.test(p.name)||(/turbo/i.test(p.name)&&/controller|gamepad/i.test(p.name)));const ok=p&&!arcadeExcluded&&!(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name))&&p.name!=='Zippy Coin Drop Switch'&&!p.aliasOf&&(allView?!['cpu','gamebox','arcade-box','ps2','ps3','ps4','ps5','consoles','mobile','coolers'].includes(p.shopPage):p.shopPages.includes(page))&&(!q||card.textContent.toLowerCase().includes(q));card.hidden=!ok;card.style.display=ok?'':'none';if(ok)visible++});panel.hidden=!visible;panel.style.display=visible?'':'none';count+=visible});const empty=document.getElementById('storeEmpty');if(empty)empty.style.display=count?'none':'block';const ct=document.getElementById('storeCount');if(ct)ct.textContent=count+' products';document.title=label+' | GAMES PLANET';}
+function apply(){let count=0;const q=search?.value.toLowerCase().trim()||'';document.querySelectorAll('#products .category-panel').forEach(panel=>{let visible=0;panel.classList.add('is-open');if(allView){const toggle=panel.querySelector('.category-toggle');if(toggle){toggle.onclick=e=>{e.preventDefault();panel.classList.add('is-open');};toggle.setAttribute('aria-expanded','true');}}panel.querySelectorAll('.product').forEach(card=>{const title=card.querySelector('.product-title');const name=card.dataset.productName||(title?.textContent||'');card.dataset.productName=name;const p=products.find(x=>x.name===name);const arcadeExcluded=p&&(allView||page==='arcade')&&(/xbox/i.test(p.name)||(/turbo/i.test(p.name)&&/controller|gamepad/i.test(p.name)));const ok=p&&(newView||!arcadeExcluded)&&!(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name))&&p.name!=='Zippy Coin Drop Switch'&&!p.aliasOf&&(newView?p.isNew:allView?!['cpu','gamebox','arcade-box','ps2','ps3','ps4','ps5','consoles','mobile','coolers'].includes(p.shopPage):p.shopPages.includes(page))&&(!q||card.textContent.toLowerCase().includes(q));card.hidden=!ok;card.style.display=ok?'':'none';if(p?.isNew){card.dataset.newProduct='true';if(!card.querySelector('.gp-new-badge')){const badge=document.createElement('span');badge.className='gp-new-badge';badge.textContent='🆕 NEW';badge.style.cssText='display:inline-block;background:#0e7490;color:#fff;padding:3px 7px;border-radius:6px;font-weight:bold;margin-bottom:4px';card.querySelector('.product-title')?.prepend(badge);}}if(ok)visible++});panel.hidden=!visible;panel.style.display=visible?'':'none';count+=visible});const empty=document.getElementById('storeEmpty');if(empty)empty.style.display=count?'none':'block';const ct=document.getElementById('storeCount');if(ct)ct.textContent=count+' products';document.title=label+' | GAMES PLANET';}
 window.filterCatalog=value=>{const match=products.find(p=>p.category===value);if(value==='all'){location.href=allHref;return}if(match)location.href=href(match.shopPage)};
 const select=document.getElementById('catalogFilter');if(select)select.closest('.catalog-controls')?.setAttribute('hidden','');if(select)select.style.display='none';
 if(search){search.oninput=apply;search.closest('form').onsubmit=e=>{e.preventDefault();apply()};}
