@@ -31,3 +31,14 @@
 .product .variant-row .qty button,.classic-view .product .variant-row .qty button{width:32px!important;height:34px!important;min-width:32px!important;font-size:18px!important}
 .product .variant-label>span,.classic-view .product .variant-label>span{font-size:11px!important;line-height:1.35!important}
 @media(max-width:300px){.product .variant-row,.classic-view .product .variant-row{grid-template-columns:minmax(0,1fr)!important}}
+
+/* Matching product demos remain inside their product card. */
+#products .product .gp-product-media{grid-column:1/-1!important;grid-row:5!important;min-width:0;width:100%;margin-top:5px}
+#products .gp-image-note{font-size:10px;line-height:1.4;opacity:.8;margin:3px 0 6px}
+#products .gp-product-media details{border:1px solid #64748b;border-radius:8px;padding:8px}
+#products .gp-product-media summary{cursor:pointer;font-size:12px;font-weight:750;min-height:30px;display:flex;align-items:center}
+#products .gp-demo-credit{font-size:11px;margin:5px 0}
+#products .gp-product-player:empty{display:none}
+#products .gp-product-player iframe{display:block;width:100%;aspect-ratio:16/9;height:auto;border:0;border-radius:6px;background:#111}
+#products .gp-product-video-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#products .gp-product-video-links a{display:inline-flex;align-items:center;min-height:36px;padding:6px 9px;background:#b91c1c;color:#fff;border-radius:6px;font-size:11px;text-decoration:none}

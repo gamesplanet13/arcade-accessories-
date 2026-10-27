@@ -66,5 +66,39 @@
   "Intel Core i5 3rd Gen": {
     "image": "images/cpu/intel-core-i5-3rd-gen.jpg",
     "source": "https://i.ebayimg.com/images/g/87kAAOSwzRhgdTjZ/s-l1200.jpg"
+  },
+  "PS4 Slim 500GB Black": {
+    "image": "images/jpeg/ps4-slim-black-reference.jpg",
+    "source": "https://gmedia.playstation.com/is/image/SIEPDC/ps4-slim-image-block-01-en-24jul20?fmt=png-alpha&wid=1200",
+    "source_page": "https://www.playstation.com/en-in/ps4/",
+    "kind": "manufacturer reference photo",
+    "verified": "2026-10-27"
+  },
+  "PS4 Slim 500GB White": {
+    "image": "images/jpeg/ps4-slim-white-reference.jpg",
+    "source": "https://c1.staticflickr.com/1/544/32174380196_9ec5d7ca82_o.png",
+    "source_page": "https://blog.playstation.com/archive/2017/01/10/introducing-the-new-glacier-white-playstation-4-out-24th-january/",
+    "kind": "manufacturer reference photo",
+    "verified": "2026-10-27"
+  },
+  "PS4 Pro 1TB Black": {
+    "image": "images/jpeg/ps4-pro-black-reference.jpg",
+    "source": "https://gmedia.playstation.com/is/image/SIEPDC/ps4-pro-image-block-01-en-24jul20?fmt=png-alpha&wid=1200",
+    "source_page": "https://www.playstation.com/en-in/ps4/",
+    "kind": "manufacturer reference photo",
+    "verified": "2026-10-27"
+  },
+  "PS4 Pro 1TB White": {
+    "image": "images/jpeg/ps4-pro-white-reference.jpg",
+    "source": "https://farm5.staticflickr.com/4717/39658737371_0bca4ed602_z.jpg",
+    "source_page": "https://blog.playstation.com/2018/01/16/two-new-ways-to-get-ps4-pro/",
+    "kind": "manufacturer reference photo",
+    "verified": "2026-10-27"
+  },
+  "PS4 optional games service": {
+    "image": "images/jpeg/ps4-games-service-video.jpg",
+    "source": "https://img.youtube.com/vi/hMU1cTWVtg8/hqdefault.jpg",
+    "source_page": "https://www.youtube.com/watch?v=hMU1cTWVtg8",
+    "kind": "SinghTechGaming video thumbnail"
   }
 }
