@@ -330,7 +330,7 @@
 
   <!-- Actions -->
   <div class="btns">
-    <button class="alt" onclick="submitOrder()">Submit this order</button>
+    <button class="alt" onclick="submitOrder()">Submit final order on WhatsApp</button>
     <a id="payNow" class="btn act" href="#" onclick="return launchUpiPayment(event)">Pay Now</a>
   </div>
 
@@ -1176,7 +1176,7 @@ function gpzAllItems(){
 function gpzBox(items,totalWeight){
   const manual=["actualBoxLength","actualBoxWidth","actualBoxHeight"].map(id=>Number(document.getElementById(id)?.value||0));
   if(manual.every(n=>n>0))return manual;
-  if(items.some(i=>i.cpuBuild)){const computed=GPCPUShipping.pack(items,manual).dimensions;if(computed)return computed;}
+  if(items.some(i=>i.cpuBuild||i.arcadeBuild)){const computed=GPCPUShipping.pack(items,manual).dimensions;if(computed)return computed;}
   const quantities=Object.fromEntries(items.map(item=>[item.name,Number(item.quantity||0)]));
   const hamidProfile=quantities["Push Button (Imported) - Green"]===10&&quantities["MD Switch Button"]===5&&quantities["Zippy Coin Drop Switch"]===2&&quantities["MD Handle (With Switch) - Black"]===2&&quantities["Coin Packet"]===1&&quantities["10 Core Wire (Per Meter)"]===1;
   if(hamidProfile)return [17,12,14];
@@ -1325,7 +1325,7 @@ function computeTotals(){
   const volumetricKg=(boxDimensions[0]*boxDimensions[1]*boxDimensions[2])/5000;
   const courier=document.getElementById("courier").value||"Trackon.in";
   // Volumetric weight is charged only by these courier partners.
-  const usesVolumetric=!pickup&&(items.some(i=>i.cpuBuild)||GPZ_VAS_COURIERS.includes(courier));
+  const usesVolumetric=!pickup&&(items.some(i=>i.cpuBuild||i.arcadeBuild)||GPZ_VAS_COURIERS.includes(courier));
   const chargeableKg=pickup?0:Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
   let payment=gpzMode();
   if(pickup){document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;payment="prepaid";mode="prepaid";}
@@ -1614,6 +1614,6 @@ document.querySelectorAll('input[name="gstInvoice"]').forEach(el=>el.addEventLis
 }));
 gpzInitialize();
 </script>
-<script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script><script src="site-navigation.js?v=20261016-nav"></script><script>window.GP_NATIVE_POSTAL=true;</script><script src="https://gamesplanet13.github.io/arcade-accessories-/orders-config.js?v=20261022-orders"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/unified-postal.js?v=20261022-orders"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/order-records.js?v=20261022-orders"></script><script>window.formatDateRange=function(min,max){var opts={timeZone:"UTC",weekday:"long",day:"2-digit",month:"long",year:"numeric"};return GPPostal.businessDate(min).toLocaleDateString("en-IN",opts)+" – "+GPPostal.businessDate(max).toLocaleDateString("en-IN",opts);};</script></body>
+<script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script><script src="site-navigation.js?v=20261016-nav"></script><script>window.GP_NATIVE_POSTAL=true;</script><script src="https://gamesplanet13.github.io/arcade-accessories-/orders-config.js?v=20261022-orders"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/unified-postal.js?v=20261022-orders"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/order-records.js?v=20261022-orders"></script><script>window.formatDateRange=function(min,max){var opts={timeZone:"UTC",weekday:"long",day:"2-digit",month:"long",year:"numeric"};return GPPostal.businessDate(min).toLocaleDateString("en-IN",opts)+" – "+GPPostal.businessDate(max).toLocaleDateString("en-IN",opts);};</script><script src="https://gamesplanet13.github.io/Gamesplanet_in/customer-profile.js?v=20261028-checkout"></script></body>
 </html>
 
