@@ -1,0 +1,13 @@
+{
+  "method": "Original product photos and non-generative photo compositing; no AI image generation.",
+  "controller_source": "https://gmedia.playstation.com/is/image/SIEPDC/dualshock-controller-product-thumbnail-01-en-14sep21?fmt=png-alpha&wid=1600",
+  "console_sources": {
+    "slim-black": "https://gmedia.playstation.com/is/image/SIEPDC/ps4-slim-image-block-01-en-24jul20?fmt=png-alpha&wid=1600",
+    "pro-black": "https://gmedia.playstation.com/is/image/SIEPDC/ps4-pro-image-block-01-en-24jul20?fmt=png-alpha&wid=1600",
+    "slim-white": "https://c1.staticflickr.com/1/544/32174380196_9ec5d7ca82_o.png",
+    "pro-white": "https://farm5.staticflickr.com/4717/39658737371_0bca4ed602_z.jpg",
+    "slim-blue": "Customer original upload: 1000642287.jpg",
+    "slim-dragon": "Customer original upload: 1000642290.jpg"
+  },
+  "date": "2026-10-28"
+}
