@@ -1386,7 +1386,7 @@ body.wizard-popup-open{
   <!-- Top navigation shortcuts -->
   <div class="controls">
     <button type="button" class="linkbtn hidden" id="changeProductChoice" onclick="showModeSelector()">⬅ Change Product</button>
-    <a class="linkbtn optional-selector-link hidden" href="https://gamesplanet13.github.io/ps2gameselector/" target="_blank" rel="noopener">🟨 Optional Games Selector</a>
+    <a class="linkbtn optional-selector-link hidden" href="https://gamesplanet13.github.io/gameselector/PS2GAMESELECTOR.html" target="_blank" rel="noopener">🟨 Optional Games Selector</a>
     <a class="linkbtn" href="https://youtu.be/bpGm0IAeyek" target="_blank" rel="noopener">▶️ Setup Video</a>
     <button type="button" class="linkbtn hidden" onclick="toggleVoice()" id="voiceToggle">🔊 Voice ON</button>
   </div>
@@ -1708,7 +1708,7 @@ const comboVariants = [
 
 function fmt(n){return `₹${Number(n).toLocaleString('en-IN')}`;}
 const topGamesVideoUrl='https://youtu.be/xGR0vUM1-Jw';
-const optionalGamesSelectorUrl='https://gamesplanet13.github.io/ps2gameselector/';
+const optionalGamesSelectorUrl='https://gamesplanet13.github.io/gameselector/PS2GAMESELECTOR.html';
 function usbDisplayName(v){ return String(v).replace(/^(\d+GB)\s+/, '$1 USB '); }
 function makeVariantBuyCard(label,top,opt,count,onTopBuy,onOptionalBuy){
   const card=document.createElement('div');

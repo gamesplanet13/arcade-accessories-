@@ -66,7 +66,7 @@ window.GPShop={pages,group,recentProducts,prepare(products){
 
 /* Shared PS4 free-game bundles and console-category policy. */
 (function(root){'use strict';
-const GAME_LIST='https://bit.ly/3sNjGfy',PS2='https://gamesplanet13.github.io/ps2/';
+const GAME_LIST='https://gamesplanet13.github.io/gameselector/PS4_GAME_SELECTOR.html',PS2='https://gamesplanet13.github.io/ps2/';
 const hardware=p=>p.category==='Game Consoles'&&/PS4|PLAYSTATION 4/i.test(p.name)&&!/Games Pack|Service/i.test(p.name);
 const pack=p=>/PS4 (?:500GB|1TB) Games Pack/i.test(p.name);
 const prepare=GPShop.prepare;
@@ -81,7 +81,7 @@ GPShop.prepare=function(products){
   if(p.shopPage==='gamebox')return;if(p.customType==='arcade')p.features=[...(p.features||[]),'Mini/Counter optional TV: 24 Inch ₹5,200 / 32 Inch ₹8,200 — 1 Year Warranty','Full-size includes 32 Inch TV with 1 Year Warranty'];
   if(hardware(p)){
    const storage=/500GB/.test(p.name)?'500GB':'1TB',count=storage==='500GB'?'5–7':'13–15';
-   p.includedGames={storage,count,price:0,listUrl:GAME_LIST,poster:'images/jpeg/ps4-free-games-'+storage.toLowerCase()+'.jpg'};p.consoleOrder=0;
+   p.includedGames={storage,count,price:0,listUrl:GAME_LIST,poster:'images/jpeg/ps4-free-games-'+storage.toLowerCase()+'.jpg'};p.images=[p.images[0],p.includedGames.poster,...(p.images||[]).slice(1).filter(im=>im!==p.includedGames.poster)];p.consoleOrder=0;
    p.features=(p.features||[]).filter(s=>!/games optional|charged separately|charges extra/i.test(s));
    p.features.push(count+' top digital offline games — FREE','No physical disc — only free digital offline games');p.shopPages.push('ps4','consoles');
   }else if(p.customType==='ps2'){

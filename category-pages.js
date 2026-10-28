@@ -87,3 +87,5 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
   const a=document.createElement('a');a.href=p.includedGames.listUrl;a.target='_blank';a.rel='noopener';a.textContent='PS4 Game List / Selector ↗';box.append(a);card.append(box);
  });
 })();
+
+;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261028-swipe';document.head.append(s);})();
