@@ -13,8 +13,8 @@ const shipping={h61:[550,[24,20,6]],h110:[550,[24,20,6]],i3:[350,[12,12,10]],i5:
 shipping.hdmi15=[99,[10,10,3]];shipping.hdmi22=[170,[15,15,3]];
 shipping.ddr3_8=[25,[17,6,2]];shipping.fan=[0,[]];shipping.cabinetSmps=[2100,[38.7,30.1,19.1]];
 for(const [key,[weight,dimensions]] of Object.entries(shipping))Object.assign(parts[key],{weight,dimensions});
-const displays={'24':{name:'24 Inch Non-Smart LCD TV — 1 Year Warranty',price:5200,image:'images/tv-24.svg',weight:2650,dimensions:[61.5,40,14],packingWeight:850},'32':{name:'32 Inch Smart TV — 1 Year Warranty',price:8300,image:'images/tv-32.svg',weight:4000,dimensions:[87.9,50,12.7],packingWeight:1800}};
-const boxes={mini:{name:'Mini Arcade Box',price:6342,image:'images/arcade-box-mini.png',lcd:5200,lcdName:'24 Inch Non-Smart TV — 1 Year Warranty'},counter:{name:'Counter Arcade Box',price:9215,image:'images/arcade-box-counter.png',lcd:5200,lcdName:'24 Inch Non-Smart TV — 1 Year Warranty'},full:{name:'Full Body Arcade Box',price:16925,image:'images/arcade-box-full-32inch.png',lcd:8300,lcdName:'32 Inch Smart TV — 1 Year Warranty'}};
+const displays={'24':{name:'24 Inch Non-Smart LCD TV — 1 Year Warranty',price:5200,image:'images/tv-24.svg',weight:2650,dimensions:[61.5,40,14],packingWeight:850},'32':{name:'32 Inch Smart TV — 1 Year Warranty',price:8200,image:'images/tv-32.svg',weight:4000,dimensions:[87.9,50,12.7],packingWeight:1800}};
+const boxes={mini:{name:'Mini Arcade Box',price:6342,image:'images/arcade-box-mini.png',lcd:5200,lcdName:'24 Inch Non-Smart TV — 1 Year Warranty'},counter:{name:'Counter Arcade Box',price:9215,image:'images/arcade-box-counter.png',lcd:5200,lcdName:'24 Inch Non-Smart TV — 1 Year Warranty'},full:{name:'Full Body Arcade Box',price:16725,image:'images/arcade-box-full-32inch.png',lcd:8200,lcdName:'32 Inch Smart TV — 1 Year Warranty'}};
 function defaults(mode='complete'){return {buildVersion:2,mode,hdmi:'1.5',preset:'1',board:'h61',processor:'i3',ram:'ddr3',storage:'usb',games:true,ssdGames:true,fan:true,cabinet:true,smps:true,assemble:true,windows:false,gpu:false,extraUsb:false,extraSsd:false,controllers:{pc:0,ps3:0,ps4:0},dongle:false,box:'none',lcd:false,tv:'24',fulfillment:'courier'};}
 function preset(id){const n=Number(id);if(!Number.isInteger(n)||n<1||n>6)throw Error('Choose a valid CPU configuration');const s=defaults();s.preset=String(id);s.processor=n<=2?'i3':n<=4?'i5':'i56';s.board=n>=5?'h110':'h61';s.ram=n>=5?'ddr4':'ddr3';s.storage=[1,3].includes(n)?'usb':'ssd';s.gpu=n===6;return s;}
 function title(s){const cpu=parts[s.processor]?.name.replace('Intel Core ','')||'Custom CPU';const ram=parts[s.ram]?.name.replace('Consistent ','')||'';const storage=s.storage==='usb'?'64GB USB':s.storage==='ssd'?'256GB SSD':'Without Storage';return 'CPU Box • '+cpu+' • '+ram+' • '+storage+(s.gpu?' • GT740 4GB':'');}
@@ -59,6 +59,14 @@ if(type==='arcade'){
   if(!['base','gamebox','ps2'].includes(mode))throw Error('Choose a system');
   items.push(item(a.name,mode==='base'?'Without game system':mode==='gamebox'?'GameBox with connectors':'PS2 gaming system',a[mode]));
  }
+}
+if(type==='arcade'){
+ const selectedTV=state.tv||'none';
+ if(!['none','24','32'].includes(selectedTV))throw Error('Choose a valid TV');
+ if(state.box!=='full'&&selectedTV!=='none'){
+  const tv=root.GPCPU.displays[selectedTV];items.push({...item(tv.name,'Optional arcade TV • 1 Year Warranty',tv.price),unitWeight:tv.weight,lineWeight:tv.weight,dimensions:tv.dimensions,image:tv.image});
+ }
+ if(state.box==='full')items[0].variant+=' • 32 Inch TV included • 1 Year Warranty';
 }
 if(type==='ps2'){
  if(state.ps2Mode==='set'){
