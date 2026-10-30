@@ -504,7 +504,7 @@ function applyCoupon(){
  // Client-side verification is an order preview, not proof of YouTube subscription.
  gpzVerifiedCoupon=eligible&&value===String.fromCharCode(71,80,90,50,48,50,54);
  const msg=document.getElementById('couponNote');
- msg.textContent=gpzVerifiedCoupon?'Coupon accepted. Discount applied to eligible game devices.':'Invalid coupon. Subscribe to all three channels, send screenshots on WhatsApp, and request a valid coupon.';
+ msg.textContent=gpzVerifiedCoupon?(gpzM88Only(gpzOfferItems())&&gpzMode()==='cod'?'COD price is already ₹6,499. Extra coupon discount is only on full prepaid.':'Coupon accepted. Eligible extra discount applied.'):'Invalid coupon. Subscribe to all three channels, send screenshots on WhatsApp, and request a valid coupon.';
  computeTotals();
 }
 document.getElementById('couponCode').addEventListener('input',()=>{
@@ -1640,6 +1640,7 @@ window.addEventListener('storage',event=>{
 
 function gpzInitialize(){
   const cartItems=gpzIncomingCartItems().map(gpzNormalizeIncomingItem);
+  if(GPZ_PARAMS.get('source')==='cart')gpzCheckoutCart=cartItems;
   const incomingPromo=GPZ_PARAMS.get('storeSource')==='Gamesplanet_in'&&cartItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
   document.body.classList.toggle('gpz-coupon-checkout',incomingPromo);
   const queryProduct=String(GPZ_PARAMS.get("product")||"").trim();
