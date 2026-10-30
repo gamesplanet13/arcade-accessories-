@@ -31,13 +31,8 @@ function capture(){
  if(repo==='arcade-accessories-'&&typeof window.buildOrderSummary==='function')save('catalog',window.buildOrderSummary().items||[]);
  if(repo==='ps2fmcb'&&typeof window.gpzCartRead==='function')save('fmcb',window.gpzCartRead().map(i=>({...i,name:i.variant&&i.variant!=='PS2'?i.product+' — '+i.variant:i.product})));
  if(repo==='Gamesplanet_in'&&window.GPCheckout?.rows){
-  let bag={};try{bag=JSON.parse(localStorage.getItem('gp-unified-cart-v1')||'{}')}catch{}
-  if(bag&&typeof bag==='object'&&!Array.isArray(bag)){
-   const ids=new Map((window.GP_CATALOG||[]).map(p=>[p.id,p]));
-   const list=Object.values(bag).filter(x=>ids.has(x?.id));
-   if(list.length)try{save('Gamesplanet_in',window.GPCheckout.rows(list,ids))}catch(e){console.warn('Shared store sync',e)}
-   else save('Gamesplanet_in',[]);
-  }
+  if(typeof window.GP_STORE_EXPORT_CART==='function')
+   try{save('Gamesplanet_in',window.GP_STORE_EXPORT_CART())}catch(e){console.warn('Shared store sync',e)}
  }
  return items();
 }
@@ -45,7 +40,7 @@ function checkout(source,rows){
  if(source)save(source,rows);else capture();
  const list=items();if(!list.length){alert('Cart is empty / पहले प्रोडक्ट जोड़ें');return}
  if(list.some(i=>i.couponCategory==='m88')&&list.some(i=>i.couponCategory!=='m88')){alert('M88 offer के लिए बाकी items पहले remove करें। Shared checkout में अलग-अलग products हैं।');return}
- const query=new URLSearchParams({source:'cart',shared:'1',storeSource:'shared',cart:JSON.stringify(list)});
+ const query=new URLSearchParams({source:'cart',shared:'1',storeSource:'shared',cart:JSON.stringify(list),cartAt:String(Date.now())});
  location.href=base+'order-prefill.html?'+query.toString();
 }
 window.GPSharedStore={version:2,read,save,items,replaceItems,reset,capture,checkout};
