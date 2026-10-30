@@ -1646,13 +1646,13 @@ function gpzInitialize(){
   const queryProduct=String(GPZ_PARAMS.get("product")||"").trim();
   const product=cartItems.length
     ? cartItems.map(i=>`${i.name} × ${i.quantity}`).join(" | ")
-    : ((queryProduct && queryProduct.toLowerCase()!=="ps2 product")?queryProduct:"Games Planet Product");
+    : (GPZ_PARAMS.get('source')==='cart'?'':((queryProduct && queryProduct.toLowerCase()!=="ps2 product")?queryProduct:"Games Planet Product"));
   const variant=cartItems.length
     ? (cartItems.length>1?"Multiple selected products":(cartItems[0].variant||GPZ_PARAMS.get("variant")||"As selected"))
     : (GPZ_PARAMS.get("variant")||"As selected");
   const base=cartItems.length
     ? cartItems.reduce((sum,i)=>sum+i.lineTotal,0)
-    : Number(GPZ_PARAMS.get("base")||0);
+    : (GPZ_PARAMS.get('source')==='cart'?0:Number(GPZ_PARAMS.get("base")||0));
   gpzDirectBasePrice=base;
 
   document.getElementById("product").value=product;
