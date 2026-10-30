@@ -179,7 +179,7 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
     <div class="hint" id="ruleNote"></div>
   </div>
 
-  <div id="gpzM88Promo" class="card" hidden><b>GPZ M88 128GB · Regular ₹6,799 · Coupon offer</b><div class="gpz-promo-slots"><section><h3>Prepaid — Full Payment</h3><strong>₹5,999</strong><p class="gpz-free-courier">Courier included · FREE</p><p>No extra charges</p></section><section><h3>Cash on Delivery</h3><strong>₹6,499</strong><p>Courier & COD charges included</p><p><b>Advance ₹600</b> · Rest ₹5,899</p></section></div><p class="gpz-coupon-help">Both panels show information only. To use the offer, subscribe to SinghTechGaming, GamesPlanet13 and GamesVallah, send screenshots to Games Planet on WhatsApp, obtain your coupon and apply it below.</p><a target="_blank" rel="noopener" href="https://wa.me/917983624797?text=Hello%20Games%20Planet%2C%20I%20subscribed%20to%20all%20three%20YouTube%20channels%20and%20want%20to%20send%20screenshots%20for%20the%20coupon.">Request coupon on WhatsApp ↗</a></div>
+  <div id="gpzM88Promo" class="card" hidden><b>GPZ M88 128GB · <s>₹6,799</s> Now ₹6,499 · Extra prepaid coupon discount</b><div class="gpz-promo-slots"><section><h3>Prepaid — Full Payment</h3><strong>₹5,999 with coupon</strong><p>Extra ₹500 discount</p><p class="gpz-free-courier">Courier included · FREE</p><p>No extra charges</p></section><section><h3>Cash on Delivery</h3><strong>₹6,499</strong><p>Courier & COD charges included</p><p><b>Advance ₹600</b> · Rest ₹5,899</p></section></div><p class="gpz-coupon-help">Both panels show information only. Extra prepaid discount needs the subscriber coupon. COD ₹6,499 is the current price without coupon. Subscribe to SinghTechGaming, GamesPlanet13 and GamesVallah, share screenshots on WhatsApp and request your coupon.</p><a target="_blank" rel="noopener" href="https://wa.me/917983624797?text=Hello%20Games%20Planet%2C%20I%20subscribed%20to%20all%20three%20YouTube%20channels%20and%20want%20to%20send%20screenshots%20for%20the%20coupon.">Request coupon on WhatsApp ↗</a></div>
   <div class="card" id="couponCard" hidden>
     <span class="badge">Discount Coupon</span>
     <div class="inline">
@@ -468,13 +468,13 @@ function norm(s){return (s||"").toString().trim().toUpperCase();}
 function getBaseProduct(){ return norm(document.getElementById("product").value); }
 function couponDiscountCap(){return 0;}
 let gpzVerifiedCoupon=false;
-function gpzOfferItems(){return GPZ_PARAMS.get('storeSource')==='Gamesplanet_in'?gpzBaseItems():[];}
+function gpzOfferItems(){return gpzBaseItems().filter(i=>i.couponCategory==='m88'||i.couponCategory==='gamebox'||i.storeProductId==='e56d6e74fdcc');}
 function gpzM88Only(items){return items.length>0&&items.every(i=>i.couponCategory==='m88'||i.storeProductId==='e56d6e74fdcc');}
 function gpzCouponDiscount(items,payment){
  if(!gpzVerifiedCoupon)return 0;
  return items.reduce((total,i)=>{
   const q=Math.max(1,Number(i.quantity)||1),kind=i.couponCategory||'';
-  if(kind==='m88'||i.storeProductId==='e56d6e74fdcc')return total+q*(payment==='cod'?300:800);
+  if(kind==='m88'||i.storeProductId==='e56d6e74fdcc')return total+q*(payment==='prepaid'?500:0);
   if(kind!=='gamebox')return total;
   const match=String(i.couponStorage||i.variant||i.name||'').match(/(?:^|\D)(64|128|256)\s*GB\b/i);
   return total+(match?({'64':200,'128':300,'256':500}[match[1]]||0)*q:0);
@@ -1366,7 +1366,7 @@ function computeTotals(){
     payment="prepaid"; mode="prepaid";
   }
   const couponItems=gpzOfferItems();
-  const m88Offer=gpzVerifiedCoupon&&gpzM88Only(couponItems)&&!items.some(i=>!gpzM88Only([i]));
+  const m88Offer=gpzM88Only(couponItems)&&items.length===couponItems.length;
   const appliedDiscount=Math.min(productTotal,gpzCouponDiscount(couponItems,payment));
   discountValue=appliedDiscount;
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
