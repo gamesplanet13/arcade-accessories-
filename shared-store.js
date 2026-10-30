@@ -40,6 +40,7 @@ function checkout(source,rows){
  if(source)save(source,rows);else capture();
  const list=items();if(!list.length){alert('Cart is empty / पहले प्रोडक्ट जोड़ें');return}
  const query=new URLSearchParams({source:'cart',shared:'1',storeSource:'shared',cart:JSON.stringify(list),cartAt:String(Date.now())});
+ if(query.toString().length>7000)query.delete('cart'); // large carts stay in shared storage, not the URL
  location.href=base+'order-prefill.html?'+query.toString();
 }
 window.GPSharedStore={version:2,read,save,items,replaceItems,reset,capture,checkout};
