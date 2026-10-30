@@ -1,38 +1,90 @@
+/* Games Planet: one canonical cart for pages hosted on gamesplanet13.github.io.
+ * A checkout URL is a one-time snapshot, not another persistent cart.
+ * Reset removes cart selections only; customer order history is preserved.
+ */
 (function(){
 'use strict';
-if(window.GPSharedStore)return;
-const base='https://gamesplanet13.github.io/arcade-accessories-/',key='gp_shared_cart_v1';
-const read=()=>{try{const v=JSON.parse(localStorage.getItem(key)||'{}');return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(_){return {}}};
-const normalize=(items,url)=>items.map(i=>{const quantity=Math.max(0,Math.floor(Number(i.quantity??i.qty)||0)),unitPrice=Number(i.unitPrice??i.price)||0,unitWeight=Number(i.unitWeight??i.weight)||0;return {...i,name:String(i.name||i.product||'Product'),quantity,unitPrice,lineTotal:quantity*unitPrice,unitWeight,lineWeight:unitWeight*quantity,image:i.image?new URL(i.image,url).href:'',dimensions:i.dimensions||i.size||[]}}).filter(i=>i.quantity>0);
-function save(source,items){const all=read();all[source]={items:normalize(items,location.href),updatedAt:Date.now()};localStorage.setItem(key,JSON.stringify(all));return all}
-function items(){return Object.entries(read()).flatMap(([source,v])=>(v.items||[]).map(i=>({...i,storeSource:source})))}
-function query(){const list=items();return new URLSearchParams({source:'cart',shared:'1',cart:JSON.stringify(list),base:String(list.reduce((n,i)=>n+i.lineTotal,0)),weight:String(list.reduce((n,i)=>n+i.lineWeight,0)),quantity:String(list.reduce((n,i)=>n+i.quantity,0))})}
-function capture(){const repo=location.pathname.split('/')[1];if(repo==='arcade-accessories-'&&typeof window.buildOrderSummary==='function')save('catalog',window.buildOrderSummary().items||[]);if(repo==='ps2fmcb'&&typeof window.gpzCartRead==='function')save('fmcb',window.gpzCartRead().map(i=>({...i,name:i.variant&&i.variant!=='PS2'?i.product+' — '+i.variant:i.product})))}
-function checkout(source,rows){if(source)save(source,rows);else capture();if(!items().length){alert('Cart is empty / पहले प्रोडक्ट जोड़ें');return}location.href=base+'order-prefill.html?'+query()}
-window.GPSharedStore={read,save,items,capture,checkout};
-const isCheckout=/\/order-prefill\.html$/i.test(location.pathname),params=new URLSearchParams(location.search);
-if(isCheckout){
- const repo=location.pathname.split('/')[1],canonical=repo==='arcade-accessories-';
- if(canonical&&params.get('shared')==='1'&&!params.has('cart'))history.replaceState(null,'',location.pathname+'?'+query());
- if(params.get('shared')!=='1'){
-  let incoming;try{incoming=JSON.parse(params.get('cart')||'null')}catch(_){}
-  const source=params.get('storeSource')||(repo==='ps2'?'ps2':repo==='ps2fmcb'?'fmcb':'catalog');
-  if(Array.isArray(incoming))save(source,incoming);
-  // Keep direct buy queries intact; only merge an explicitly supplied cart.
-  if(Array.isArray(incoming)){const q=query();for(const [k,v]of params)if(!['cart','source','base','weight','quantity','shared'].includes(k))q.set(k,v);if(canonical)history.replaceState(null,'',location.pathname+'?'+q);else{location.replace(base+'order-prefill.html?'+q);return}}
-  else if(!canonical){location.replace(base+'order-prefill.html?'+params);return}
- }
+if(window.GPSharedStore?.version===2)return;
+const base='https://gamesplanet13.github.io/arcade-accessories-/';
+const key='gp_shared_cart_v2',resetKey='gp_shared_cart_reset_v2';
+const legacyKeys=['gp_shared_cart_v1','gp_cart','gp-unified-cart-v1','gpz_ps2_cart_v1','gp_order_summary'];
+const from=(items,url)=>Array.isArray(items)?items.map(i=>{
+ const q=Math.max(0,Math.min(999,Math.floor(Number(i.quantity??i.qty)||0)));
+ const p=Number(i.unitPrice??i.price)||0,w=Number(i.unitWeight??i.weight)||0;
+ let image=i.image||'';
+ try{if(image)image=new URL(image,url||location.href).href}catch{image=''}
+ return {...i,name:String(i.name||i.product||'Product'),product:String(i.product||i.name||'Product'),quantity:q,unitPrice:p,lineTotal:p*q,unitWeight:w,lineWeight:w*q,image,dimensions:i.dimensions||i.size||[]};
+}).filter(i=>i.quantity>0):[];
+function read(){try{const o=JSON.parse(localStorage.getItem(key)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{}}catch{return {}}}
+function save(source,items){if(!source)return read();const all=read(),rows=from(items,location.href);
+ if(rows.length)all[source]={items:rows,updatedAt:Date.now()};else delete all[source];
+ localStorage.setItem(key,JSON.stringify(all));return all;
 }
-function start(){
- if(isCheckout){
-  const old=document.getElementById('gpSharedCartInfo');if(!old){const panel=document.createElement('section');panel.id='gpSharedCartInfo';panel.className='card';const title=document.createElement('h2');title.textContent='Shared Cart / सभी पेजों का कार्ट';panel.append(title);const entries=Object.entries(read()).filter(([,v])=>v.items?.length);for(const [source,v]of entries){const row=document.createElement('p');row.textContent=({catalog:'Accessories, CPU & Arcade Box',ps2:'PS2 Console',fmcb:'FMCB & USB'})[source]||source;const edit=document.createElement('a');edit.href=source==='ps2'?'https://gamesplanet13.github.io/ps2/':source==='fmcb'?'https://gamesplanet13.github.io/ps2fmcb/':base;edit.textContent=' · Edit products';row.append(edit);panel.append(row)}if(!entries.length){const p=document.createElement('p');p.textContent='आपकी चुनी हुई वस्तुएँ नीचे Order Breakdown में हैं।';panel.append(p)}document.querySelector('.wrap')?.prepend(panel)}
-  return;
+function items(){return Object.entries(read()).flatMap(([source,v])=>from(v.items||[],location.href).map(i=>({...i,storeSource:source})))}
+function replaceItems(list){const next={};for(const i of from(list,location.href)){const source=i.storeSource||'catalog';(next[source]||(next[source]={items:[],updatedAt:Date.now()})).items.push(i)}localStorage.setItem(key,JSON.stringify(next));return items()}
+function reset(){localStorage.removeItem(key);for(const k of legacyKeys)localStorage.removeItem(k);
+ localStorage.setItem(resetKey,String(Date.now()));
+ window.dispatchEvent(new CustomEvent('gp-shared-cart-reset'));return [];
+}
+function capture(){
+ const repo=location.pathname.split('/')[1];
+ if(repo==='arcade-accessories-'&&typeof window.buildOrderSummary==='function')save('catalog',window.buildOrderSummary().items||[]);
+ if(repo==='ps2fmcb'&&typeof window.gpzCartRead==='function')save('fmcb',window.gpzCartRead().map(i=>({...i,name:i.variant&&i.variant!=='PS2'?i.product+' — '+i.variant:i.product})));
+ if(repo==='Gamesplanet_in'&&window.GPCheckout?.rows){
+  let bag={};try{bag=JSON.parse(localStorage.getItem('gp-unified-cart-v1')||'{}')}catch{}
+  if(bag&&typeof bag==='object'&&!Array.isArray(bag)){
+   const ids=new Map((window.GP_CATALOG||[]).map(p=>[p.id,p]));
+   const list=Object.values(bag).filter(x=>ids.has(x?.id));
+   if(list.length)try{save('Gamesplanet_in',window.GPCheckout.rows(list,ids))}catch(e){console.warn('Shared store sync',e)}
+   else save('Gamesplanet_in',[]);
+  }
  }
+ return items();
+}
+function checkout(source,rows){
+ if(source)save(source,rows);else capture();
+ const list=items();if(!list.length){alert('Cart is empty / पहले प्रोडक्ट जोड़ें');return}
+ if(list.some(i=>i.couponCategory==='m88')&&list.some(i=>i.couponCategory!=='m88')){alert('M88 offer के लिए बाकी items पहले remove करें। Shared checkout में अलग-अलग products हैं।');return}
+ const query=new URLSearchParams({source:'cart',shared:'1',storeSource:'shared',cart:JSON.stringify(list)});
+ location.href=base+'order-prefill.html?'+query.toString();
+}
+window.GPSharedStore={version:2,read,save,items,replaceItems,reset,capture,checkout};
+function start(){
+ const checkoutPage=/\/order-prefill\.html$/i.test(location.pathname);
+ if(checkoutPage)return; // incoming checkout snapshots are edited in their own screen
  capture();
- for(const name of ['render','gpzCartSave','gpzCartReset']){const old=window[name];if(typeof old==='function'&&!old.gpSharedWrapped){const fn=function(...args){const result=old.apply(this,args);capture();return result};fn.gpSharedWrapped=true;window[name]=fn}}
- if(typeof window.goDetails==='function'&&typeof window.buildOrderSummary==='function')window.goDetails=()=>checkout('catalog',window.buildOrderSummary().items);
- if(typeof window.ps2Summary==='function'){window.ps2GoCheckout=()=>checkout('ps2',window.ps2Summary().items);window.sendOrderToWhatsApp=window.ps2GoCheckout;}
- if(typeof window.gpzCartCheckout==='function')window.gpzCartCheckout=()=>checkout();
+ if(typeof window.clearCart==='function'&&!window.clearCart.gpResetWrapped){
+  const previous=window.clearCart;
+  const fn=function(...args){
+   // Avoid double confirmation: old clearCart still handles the prompt and local UI.
+   const ok=confirm('Reset ALL Games Planet carts across repositories?');
+   if(!ok)return;
+   reset();
+   // Recreate zero-state of visible catalogue without a second prompt.
+   if(location.pathname.includes('/arcade-accessories-/')){
+    const products=window.products||[],state=window.state;
+    if(state&&typeof state==='object')Object.keys(state).forEach(k=>state[k]=0);
+    if(typeof window.render==='function')window.render();
+    location.reload();
+    return;
+   }
+   return previous.apply(this,args);
+  };
+  fn.gpResetWrapped=true;window.clearCart=fn;
+ }
+ if(typeof window.goDetails==='function'&&typeof window.buildOrderSummary==='function')
+  window.goDetails=()=>checkout('catalog',window.buildOrderSummary().items);
+ if(typeof window.gpzCartSave==='function'&&!window.gpzCartSave.gpSharedWrapped){
+  const old=window.gpzCartSave;window.gpzCartSave=function(...args){const v=old.apply(this,args);capture();return v};
+  window.gpzCartSave.gpSharedWrapped=true;
+ }
+ if(typeof window.gpzCartCheckout==='function')
+  window.gpzCartCheckout=()=>checkout('fmcb',window.gpzCartRead?.()||[]);
+ if(typeof window.gpzCartReset==='function'){
+  window.gpzCartReset=()=>{if(!confirm('Reset ALL Games Planet carts?'))return;reset();location.reload()};
+ }
+ // Sync all tabs: reset elsewhere must immediately clear local, in-memory carts.
+ window.addEventListener('storage',e=>{if(e.key===resetKey)location.reload()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
