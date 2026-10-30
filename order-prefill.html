@@ -1337,6 +1337,7 @@ function gpzRenderRateGuide(kg){
 }
 function computeTotals(){
   const items=gpzAllItems();
+  const emptyOrder=items.length===0;
   const productTotal=items.reduce((s,i)=>s+i.lineTotal,0);
   const totalWeight=items.reduce((s,i)=>s+i.lineWeight,0);
   const pickup=gpzPickup(items);
@@ -1365,7 +1366,7 @@ function computeTotals(){
   if(!pickup){gpzLoadBigshipQuote();gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);}
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
-  const courierBaseCharge=(pickup||m88Offer)?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg));
+  const courierBaseCharge=(emptyOrder||pickup||m88Offer)?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg));
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
@@ -1376,7 +1377,7 @@ function computeTotals(){
   const amountBeforeGst=Math.max(0,productTotal+courierCharge-appliedDiscount);
   const productGst=invoiceIncluded?(m88Offer?Math.round(amountBeforeGst*18/118):Math.ceil(amountBeforeGst*.18)):0;
   const totalBeforeVas=amountBeforeGst+(m88Offer?0:productGst);
-  const vasApplies=!m88Offer&&!pickup&&GPZ_VAS_COURIERS.includes(courier);
+  const vasApplies=!emptyOrder&&!m88Offer&&!pickup&&GPZ_VAS_COURIERS.includes(courier);
   const vasCharge=vasApplies?Math.ceil(totalBeforeVas*.02):0;
   const grandTotal=totalBeforeVas+vasCharge;
   const advanceAmount=payment==="cod"?(m88Offer?Math.min(grandTotal,600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0)):Math.min(grandTotal,Math.max(500,Math.ceil(courierCharge*2)))):grandTotal;
@@ -1434,6 +1435,7 @@ function computeTotals(){
   document.getElementById("modeBadge").className="badge right "+(payment==="cod"?"mode-cod":"mode-pre");
   const paymentNote=payment==="cod"?"COD Payment":(invoiceIncluded?"GST Invoice Payment":"Prepaid Order");
   const payNow=document.getElementById("payNow");
+  payNow.style.pointerEvents=emptyOrder?'none':'';payNow.style.opacity=emptyOrder?'0.45':'';
   const paymentUpi=gpzUpiLink(advanceAmount,paymentNote,invoiceIncluded);
   payNow.href=paymentUpi;
   payNow.dataset.upi=paymentUpi;
