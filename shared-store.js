@@ -92,7 +92,7 @@ function start(){
   window.gpzCartReset=()=>{if(!confirm('Reset ALL Games Planet carts?'))return;reset();location.reload()};
  }
  // Sync all tabs: reset elsewhere must immediately clear local, in-memory carts.
- window.addEventListener('storage',e=>{if(e.key===resetKey)location.reload()});
+ window.addEventListener('storage',e=>{if(e.key===resetKey||e.key===key)location.reload()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
