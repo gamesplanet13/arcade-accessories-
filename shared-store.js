@@ -45,12 +45,15 @@ function checkout(source,rows){
 }
 window.GPSharedStore={version:2,read,save,items,replaceItems,reset,capture,checkout};
 function mountSharedCartBar(){
+ // Gamesplanet_in already has a fixed mobile Cart tab and header cart.
+ // A second floating dock overlaps product cards (especially when empty).
+ if(location.pathname.split('/')[1]?.toLowerCase()==='gamesplanet_in')return;
  if(document.getElementById('gpSharedCartDock'))return;
  const nav=document.createElement('div');nav.id='gpSharedCartDock';
  nav.style.cssText='position:fixed;right:12px;bottom:76px;z-index:9900;background:#10253d;color:#fff;border-radius:12px;padding:9px;box-shadow:0 5px 20px #0005;display:flex;align-items:center;gap:7px;font:600 12px system-ui';
  nav.innerHTML='<button id="gpSharedView" type="button" style="border:0;background:#ccf66b;color:#10253d;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">🛒 All Carts <span id="gpSharedCount">0</span> · Edit</button><button id="gpSharedReset" type="button" title="Reset every Games Planet cart" style="border:1px solid #8291a4;background:transparent;color:#fff;border-radius:8px;padding:9px;cursor:pointer">Reset</button>';
  document.body.appendChild(nav);
- const count=()=>{document.getElementById('gpSharedCount').textContent=String(items().reduce((n,i)=>n+(Number(i.quantity)||0),0))};
+ const count=()=>{const n=items().reduce((total,item)=>total+(Number(item.quantity)||0),0);document.getElementById('gpSharedCount').textContent=String(n);nav.hidden=n===0;nav.style.display=n?'flex':'none'};
  nav.querySelector('#gpSharedView').onclick=()=>checkout();
  nav.querySelector('#gpSharedReset').onclick=()=>{if(confirm('Reset every Games Planet cart?')){reset();location.reload()}};
  window.addEventListener('storage',e=>{if(e.key===key)count()});
