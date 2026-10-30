@@ -60,6 +60,18 @@
   @media(max-width:720px){.grid2,.grid3,.choice-grid{grid-template-columns:1fr}}
 </style>
 <style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}
+#gpzEditableCart{border:1px solid #cbd5e1;background:#fff}
+.gpz-cart-edit-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.gpz-cart-edit-header p{font-size:12px;color:#64748b;margin:5px 0}
+.gpz-cart-edit-header button{border:1px solid #c2410c;color:#9a3412;background:#fff7ed;border-radius:9px;padding:10px 12px;font-weight:700;cursor:pointer}
+.gpz-cart-edit-row{padding:12px 0;border-bottom:1px solid #e2e8f0;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.gpz-cart-edit-row strong{display:block;font-size:13px;line-height:1.6}
+.gpz-cart-edit-row small{display:block;font-size:11px;color:#64748b;line-height:1.5}
+.gpz-cart-edit-controls{display:flex;align-items:center;gap:5px}
+.gpz-cart-edit-controls button{min-width:32px;min-height:34px;border:1px solid #cbd5e1;background:#f8fafc;color:#102a43;border-radius:7px;font-size:15px;cursor:pointer}
+.gpz-cart-edit-controls .gpz-cart-remove{padding:6px 9px;color:#b91c1c;font-size:12px}
+#gpzEditableCartTotal{font-size:14px;font-weight:800;text-align:right;margin-top:12px}
+.gpz-cart-empty{padding:18px;background:#f8fafc;border-radius:8px;color:#475569}
 body.gpz-coupon-checkout #couponCard{display:block!important}
 body.gpz-coupon-checkout #sumDiscount{display:inline!important}
 body.gpz-coupon-checkout #couponCodNotice{display:none!important}
@@ -77,6 +89,12 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
   <h1>Games Planet — Quick Order</h1>
 <div id="modeBadge" class="badge right mode-pre" role="status">Mode: Prepaid</div>
   <div class="sub">One checkout for PS2, FMCB, CPU, consoles and accessories • आपका साझा कार्ट</div>
+  <section class="card" id="gpzEditableCart" aria-label="Edit unified order cart">
+    <div class="gpz-cart-edit-header"><div><b>One Cart · All Games Planet Pages</b><p>यहाँ हर product की quantity बदलें या remove करें।</p></div>
+      <button type="button" id="gpzResetAllCart" class="ghost">Reset Entire Cart</button></div>
+    <div id="gpzEditableCartRows" aria-live="polite"></div>
+    <div id="gpzEditableCartTotal"></div>
+  </section>
 
 <div class="card" id="fulfillmentCard" hidden><span class="badge">Delivery / Shop Pickup</span><div class="label">Receive your order</div><select id="fulfillment" onchange="computeTotals()"><option value="courier">Courier Delivery — size / weight based</option><option value="pickup">Shop Pickup — Courier ₹0</option></select><div class="hint">Shop pickup पर courier और VAS ₹0। Delivery packing size और weight अनुमानित हैं; final packed measurements से पुष्टि होगी।</div></div>
   <!-- Customer -->
@@ -1088,48 +1106,19 @@ let gpzDirectBasePrice=0;
 /* Read the cart that belongs to THIS checkout.
    URL payload is primary so checkout still works when localStorage is blocked,
    cleared, or a stale cart exists from an older order. */
+let gpzCheckoutCart=null;
 function gpzIncomingCartItems(){
-  if(GPZ_PARAMS.get("source")!=="cart") return [];
-
-  const urlCart=GPZ_PARAMS.get("cart");
-  if(urlCart){
-    try{
-      const parsed=JSON.parse(urlCart);
-      if(Array.isArray(parsed)&&parsed.length) return parsed;
-    }catch(e){
-      console.warn("Could not parse cart from checkout URL.",e);
-    }
+  if(Array.isArray(gpzCheckoutCart))return gpzCheckoutCart;
+  if(GPZ_PARAMS.get("source")!=="cart")return [];
+  const raw=GPZ_PARAMS.get("cart");
+  const resetAt=Number(localStorage.getItem("gp_shared_cart_reset_v2")||0);
+  const cartAt=Number(GPZ_PARAMS.get("cartAt")||0);
+  if(cartAt&&cartAt<resetAt)return [];
+  if(raw!==null){
+    try{const list=JSON.parse(raw);return Array.isArray(list)?list:[];}
+    catch(e){console.warn("Invalid incoming cart",e);return [];}
   }
-
-  try{
-    const stored=JSON.parse(localStorage.getItem("gp_order_summary")||"null");
-    if(stored&&stored.source==="cart"&&Array.isArray(stored.items)&&stored.items.length) return stored.items;
-  }catch(e){
-    console.warn("Could not read saved checkout cart.",e);
-  }
-
-  // Last-resort fallback: read the original persistent cart used by index.html / Simple.html.
-  // This prevents a generic “PS2 Product” label if checkout-summary storage was cleared or overwritten.
-  try{
-    const rawCart=JSON.parse(localStorage.getItem("gpz_ps2_cart_v1")||"[]");
-    if(Array.isArray(rawCart)&&rawCart.length){
-      return rawCart.map(i=>({
-        name:(i.variant&&i.variant!=="PS2")?`${i.product} — ${i.variant}`:i.product,
-        product:i.product,
-        variant:i.variant||"PS2",
-        pack:i.pack||"",
-        quantity:Number(i.quantity)||1,
-        unitPrice:Number(i.unitPrice)||0,
-        lineTotal:(Number(i.unitPrice)||0)*(Number(i.quantity)||1),
-        unitWeight:Number(i.unitWeight)||25,
-        lineWeight:(Number(i.unitWeight)||25)*(Number(i.quantity)||1),
-        size:i.size||""
-      }));
-    }
-  }catch(e){
-    console.warn("Could not read persistent PS2 cart.",e);
-  }
-  return [];
+  return GPZ_PARAMS.get("shared")==="1"?(window.GPSharedStore?.items()||[]):[];
 }
 
 function gpzNormalizeIncomingItem(i){
@@ -1180,6 +1169,7 @@ function gpzItemDimensions(item){
 }
 function gpzBaseItems(){
   const incomingCart=gpzIncomingCartItems();
+  if(GPZ_PARAMS.get("source")==="cart")return incomingCart.map(gpzNormalizeIncomingItem);
   if(incomingCart.length) return incomingCart.map(gpzNormalizeIncomingItem);
 
   const product=GPZ_PARAMS.get("product")||document.getElementById("product").value||"PS2 Product";
@@ -1568,6 +1558,7 @@ function buildWhatsAppTemplate(){
   ].join("\n");
 }
 function submitOrder(){
+  if(!gpzCurrentOrder?.items?.length){alert('Cart is empty. Add a product before submitting an order.');return;}
   // Only these four customer fields are compulsory. Everything else is optional.
   const required=gpzCurrentOrder?.fulfillment==="pickup"?["name","mobile"]:["name","mobile","address","pincode"];
   const labels={name:"Name",mobile:"Mobile Number",address:"Address",pincode:"Pincode"};
@@ -1597,6 +1588,54 @@ function submitOrder(){
   GPOrderRecords.send(message, gpzCurrentOrder);
   // Keep checkout open after WhatsApp submission; orders.html is not part of this project.
 }
+// Cart edits use one active snapshot and one shared cart store; never re-read old summaries.
+function gpzRenderEditableCart(){
+ const host=document.getElementById('gpzEditableCartRows');
+ const total=document.getElementById('gpzEditableCartTotal');
+ const items=gpzBaseItems();
+ host.innerHTML=items.length?items.map((i,n)=>'<div class="gpz-cart-edit-row"><div><strong>'+gpzEscape(i.name)+'</strong><small>'+gpzEscape(i.variant||i.storeSource||'Games Planet')+' · ₹'+Number(i.unitPrice).toLocaleString('en-IN')+' each</small></div><div class="gpz-cart-edit-controls"><button type="button" data-cart-idx="'+n+'" data-cart-change="-1" aria-label="Decrease quantity">−</button><b>'+i.quantity+'</b><button type="button" data-cart-idx="'+n+'" data-cart-change="1" aria-label="Increase quantity">+</button><button type="button" class="gpz-cart-remove" data-cart-idx="'+n+'" data-cart-remove="1">Remove</button></div></div>').join(''):'<div class="gpz-cart-empty">Cart is empty. No products from any source are included.</div>';
+ total.textContent='Products total: ₹'+items.reduce((a,i)=>a+i.lineTotal,0).toLocaleString('en-IN');
+}
+function gpzUpdateEditableCart(next){
+ gpzCheckoutCart=next.filter(i=>Number(i.quantity)>0).map(gpzNormalizeIncomingItem);
+ GPZ_PARAMS.set('source','cart');GPZ_PARAMS.set('shared','1');
+ GPZ_PARAMS.set('storeSource','shared');
+ GPZ_PARAMS.set('cart',JSON.stringify(gpzCheckoutCart));
+ GPZ_PARAMS.set('cartAt',String(Date.now()));
+ for(const k of ['product','variant','base','weight','quantity','grandTotal'])GPZ_PARAMS.delete(k);
+ try{history.replaceState(null,'',location.pathname+'?'+GPZ_PARAMS.toString())}catch(e){console.warn('Cart URL could not be updated',e)}
+ window.GPSharedStore?.replaceItems(gpzCheckoutCart);
+ const label=gpzCheckoutCart.map(i=>i.name+' × '+i.quantity).join(' | ');
+ document.getElementById('product').value=label;
+ document.getElementById('variant').value=gpzCheckoutCart.length===1?(gpzCheckoutCart[0].variant||''):'';
+ gpzVerifiedCoupon=false;
+ document.getElementById('couponCode').value='';
+ document.getElementById('couponNote').textContent='Apply a valid coupon to receive eligible extra discounts.';
+ gpzRenderEditableCart();computeTotals();
+}
+function gpzResetEntireCart(){
+ if(!confirm('Reset ALL Games Planet carts and remove every selected product?'))return;
+ window.GPSharedStore?.reset();
+ for(const key of ['gp_cart','gp-unified-cart-v1','gpz_ps2_cart_v1','gp_shared_cart_v1','gp_order_summary'])localStorage.removeItem(key);
+ document.querySelectorAll('#items .addon-row').forEach(x=>x.remove());
+ gpzUpdateEditableCart([]);
+ document.getElementById('gpzM88Promo').hidden=true;
+}
+document.getElementById('gpzEditableCartRows').addEventListener('click',event=>{
+ const btn=event.target.closest('button[data-cart-idx]');if(!btn)return;
+ const at=Number(btn.dataset.cartIdx);
+ const rows=gpzBaseItems().map(i=>({...i}));
+ if(!Number.isInteger(at)||!rows[at])return;
+ if(btn.hasAttribute('data-cart-remove'))rows.splice(at,1);
+ else{const q=Number(rows[at].quantity)+Number(btn.dataset.cartChange||0);
+ if(q<1)rows.splice(at,1);else {rows[at].quantity=Math.min(999,q);rows[at].lineTotal=Number(rows[at].unitPrice)*rows[at].quantity;rows[at].lineWeight=Number(rows[at].unitWeight)*rows[at].quantity;}}
+ gpzUpdateEditableCart(rows);
+});
+document.getElementById('gpzResetAllCart').addEventListener('click',gpzResetEntireCart);
+window.addEventListener('storage',event=>{
+ if(event.key==='gp_shared_cart_reset_v2'){gpzCheckoutCart=[];GPZ_PARAMS.set('source','cart');GPZ_PARAMS.set('cart','[]');GPZ_PARAMS.set('cartAt',String(Date.now()));history.replaceState(null,'',location.pathname+'?'+GPZ_PARAMS.toString());gpzRenderEditableCart();computeTotals();}
+});
+
 function gpzInitialize(){
   const cartItems=gpzIncomingCartItems().map(gpzNormalizeIncomingItem);
   const incomingPromo=GPZ_PARAMS.get('storeSource')==='Gamesplanet_in'&&cartItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
@@ -1624,6 +1663,7 @@ function gpzInitialize(){
   document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
   syncCourierOptions();
   computeTotals();
+  gpzRenderEditableCart();
 }
 function gpzSyncOptionalGstCustomerName(force=false){
   const gstIncluded=gpzInvoice();
