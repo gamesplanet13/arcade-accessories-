@@ -18,10 +18,10 @@ const from=(items,url)=>Array.isArray(items)?items.map(i=>{
 function read(){try{const o=JSON.parse(localStorage.getItem(key)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{}}catch{return {}}}
 function save(source,items){if(!source)return read();const all=read(),rows=from(items,location.href);
  if(rows.length)all[source]={items:rows,updatedAt:Date.now()};else delete all[source];
- localStorage.setItem(key,JSON.stringify(all));return all;
+ localStorage.setItem(key,JSON.stringify(all));window.dispatchEvent(new Event('gp-shared-cart-updated'));return all;
 }
 function items(){return Object.entries(read()).flatMap(([source,v])=>from(v.items||[],location.href).map(i=>({...i,storeSource:source})))}
-function replaceItems(list){const next={};for(const i of from(list,location.href)){const source=i.storeSource||'catalog';(next[source]||(next[source]={items:[],updatedAt:Date.now()})).items.push(i)}localStorage.setItem(key,JSON.stringify(next));return items()}
+function replaceItems(list){const next={};for(const i of from(list,location.href)){const source=i.storeSource||'catalog';(next[source]||(next[source]={items:[],updatedAt:Date.now()})).items.push(i)}localStorage.setItem(key,JSON.stringify(next));window.dispatchEvent(new Event('gp-shared-cart-updated'));return items()}
 function reset(){localStorage.removeItem(key);for(const k of legacyKeys)localStorage.removeItem(k);
  localStorage.setItem(resetKey,String(Date.now()));
  window.dispatchEvent(new CustomEvent('gp-shared-cart-reset'));return [];
@@ -44,10 +44,24 @@ function checkout(source,rows){
  location.href=base+'order-prefill.html?'+query.toString();
 }
 window.GPSharedStore={version:2,read,save,items,replaceItems,reset,capture,checkout};
+function mountSharedCartBar(){
+ if(document.getElementById('gpSharedCartDock'))return;
+ const nav=document.createElement('div');nav.id='gpSharedCartDock';
+ nav.style.cssText='position:fixed;right:12px;bottom:76px;z-index:9900;background:#10253d;color:#fff;border-radius:12px;padding:9px;box-shadow:0 5px 20px #0005;display:flex;align-items:center;gap:7px;font:600 12px system-ui';
+ nav.innerHTML='<button id="gpSharedView" type="button" style="border:0;background:#ccf66b;color:#10253d;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">🛒 All Carts <span id="gpSharedCount">0</span> · Edit</button><button id="gpSharedReset" type="button" title="Reset every Games Planet cart" style="border:1px solid #8291a4;background:transparent;color:#fff;border-radius:8px;padding:9px;cursor:pointer">Reset</button>';
+ document.body.appendChild(nav);
+ const count=()=>{document.getElementById('gpSharedCount').textContent=String(items().reduce((n,i)=>n+(Number(i.quantity)||0),0))};
+ nav.querySelector('#gpSharedView').onclick=()=>checkout();
+ nav.querySelector('#gpSharedReset').onclick=()=>{if(confirm('Reset every Games Planet cart?')){reset();location.reload()}};
+ window.addEventListener('storage',e=>{if(e.key===key)count()});
+ window.addEventListener('gp-shared-cart-updated',count);
+ count();
+}
 function start(){
  const checkoutPage=/\/order-prefill\.html$/i.test(location.pathname);
  if(checkoutPage)return; // incoming checkout snapshots are edited in their own screen
  capture();
+ mountSharedCartBar();
  if(typeof window.clearCart==='function'&&!window.clearCart.gpResetWrapped){
   const previous=window.clearCart;
   const fn=function(...args){
