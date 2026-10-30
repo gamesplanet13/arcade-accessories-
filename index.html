@@ -1936,7 +1936,25 @@ products.push({"name":"PS4 Controller Rubber Set","category":"PS4","price":150,"
 products.push(...[{"name":"Ribbon for PS2 Slim — 7XXXX to 9XXXX Series","category":"PS2","price":100,"weight":1,"dimensions":[],"sizeLabel":"Not specified","features":["Compatible with PS2 Slim 7XXXX to 9XXXX series","₹100 per ribbon • Quantity 1 = one ribbon","Ribbon only; reset button PCB is sold separately"],"images":["images/jpeg/ps2-slim-ribbon-contacts.jpg","images/jpeg/ps2-slim-ribbon-back.jpg"]},{"name":"PS2 Slim 90XXX Reset Button with PCB","category":"PS2","price":300,"priceLabel":"₹300 without ribbon / ₹400 with ribbon","weight":10,"dimensions":[2,2,2],"variants":["Without Ribbon","With Ribbon"],"variantPrices":{"Without Ribbon":300,"With Ribbon":400},"features":["For PS2 Slim 90XXX series","Without Ribbon: reset button with PCB only — ₹300","With Ribbon: reset button with PCB + 1 ribbon — ₹400","Both photos show the two sides of the same PCB"],"images":["images/jpeg/ps2-slim-90xxx-reset-front.jpg","images/jpeg/ps2-slim-90xxx-reset-back.jpg"]}]);
 products.push(...[{"name":"PS2 Slim 7XXXX Reset Button with PCB","category":"PS2","price":300,"priceLabel":"₹300 without ribbon / ₹400 with ribbon","weight":10,"dimensions":[2,2,2],"variants":["Without Ribbon","With Ribbon"],"variantPrices":{"Without Ribbon":300,"With Ribbon":400},"features":["For PS2 Slim models starting with 7 (7XXXX series)","Without Ribbon: reset button + PCB only — ₹300","With Ribbon: reset button + PCB + 1 PS2 ribbon — ₹400","Photo shows both sides of one PCB"],"images":["images/jpeg/ps2-7xxxx-reset.jpg"]},{"name":"PS3 Super Slim Power / Reset Button with PCB","category":"PS3","price":800,"priceLabel":"₹800 without ribbon / ₹950 with ribbon","weight":10,"dimensions":[2,2,2],"variants":["Without Ribbon","With Ribbon"],"variantPrices":{"Without Ribbon":800,"With Ribbon":950},"features":["For PS3 Super Slim","Without Ribbon: power/reset button + PCB — ₹800","With Ribbon: PCB + 1 PS3 Super Slim power ribbon — ₹950","Photo shows both sides of one PCB"],"images":["images/jpeg/ps3-super-slim-reset.jpg"]},{"name":"PS3 Super Slim Power Ribbon / Flex Cable","category":"PS3","price":150,"weight":10,"dimensions":[2,2,2],"features":["Ribbon only — PCB sold separately","₹150 per piece"],"images":["images/jpeg/ps3-super-slim-ribbon.jpg"]},{"name":"Controller Analog Mechanism","category":"Gaming Accessories","price":400,"priceLabel":"₹400 without cap • PS4 cap ₹530 • PS5 cap ₹580","weight":50,"dimensions":[5.08,5.08,5.08],"sizeLabel":"2 × 2 × 2 inch","variants":["Without Cap","With PS4 Cap","With PS5 Cap"],"variantPrices":{"Without Cap":400,"With PS4 Cap":530,"With PS5 Cap":580},"variantWeights":{"Without Cap":50,"With PS4 Cap":100,"With PS5 Cap":100},"features":["Replacement analog mechanism for PS4 / PS5 / Xbox controller repairs","Without Cap: 1 mechanism only — ₹400 / 50 g","With PS4 Cap: 1 mechanism + 1 PS4 cap — ₹530 / 100 g","With PS5 Cap: 1 mechanism + 1 PS5 cap — ₹580 / 100 g","Photos are different views of the same mechanism"],"images":["images/jpeg/controller-analog-mechanism.jpg"]},{"name":"PS4 Analog Stick Cap","category":"PS4","price":130,"weight":50,"dimensions":[5.08,5.08,5.08],"sizeLabel":"2 × 2 × 2 inch","features":["₹130 per cap • Quantity 1 = one cap","Cap only — analog mechanism not included","Photo shows different views of one cap"],"images":["images/jpeg/ps4-analog-cap.jpg"]},{"name":"PS5 Analog Stick Cap","category":"PS5","price":180,"weight":50,"dimensions":[5.08,5.08,5.08],"sizeLabel":"2 × 2 × 2 inch","features":["₹180 per cap • Quantity 1 = one cap","Cap only — analog mechanism not included","Photo shows different views of one cap"],"images":["images/jpeg/ps5-analog-cap.jpg"]}]);
 GPShop.prepare(products);
-const state = (()=>{try{return GPShop.migrate(JSON.parse(localStorage.getItem("gp_cart")||"{}"),products)}catch(_){return {}}})();
+const state = (()=>{
+ try{
+  const sharedRaw=localStorage.getItem('gp_shared_cart_v2');
+  if(sharedRaw!==null||localStorage.getItem('gp_shared_cart_reset_v2')!==null){
+   const shared=JSON.parse(sharedRaw||'{}');
+   const rows=shared?.catalog?.items||[];
+   const selected={};
+   rows.forEach(item=>{
+     const idx=products.findIndex(p=>p.name===item.product||p.name===item.name);
+     if(idx<0)return;
+     const v=String(item.variant||'');
+     const key=v&&products[idx].variants?.includes(v)?'v_'+idx+'_'+v:String(idx);
+     selected[key]=(selected[key]||0)+(Number(item.quantity)||0);
+   });
+   return GPShop.migrate(selected,products);
+  }
+  return GPShop.migrate(JSON.parse(localStorage.getItem('gp_cart')||'{}'),products);
+ }catch(_){return {}}
+})();
 const container=document.getElementById("products");
 
 function productActionLinks(p){
