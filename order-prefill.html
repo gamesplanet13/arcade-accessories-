@@ -476,7 +476,7 @@ function gpzCouponDiscount(items,payment){
   const q=Math.max(1,Number(i.quantity)||1),kind=i.couponCategory||'';
   if(kind==='m88'||i.storeProductId==='e56d6e74fdcc')return total+q*(payment==='cod'?300:800);
   if(kind!=='gamebox')return total;
-  const match=String(i.variant||i.name||'').match(/(?:^|\D)(64|128|256)\s*GB\b/i);
+  const match=String(i.couponStorage||i.variant||i.name||'').match(/(?:^|\D)(64|128|256)\s*GB\b/i);
   return total+(match?({'64':200,'128':300,'256':500}[match[1]]||0)*q:0);
  },0);
 }
