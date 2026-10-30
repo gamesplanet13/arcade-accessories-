@@ -59,7 +59,19 @@
   @media(max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
   @media(max-width:720px){.grid2,.grid3,.choice-grid{grid-template-columns:1fr}}
 </style>
-<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}</style><script src="cpu-shipping.js?v=2"></script><script src="shared-store.js?v=20261019"></script></head>
+<style>#couponCard,#couponCodNotice,#sumDiscount{display:none!important} .summary-row:has(#sumDiscount){display:none!important}
+body.gpz-coupon-checkout #couponCard{display:block!important}
+body.gpz-coupon-checkout #sumDiscount{display:inline!important}
+body.gpz-coupon-checkout #couponCodNotice{display:none!important}
+.gpz-promo-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
+.gpz-promo-slots>section{padding:14px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc}
+.gpz-promo-slots>section:first-child{border-color:#86efac;background:#f0fdf4}
+.gpz-promo-slots h3{margin:0 0 8px;font-size:14px}
+.gpz-promo-slots strong{display:block;font-size:24px}
+.gpz-promo-slots p{margin:5px 0;font-size:13px}.gpz-free-courier{color:#166534;font-weight:800}
+.gpz-coupon-help{line-height:1.6;font-size:13px}
+@media(max-width:560px){.gpz-promo-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.gpz-promo-slots>section{padding:9px}.gpz-promo-slots strong{font-size:20px}.gpz-promo-slots p{font-size:11px}}
+</style><script src="cpu-shipping.js?v=2"></script><script src="shared-store.js?v=20261019"></script></head>
 <body>
 <div class="wrap">
   <h1>Games Planet — Quick Order</h1>
@@ -167,11 +179,12 @@
     <div class="hint" id="ruleNote"></div>
   </div>
 
+  <div id="gpzM88Promo" class="card" hidden><b>GPZ M88 128GB · Regular ₹6,799 · Coupon offer</b><div class="gpz-promo-slots"><section><h3>Prepaid — Full Payment</h3><strong>₹5,999</strong><p class="gpz-free-courier">Courier included · FREE</p><p>No extra charges</p></section><section><h3>Cash on Delivery</h3><strong>₹6,499</strong><p>Courier & COD charges included</p><p><b>Advance ₹600</b> · Rest ₹5,899</p></section></div><p class="gpz-coupon-help">Both panels show information only. To use the offer, subscribe to SinghTechGaming, GamesPlanet13 and GamesVallah, send screenshots to Games Planet on WhatsApp, obtain your coupon and apply it below.</p><a target="_blank" rel="noopener" href="https://wa.me/917983624797?text=Hello%20Games%20Planet%2C%20I%20subscribed%20to%20all%20three%20YouTube%20channels%20and%20want%20to%20send%20screenshots%20for%20the%20coupon.">Request coupon on WhatsApp ↗</a></div>
   <div class="card" id="couponCard" hidden>
     <span class="badge">Discount Coupon</span>
     <div class="inline">
       <div style="flex:1 1 220px">
-        <div class="label">Coupon Code (Prepaid only)</div>
+        <div class="label">Coupon Code (verified subscriber offer)</div>
         <input id="couponCode" placeholder="Enter coupon code">
       </div>
       <div style="align-self:flex-end">
@@ -181,7 +194,7 @@
     <div class="hint" id="couponNote">Coupon discount लागू होने पर total में अपने आप घट जाएगा।</div>
   </div>
   <div class="card" id="couponCodNotice" hidden style="display:none">
-    <b>Coupon is only valid for prepaid orders, not for COD.</b>
+    <b>Coupon discount is applied only after successful validation.</b>
   </div>
 
   <!-- Add-ons -->
@@ -454,8 +467,32 @@ function updatePrimeCourierAvailability(){
 function norm(s){return (s||"").toString().trim().toUpperCase();}
 function getBaseProduct(){ return norm(document.getElementById("product").value); }
 function couponDiscountCap(){return 0;}
-function computeCouponDiscount(){return 0;}
-function applyCoupon(){discountValue=0;computeTotals();}
+let gpzVerifiedCoupon=false;
+function gpzOfferItems(){return GPZ_PARAMS.get('storeSource')==='Gamesplanet_in'?gpzBaseItems():[];}
+function gpzM88Only(items){return items.length>0&&items.every(i=>i.couponCategory==='m88'||i.storeProductId==='e56d6e74fdcc');}
+function gpzCouponDiscount(items,payment){
+ if(!gpzVerifiedCoupon)return 0;
+ return items.reduce((total,i)=>{
+  const q=Math.max(1,Number(i.quantity)||1),kind=i.couponCategory||'';
+  if(kind==='m88'||i.storeProductId==='e56d6e74fdcc')return total+q*(payment==='cod'?300:800);
+  if(kind!=='gamebox')return total;
+  const match=String(i.variant||i.name||'').match(/(?:^|\D)(64|128|256)\s*GB\b/i);
+  return total+(match?({'64':200,'128':300,'256':500}[match[1]]||0)*q:0);
+ },0);
+}
+function applyCoupon(){
+ const eligible=gpzOfferItems().some(i=>i.couponCategory==='m88'||i.couponCategory==='gamebox'||i.storeProductId==='e56d6e74fdcc');
+ const value=(document.getElementById('couponCode').value||'').trim().toUpperCase();
+ // Client-side verification is an order preview, not proof of YouTube subscription.
+ gpzVerifiedCoupon=eligible&&value===String.fromCharCode(71,80,90,50,48,50,54);
+ const msg=document.getElementById('couponNote');
+ msg.textContent=gpzVerifiedCoupon?'Coupon accepted. Discount applied to eligible game devices.':'Invalid coupon. Subscribe to all three channels, send screenshots on WhatsApp, and request a valid coupon.';
+ computeTotals();
+}
+document.getElementById('couponCode').addEventListener('input',()=>{
+ gpzVerifiedCoupon=false;
+ if(gpzCurrentOrder)computeTotals();
+});
 
 /* ===== Add-ons sum & totals helpers ===== */
 function sumAddons(){
@@ -1288,13 +1325,8 @@ function setMode(nextMode){
   }else{
     mode=nextMode;
   }
-  document.getElementById("couponCard").style.display=mode==="prepaid"?"block":"none";
-  document.getElementById("couponCodNotice").style.display=mode==="cod"?"block":"none";
-  if(mode==="cod"){
-    discountValue=0;
-    document.getElementById("couponCode").value="";
-    document.getElementById("couponNote").textContent="Coupon केवल Prepaid order पर लागू है।";
-  }
+  document.getElementById("couponCard").style.display=gpzOfferItems().some(i=>['gamebox','m88'].includes(i.couponCategory))?"block":"none";
+  document.getElementById("couponCodNotice").style.display="none";
   syncCourierOptions();
 }
 function gpzRenderRateGuide(kg){
@@ -1333,15 +1365,17 @@ function computeTotals(){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     payment="prepaid"; mode="prepaid";
   }
-  if(payment==="cod") discountValue=0;
-  const appliedDiscount=0;discountValue=0;
+  const couponItems=gpzOfferItems();
+  const m88Offer=gpzVerifiedCoupon&&gpzM88Only(couponItems)&&!items.some(i=>!gpzM88Only([i]));
+  const appliedDiscount=Math.min(productTotal,gpzCouponDiscount(couponItems,payment));
+  discountValue=appliedDiscount;
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
   const speed=gpzSpeed();
   const liveKey=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
   if(!pickup){gpzLoadBigshipQuote();gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);}
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
-  const courierBaseCharge=pickup?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg));
+  const courierBaseCharge=(pickup||m88Offer)?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg));
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
@@ -1350,17 +1384,17 @@ function computeTotals(){
   // Products + add-ons + courier - discount + GST = total before VAS.
   // VAS is calculated on that total, then added to make the final amount.
   const amountBeforeGst=Math.max(0,productTotal+courierCharge-appliedDiscount);
-  const productGst=invoiceIncluded?Math.ceil(amountBeforeGst*.18):0;
-  const totalBeforeVas=amountBeforeGst+productGst;
-  const vasApplies=!pickup&&GPZ_VAS_COURIERS.includes(courier);
+  const productGst=invoiceIncluded?(m88Offer?Math.round(amountBeforeGst*18/118):Math.ceil(amountBeforeGst*.18)):0;
+  const totalBeforeVas=amountBeforeGst+(m88Offer?0:productGst);
+  const vasApplies=!m88Offer&&!pickup&&GPZ_VAS_COURIERS.includes(courier);
   const vasCharge=vasApplies?Math.ceil(totalBeforeVas*.02):0;
   const grandTotal=totalBeforeVas+vasCharge;
-  const advanceAmount=payment==="cod"?Math.min(grandTotal,Math.max(500,Math.ceil(courierCharge*2))):grandTotal;
+  const advanceAmount=payment==="cod"?(m88Offer?Math.min(grandTotal,600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0)):Math.min(grandTotal,Math.max(500,Math.ceil(courierCharge*2)))):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":"courier",deliverySpeed:pickup?"Shop Pickup":speed,courier:pickup?"Shop Pickup":courier,
     courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),gstInvoiceIncluded:invoiceIncluded,productGst,
-    discountApplied:appliedDiscount,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",
+    discountApplied:appliedDiscount,couponApplied:gpzVerifiedCoupon,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",specialM88Offer:m88Offer,courierIncluded:m88Offer,
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
     // User-facing Base Price is deliberately GST-exclusive and follows:
     // all products + add-ons + courier + VAS. Discount/GST are shown separately.
@@ -1374,11 +1408,17 @@ function computeTotals(){
   const codAvailable=!pickup&&productTotal>=GPZ_COD_MIN;
   document.getElementById("codChoice").style.display=codAvailable?"":"none";
   document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
-  document.getElementById("codNote").textContent=codAvailable
-    ? "COD available. Courier charges will be added separately."
-    : "COD is available when products + add-ons total is ₹1,300 or more.";
-  document.getElementById("couponCard").style.display=payment==="prepaid"?"block":"none";
-  document.getElementById("couponCodNotice").style.display=payment==="cod"?"block":"none";
+  document.getElementById("codNote").textContent=m88Offer
+    ? "M88 coupon COD offer: ₹600 advance per unit, remaining on delivery. No courier or COD fee."
+    : codAvailable?"COD available. Courier charges will be added separately.":"COD is available when products + add-ons total is ₹1,300 or more.";
+  const showCoupon=couponItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
+  document.body.classList.toggle('gpz-coupon-checkout',showCoupon);
+  document.getElementById("couponCard").hidden=!showCoupon;
+  document.getElementById("couponCard").style.display=showCoupon?"block":"none";
+  document.getElementById("couponCodNotice").style.display="none";
+  document.getElementById("gpzM88Promo").hidden=!gpzM88Only(couponItems);
+  const discountCaption=document.getElementById('sumDiscount').previousElementSibling;
+  if(discountCaption)discountCaption.hidden=!showCoupon;
   document.getElementById("itemBreakdown").innerHTML=items.map((i,n)=>{
     const details=[];
     if(i.product&&i.product!==i.name) details.push(`Product: <b>${gpzEscape(i.product)}</b>`);
@@ -1390,10 +1430,10 @@ function computeTotals(){
     details.push(`Dimensions: <b>${gpzEscape(gpzItemDimensions(i))}</b>`);
     return `<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${details.join("<br>")}</div>`;
   }).join("");
-  const values={sumProducts:gpzMoney(productTotal),sumDiscount:"-"+gpzMoney(appliedDiscount),sumProductGst:gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
+  const values={sumProducts:gpzMoney(productTotal),sumDiscount:appliedDiscount?"-"+gpzMoney(appliedDiscount):gpzMoney(0),sumProductGst:(m88Offer&&invoiceIncluded?'Included: ':'')+gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
     sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:usesVolumetric?volumetricKg.toFixed(2)+"kg":"Not applicable for "+courier,
     sumChargeable:chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
-    sumCourier:gpzMoney(courierCharge),sumRateSource:gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
+    sumCourier:gpzMoney(courierCharge)+(m88Offer?' (included in offer)':''),sumRateSource:m88Offer?'Included in M88 coupon offer':gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
     sumPaid:gpzMoney(advanceAmount),sumRest:gpzMoney(restAmount)};
   Object.entries(values).forEach(([id,value])=>document.getElementById(id).textContent=value);
   const bigshipStatus=document.getElementById("bigshipRateStatus");
@@ -1512,9 +1552,10 @@ function buildWhatsAppTemplate(){
     "━━━━━━━━━━━━━━━━━━━━","",
     `Total Products: ${o.totalQuantity}`,
     `Products + Add-ons: ${gpzMoney(o.productTotal)}`,
-    `Courier Charges: +${gpzMoney(o.courierCharge)}`,
-    `Products + Courier: ${gpzMoney(o.productTotal+o.courierCharge)}`,
-    `GST Invoice (18%): ${o.gstInvoiceIncluded?"+"+gpzMoney(o.productGst):gpzMoney(0)+" (Excluded)"}`,
+    `Coupon Discount: -${gpzMoney(o.discountApplied)}`,
+    `Courier Charges: ${o.courierIncluded?'Included in offer — ₹0':"+"+gpzMoney(o.courierCharge)}`,
+    `Products + Courier After Discount: ${gpzMoney(o.discountedProducts+o.courierCharge)}`,
+    `GST Invoice (18%): ${o.gstInvoiceIncluded?(o.specialM88Offer?'Included '+gpzMoney(o.productGst):"+"+gpzMoney(o.productGst)):gpzMoney(0)+" (Excluded)"}`,
     ...gstCustomerLines,
     `Total Before VAS: ${gpzMoney(o.totalBeforeVas)}`,
     `VAS (2%): ${o.vasApplies?"+"+gpzMoney(o.vasCharge):gpzMoney(0)+" (Not Applicable)"}`,
@@ -1558,6 +1599,8 @@ function submitOrder(){
 }
 function gpzInitialize(){
   const cartItems=gpzIncomingCartItems().map(gpzNormalizeIncomingItem);
+  const incomingPromo=GPZ_PARAMS.get('storeSource')==='Gamesplanet_in'&&cartItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
+  document.body.classList.toggle('gpz-coupon-checkout',incomingPromo);
   const queryProduct=String(GPZ_PARAMS.get("product")||"").trim();
   const product=cartItems.length
     ? cartItems.map(i=>`${i.name} × ${i.quantity}`).join(" | ")
