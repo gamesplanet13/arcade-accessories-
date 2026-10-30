@@ -99,7 +99,7 @@ function init(){
   if(event.key==='Tab'){const nodes=[close,...drawer.querySelectorAll('a[href]')],first=nodes[0],last=nodes[nodes.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}
  });
  window.addEventListener('pageshow',()=>setOpen(false));
- if(!window.GPSharedStore&&!document.getElementById('gp-shared-store-loader')){const script=document.createElement('script');script.id='gp-shared-store-loader';script.src=shop+'shared-store.js?v=20261030-unified-v4';document.head.append(script)}
+ if(!window.GPSharedStore&&!document.getElementById('gp-shared-store-loader')){const script=document.createElement('script');script.id='gp-shared-store-loader';script.src=shop+'shared-store.js?v=20261031-mobile-dock-fix';document.head.append(script)}
  drawer.querySelectorAll('a').forEach(a=>{if(a.href===shop+'order-prefill.html?source=cart&shared=1')a.addEventListener('click',e=>{if(window.GPSharedStore){e.preventDefault();GPSharedStore.checkout()}})});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
