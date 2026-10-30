@@ -39,7 +39,6 @@ function capture(){
 function checkout(source,rows){
  if(source)save(source,rows);else capture();
  const list=items();if(!list.length){alert('Cart is empty / पहले प्रोडक्ट जोड़ें');return}
- if(list.some(i=>i.couponCategory==='m88')&&list.some(i=>i.couponCategory!=='m88')){alert('M88 offer के लिए बाकी items पहले remove करें। Shared checkout में अलग-अलग products हैं।');return}
  const query=new URLSearchParams({source:'cart',shared:'1',storeSource:'shared',cart:JSON.stringify(list),cartAt:String(Date.now())});
  location.href=base+'order-prefill.html?'+query.toString();
 }
