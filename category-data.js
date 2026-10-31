@@ -41,7 +41,7 @@ window.GPShop={pages,group,recentProducts,prepare(products){
   if(p.name==='Zebronics H110 Motherboard'&&h110>=0)p.aliasOf=h110;
   if(p.name==='Consistent H110 DDR4 Motherboard')p.name='H110 DDR4 Motherboard';
   if(p.name==='DDR3 8GB RAM')p.name='Consistent DDR3 8GB RAM';
-  if(p.name==='64GB Pendrive'||p.name==='SanDisk Ultra 64GB USB 3.0 Pendrive'){p.name='SanDisk Ultra 64GB USB 3.0 Pendrive with Batocera Games';p.price=1999;p.images=['images/batocera-sandisk-64gb.svg'];p.weight=30;p.features=['64GB USB 3.0 with Batocera games preloaded','₹1,999 per pendrive — not blank','Optional CPU/Arcade/PC game storage'];}
+  if(p.name==='64GB Pendrive'||p.name==='SanDisk Ultra 64GB USB 3.0 Pendrive'||p.name==='SanDisk Ultra Flair USB 3.0 64GB with Batocera Games'){p.name='SanDisk Ultra Flair USB 3.0 64GB with Batocera Games';p.price=1999;p.images=['images/sandisk-ultra-flair-batocera-minimal.svg'];p.weight=30;p.features=['64GB USB 3.0 with Batocera games preloaded','₹1,999 per pendrive — not blank','Optional CPU/Arcade/PC game storage'];}
   if(/^(Normal Cabinet without SMPS|Cabinet \+ SMPS)$/.test(p.name)){p.images=['images/cpu-box-zebronics.png'];p.name=p.name.replace('Normal Cabinet','Zebronics Basic Cabinet').replace(/^Cabinet/,'Zebronics Basic Cabinet');}
   if(p.customType==='ps2')p.images=['images/ps2-black-70000.jpg'];
   if(p.name==='Assembling')p.images=['images/assembling.svg'];
