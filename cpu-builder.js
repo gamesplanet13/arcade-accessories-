@@ -1,4 +1,11 @@
 (function(){'use strict';const C=GPCPU,m=GPSetup.money,e=GPSetup.escape,$=id=>document.getElementById(id);const mode=document.body.dataset.cpuMode;if(!mode)return;const params=new URLSearchParams(location.search);let edit=params.get('edit');let s=C.defaults(mode);let sets=[];try{sets=JSON.parse(localStorage.getItem('gp_configured_sets')||'[]');const old=sets.find(x=>x.id===edit&&x.type==='cpu'&&x.selection?.buildVersion===2);if(old)s={...C.defaults(mode),...old.selection,mode};}catch(_){}const storageKey='gp_cpu_builder_'+mode;if(!edit)try{const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(saved?.buildVersion===2)s={...s,...saved,mode};}catch(_){}
+// Explicit model links from Gamesplanet_in must load that model's own
+// included hardware, NOT a previously saved customer's optional selection.
+// Edit mode deliberately takes precedence so existing saved builds survive.
+const linkedPreset=params.get('preset');
+if(!edit&&mode==='complete'&&/^[1-6]$/.test(linkedPreset||'')){
+ s={...C.preset(Number(linkedPreset)),mode:'complete'};
+}
 const opt=(v,text,selected)=>'<option value="'+v+'" '+(selected===v?'selected':'')+'>'+e(text)+'</option>';const field=(key,title,options)=>'<label class="field">'+title+'<select data-key="'+key+'">'+options.map(([id,text])=>opt(id,text,s[key])).join('')+'</select></label>';const check=(key,text)=>'<label class="toggle"><input type="checkbox" data-check="'+key+'" '+(s[key]?'checked':'')+'>'+text+'</label>';
 function row(p,q,amount,included){return '<div class="line"><img src="'+e(p.image)+'" alt="'+e(p.name)+'" loading="lazy" onclick="openCPUImage(this.src)"><div class="copy">'+e(p.name)+'<small>Qty: '+q+(included?' • Included':'')+'</small></div>'+(amount===null?'':'<b class="amount">'+m(amount)+'</b>')+'</div>';}
 window.openCPUImage=src=>{const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:#000b;z-index:100;display:grid;place-items:center;padding:25px;cursor:zoom-out';const img=document.createElement('img');img.src=src;img.alt='Product image';img.style.cssText='max-width:95%;max-height:85vh;object-fit:contain;background:white;border-radius:12px';d.append(img);d.onclick=()=>d.remove();document.body.append(d);};
