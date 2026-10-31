@@ -17,7 +17,7 @@ function init(){
  ['Arcade Accessories',shop],
  ['PS2 Accessories',shop+'ps2.html'],['PS3 Accessories',shop+'ps3.html'],
  ['PS4 Accessories',shop+'ps4.html'],['PS5 Accessories',shop+'ps5.html'],
- ['Gaming Accessories',shop+'gaming.html'],['Computer Parts',shop+'cpu.html']]],
+ ['Gaming Accessories',shop+'gaming.html'],['Computer Parts',shop+'cpu.html'],['USB Storage — Batocera',shop+'usb-storage.html']]],
  ['Mobile & Electronics',[
  ['Mobile & Audio',shop+'mobile.html'],['Mobile Phone Coolers',shop+'coolers.html'],
  ['Cables',shop+'cables.html'],['Electrical Items',shop+'electrical.html'],
