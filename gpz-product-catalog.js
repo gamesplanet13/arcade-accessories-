@@ -918,8 +918,8 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "64GB Pendrive",
-    "price": 930,
+    "name": "SanDisk Ultra 64GB USB 3.0 Pendrive with Batocera Games",
+    "price": 1999,
     "weight": 0,
     "size": ""
   },
