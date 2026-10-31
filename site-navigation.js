@@ -61,11 +61,27 @@ function init(){
  if(productRepo&&!utility&&!document.getElementById('gp-page-enquiry')){
   const panel=document.createElement('div');panel.id='gp-page-enquiry';
   panel.style.cssText='box-sizing:border-box;display:flex;justify-content:flex-end;max-width:1100px;width:calc(100% - 12px);margin:8px auto 12px;padding:0 4px';
-  const enquiry=document.createElement('a');enquiry.textContent='Enquiry / जानकारी पूछें';enquiry.target='_blank';enquiry.rel='noopener noreferrer';
-  enquiry.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:9px;background:#08783a;color:#fff;text-decoration:none;font:700 14px/1.4 system-ui;box-shadow:none';
-
-  enquiry.textContent='Selected products enquiry / चुने हुए सामान की जानकारी';
-  enquiry.addEventListener('click',event=>{
+  const isCpuBuilder=/^cpu-(?:complete|manual)-setup\.html$/i.test(file);
+  const isCpuLanding=/^cpu-setup\.html$/i.test(file);
+  const enquiry=document.createElement(isCpuBuilder?'button':'a');
+  if(!isCpuBuilder){enquiry.target='_blank';enquiry.rel='noopener noreferrer';}
+  enquiry.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:9px;background:#08783a;color:#fff;text-decoration:none;font:700 14px/1.4 system-ui;box-shadow:none;border:0;cursor:pointer;width:100%';
+  if(isCpuBuilder){
+   enquiry.type='button';
+   enquiry.textContent='Buy Now / Checkout →';
+   enquiry.setAttribute('aria-label','Buy selected CPU configuration and continue to checkout');
+   enquiry.onclick=()=>{
+    const checkout=document.getElementById('checkout');
+    if(checkout&&!checkout.disabled){checkout.click();}
+    else alert('कृपया पहले अपना CPU setup चुनें।');
+   };
+  }else if(isCpuLanding){
+   enquiry.textContent='Choose CPU Setup / Buy Now →';
+   enquiry.href=shop+'cpu-complete-setup.html';
+   enquiry.removeAttribute('target');
+  }else{
+   enquiry.textContent='Selected products enquiry / चुने हुए सामान की जानकारी';
+   enquiry.addEventListener('click',event=>{
    let selected=[],details='';
    try{
     if(typeof window.completeSummary==='function')selected=window.completeSummary().items;
@@ -77,7 +93,8 @@ function init(){
    else details=document.querySelector('#preview')?.innerText.trim()||'';
    if(!details){event.preventDefault();alert('पहले प्रोडक्ट / सेटअप चुनें या cart में जोड़ें।');return}
    enquiry.href='https://wa.me/917983624797?text='+encodeURIComponent('GAMES PLANET — Selected Products Enquiry\nPage: '+document.title+'\n'+location.href+'\n\n'+details+'\n\nकृपया इस चुने हुए सामान की जानकारी और उपलब्धता बताएँ।');
-  });
+   });
+  }
   panel.append(enquiry);
   function placeEnquiry(){const selection=document.querySelector('#ps2CartPreview')||document.querySelector('#orderDetailsSection')||document.querySelector('#summary')?.closest('section')||document.querySelector('#preview')?.closest('section')||document.querySelector('#preview');if(selection){if(selection.nextElementSibling!==panel)selection.after(panel)}else{const footer=document.querySelector('#gp-ps2-style-footer');if(footer)footer.before(panel);else if(!panel.isConnected)document.body.append(panel)}}
   placeEnquiry();window.addEventListener('load',placeEnquiry,{once:true});
