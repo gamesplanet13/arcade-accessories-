@@ -918,7 +918,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "SanDisk Ultra 64GB USB 3.0 Pendrive with Batocera Games",
+    "name": "SanDisk Ultra Flair USB 3.0 64GB with Batocera Games",
     "price": 1999,
     "weight": 0,
     "size": ""
