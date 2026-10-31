@@ -4,7 +4,7 @@ function group(p){
  const n=p.name,c=p.category;
  if(!/controller|gamepad|cable|converter|cover|case|casing|silicone|charger|charging|remote plate/i.test(n)&&/(?:\bM\s*(?:22|23|33|66|88)\b|\bGD\s*\d+\b|\bG\s*(?:10|11\s*Pro|90)\b|\bGS5\s*(?:Mini|Pro)\b|\bR\s*(?:35S|36S|36\s*Ultra)\b|\bX\s*(?:9|7M)\b|\bM15\b|gamestick|game\s*stick|handheld|retro\s*console)/i.test(n))return 'gamebox';
  if(c==='Game Consoles')return 'consoles';if(c==='Game Stick, Game Box & Handheld Consoles')return 'gamebox';
- if(/SanDisk Ultra 64GB USB 3.0 Pendrive with Batocera Games/i.test(n))return 'usb-storage';
+ if(/SanDisk.*64GB.*Batocera Games|SanDisk.*Batocera Games.*64GB/i.test(n))return 'usb-storage';
  if(p.customType==='cpu'||/Computer Parts|Computer & Network/.test(c))return 'cpu';
  if(p.customType==='arcade')return 'arcade-box';
  if(c==='Arcade Box Accessories')return 'arcade';
@@ -58,7 +58,7 @@ window.GPShop={pages,group,recentProducts,prepare(products){
   p.shopPage=group(p);if(p.shopPage==='gamebox')p.category='Game Stick, Game Box & Handheld Consoles';
  });
  // These cables fit several consoles; keep one product and one cart identity.
- products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name==='Controller Analog Mechanism')p.shopPages.push('ps4','ps5');if((p.shopPage==='ps4'&&!/Console/i.test(p.name))||/HDMI Cable|Power Cable for PS2 \/ PS3 \/ PS4 \/ PS5|CPU \/ PS4 Pro Power Cable/.test(p.name))p.shopPages.push('consoles');if(!/Xbox/i.test(p.name)&&/Ucom.*Controller|USB Gamepad|USB.*(?:Wired )?Controller/i.test(p.name))p.shopPages.push('cpu','arcade','gaming');if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(/SanDisk Ultra 64GB USB 3.0 Pendrive with Batocera Games/.test(p.name))p.shopPages.push('cpu','arcade','gaming','usb-storage');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
+ products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name==='Controller Analog Mechanism')p.shopPages.push('ps4','ps5');if((p.shopPage==='ps4'&&!/Console/i.test(p.name))||/HDMI Cable|Power Cable for PS2 \/ PS3 \/ PS4 \/ PS5|CPU \/ PS4 Pro Power Cable/.test(p.name))p.shopPages.push('consoles');if(!/Xbox/i.test(p.name)&&/Ucom.*Controller|USB Gamepad|USB.*(?:Wired )?Controller/i.test(p.name))p.shopPages.push('cpu','arcade','gaming');if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(/SanDisk.*64GB.*Batocera Games|SanDisk.*Batocera Games.*64GB/i.test(p.name))p.shopPages.push('cpu','arcade','gaming','usb-storage');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
 },migrate(state,products){
  products.forEach((p,i)=>{if(p.aliasOf!==undefined){state[p.aliasOf]=(Number(state[p.aliasOf])||0)+(Number(state[i])||0);state[i]=0;}});
  localStorage.setItem('gp_cart',JSON.stringify(state));return state;
