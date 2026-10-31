@@ -40,7 +40,7 @@ window.GPShop={pages,group,recentProducts,prepare(products){
   if(p.name==='Zebronics H110 Motherboard'&&h110>=0)p.aliasOf=h110;
   if(p.name==='Consistent H110 DDR4 Motherboard')p.name='H110 DDR4 Motherboard';
   if(p.name==='DDR3 8GB RAM')p.name='Consistent DDR3 8GB RAM';
-  if(p.name==='64GB Pendrive')p.name='SanDisk Ultra 64GB USB 3.0 Pendrive';
+  if(p.name==='64GB Pendrive'||p.name==='SanDisk Ultra 64GB USB 3.0 Pendrive'){p.name='SanDisk Ultra 64GB USB 3.0 Pendrive with Batocera Games';p.price=1999;p.images=['images/batocera-sandisk-64gb.svg'];p.weight=30;p.features=['64GB USB 3.0 with Batocera games preloaded','₹1,999 per pendrive — not blank','Optional CPU/Arcade/PC game storage'];}
   if(/^(Normal Cabinet without SMPS|Cabinet \+ SMPS)$/.test(p.name)){p.images=['images/cpu-box-zebronics.png'];p.name=p.name.replace('Normal Cabinet','Zebronics Basic Cabinet').replace(/^Cabinet/,'Zebronics Basic Cabinet');}
   if(p.customType==='ps2')p.images=['images/ps2-black-70000.jpg'];
   if(p.name==='Assembling')p.images=['images/assembling.svg'];
@@ -57,7 +57,7 @@ window.GPShop={pages,group,recentProducts,prepare(products){
   p.shopPage=group(p);if(p.shopPage==='gamebox')p.category='Game Stick, Game Box & Handheld Consoles';
  });
  // These cables fit several consoles; keep one product and one cart identity.
- products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name==='Controller Analog Mechanism')p.shopPages.push('ps4','ps5');if((p.shopPage==='ps4'&&!/Console/i.test(p.name))||/HDMI Cable|Power Cable for PS2 \/ PS3 \/ PS4 \/ PS5|CPU \/ PS4 Pro Power Cable/.test(p.name))p.shopPages.push('consoles');if(!/Xbox/i.test(p.name)&&/Ucom.*Controller|USB Gamepad|USB.*(?:Wired )?Controller/i.test(p.name))p.shopPages.push('cpu','arcade','gaming');if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
+ products.forEach(p=>{p.shopPages=[p.shopPage];if(p.name==='Controller Analog Mechanism')p.shopPages.push('ps4','ps5');if((p.shopPage==='ps4'&&!/Console/i.test(p.name))||/HDMI Cable|Power Cable for PS2 \/ PS3 \/ PS4 \/ PS5|CPU \/ PS4 Pro Power Cable/.test(p.name))p.shopPages.push('consoles');if(!/Xbox/i.test(p.name)&&/Ucom.*Controller|USB Gamepad|USB.*(?:Wired )?Controller/i.test(p.name))p.shopPages.push('cpu','arcade','gaming');if(p.name==='Power Cable for PS2 / PS3 / PS4 / PS5')p.shopPages.push('ps2','ps3','ps4','ps5');if(/HDMI Cable/.test(p.name))p.shopPages.push('ps2','ps3','ps4','ps5','cpu');if(/CPU Power Cable|Laptop Power Cable/.test(p.name))p.shopPages.push('cpu');if(/SanDisk Ultra 64GB USB 3.0 Pendrive with Batocera Games/.test(p.name))p.shopPages.push('cpu','gaming','usb-storage');if(p.name==='USB to PS2/PS3/PC Converter')p.shopPages.push('ps3','cpu');});
 },migrate(state,products){
  products.forEach((p,i)=>{if(p.aliasOf!==undefined){state[p.aliasOf]=(Number(state[p.aliasOf])||0)+(Number(state[i])||0);state[i]=0;}});
  localStorage.setItem('gp_cart',JSON.stringify(state));return state;
