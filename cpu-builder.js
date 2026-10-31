@@ -33,7 +33,28 @@ const wireless=Number(s.controllers.ps3||0)+Number(s.controllers.ps4||0)>0;out+=
 document.querySelectorAll('[data-key]').forEach(x=>x.onchange=()=>{const key=x.dataset.key;if(key==='preset'){s.storageOptionsConfirmed=true;const extra={controllers:s.controllers,dongle:s.dongle,box:s.box,lcd:s.lcd,tv:s.tv,fulfillment:s.fulfillment,usbQty:s.usbQty,usb128Qty:s.usb128Qty,hdd500Qty:s.hdd500Qty,extraSsd:s.extraSsd,hdmi:s.hdmi};s={...C.preset(x.value),...extra};}else{s[key]=x.value;if(key==='storage')s.storageOptionsConfirmed=true;if(key==='casePower'){s.cabinet=['both','cabinet'].includes(x.value);s.smps=['both','smps'].includes(x.value);}if(key==='board'){s.processor=s.board==='h110'?'i56':'i3';s.ram=s.board==='h110'?'ddr4':'ddr3';}if(key==='box'&&s.box==='full')s.tv='32';if(key==='storage'){if(s.storage==='ssd')s.extraSsd=false;}}render();});
 document.querySelectorAll('[data-check]').forEach(x=>x.onchange=()=>{s[x.dataset.check]=x.checked;render();});document.querySelectorAll('[data-usb-delta]').forEach(x=>x.onclick=()=>{s.usbQty=Math.max(0,Math.min(99,(Number(s.usbQty)||0)+Number(x.dataset.usbDelta)));s.extraUsb=false;render();});document.querySelectorAll('[data-batocera-key]').forEach(x=>x.onclick=()=>{const key=x.dataset.batoceraKey;s[key]=Math.max(0,Math.min(99,(Number(s[key])||0)+Number(x.dataset.batoceraDelta)));render();});document.querySelectorAll('[data-controller]').forEach(x=>x.onclick=()=>{const key=x.dataset.controller;s.controllers[key]=Math.max(0,Math.min(20,Number(s.controllers[key]||0)+Number(x.dataset.delta)));render();});const dongle=document.querySelector('[data-check="dongle"]');if(wireless){dongle.checked=true;dongle.disabled=true;}
 try{const c=C.calculate(s);$('setupTitle').textContent=C.title(s);$('setupContents').textContent='Included: '+c.hardware.map(x=>x.name+' × '+x.quantity).join(' • ');$('preview').innerHTML=[...c.hardware,...c.addons].map(x=>row(x,x.quantity,x.lineTotal,mode==='complete'&&c.hardware.includes(x))).join('');const weight=c.totalWeight;const packaging=GPCPUShipping.pack(c.items);$('shippingEstimate').textContent=s.fulfillment==='pickup'?'Shop Pickup • Courier ₹0 • VAS ₹0':'Estimated product weight '+(weight/1000).toFixed(2)+' kg • Packed '+((weight+packaging.packingWeight)/1000).toFixed(2)+' kg • Box '+(packaging.dimensions||[]).join(' × ')+' cm';$('total').textContent=m(c.total);$('bottomTotal').textContent=m(c.total);$('checkout').disabled=false;$('error').textContent='';localStorage.setItem(storageKey,JSON.stringify(s));}catch(err){$('error').textContent=err.message;$('checkout').disabled=true;}}
-function save(){const calc=C.calculate(s);let all=[];try{all=JSON.parse(localStorage.getItem('gp_configured_sets')||'[]');}catch(_){}const id=edit||'cpu-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);const record={id,type:'cpu',selection:JSON.parse(JSON.stringify(s)),items:calc.items,title:C.title(s)};const i=all.findIndex(x=>x.id===id);if(i>=0)all[i]=record;else all.push(record);localStorage.setItem('gp_configured_sets',JSON.stringify(all));edit=id;sessionStorage.setItem('gp_setup_checkout','1');location.href='https://gamesplanet13.github.io/arcade-accessories-/index.html#orderDetailsSection';}
+function save(){
+ const calc=C.calculate(s);
+ if(!calc.items.length||calc.total<=0)throw Error('Please select a valid CPU setup');
+ // Keep the customer's selection editable after using Back without duplicating
+ // CPU lines in the legacy configured-cart and the unified shared cart.
+ localStorage.setItem(storageKey,JSON.stringify(s));
+ // If editing a legacy configured set, replace it instead of keeping a duplicate.
+ if(edit){
+  try{const old=JSON.parse(localStorage.getItem('gp_configured_sets')||'[]');
+    localStorage.setItem('gp_configured_sets',JSON.stringify(old.filter(x=>x.id!==edit)));
+  }catch(_){}
+ }
+ const destination='https://gamesplanet13.github.io/arcade-accessories-/order-prefill.html';
+ const rows=calc.items.map(item=>({...item,image:cpuAsset(item.image)}));
+ if(window.GPSharedStore&&typeof window.GPSharedStore.checkout==='function'){
+  window.GPSharedStore.checkout('cpu-build',rows);
+  return;
+ }
+ // Direct checkout also works when the shared-cart script is unavailable.
+ const params=new URLSearchParams({source:'cart',cart:JSON.stringify(rows),cartAt:String(Date.now()),storeSource:'cpu-build'});
+ location.href=destination+'?'+params.toString();
+}
 $('checkout').onclick=()=>{try{save();}catch(err){$('error').textContent='Unable to save: '+err.message;}};render();})();
 
 
