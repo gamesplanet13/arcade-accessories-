@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+<title id="title">SanDisk 64GB USB 3.0 with Batocera Games</title><desc id="desc">Games Planet graphic showing one black and red SanDisk-style USB pendrive alongside a Batocera gaming screen and price ₹1,999. Illustrative artwork, not an actual product photograph.</desc>
+<defs>
+<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#060c24"/><stop offset=".55" stop-color="#173783"/><stop offset="1" stop-color="#5610b6"/></linearGradient>
+<linearGradient id="usb" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#4e4f54"/><stop offset=".4" stop-color="#11151d"/><stop offset="1" stop-color="#070a10"/></linearGradient>
+<linearGradient id="red" x1="0" x2="1"><stop stop-color="#fd335d"/><stop offset="1" stop-color="#c90927"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<rect width="1200" height="800" rx="40" fill="url(#bg)"/>
+<circle cx="1030" cy="190" r="260" fill="#6e46ee" opacity=".25" filter="url(#shadow)"/>
+<circle cx="310" cy="640" r="255" fill="#20d6ff" opacity=".12" filter="url(#shadow)"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="80" y="89" fill="#80dfff" font-size="37" font-weight="700">GAMES PLANET</text>
+<text x="80" y="153" fill="#fff" font-size="49" font-weight="800">SanDisk USB 3.0</text>
+<text x="80" y="217" fill="#d6ecff" font-size="42" font-weight="700">64GB • Batocera Games</text>
+<g transform="translate(70 290) rotate(-9 380 155)">
+<rect x="57" y="43" width="880" height="267" rx="85" fill="#050619" opacity=".6" filter="url(#shadow)"/>
+<rect x="30" y="102" width="213" height="150" rx="12" fill="#b5c7d7"/><rect x="20" y="136" width="66" height="80" rx="4" fill="#087ee4"/><rect x="47" y="145" width="11" height="24" rx="3" fill="#b8f5ff"/><rect x="48" y="186" width="11" height="24" rx="3" fill="#b8f5ff"/>
+<rect x="204" y="55" width="739" height="245" rx="100" fill="url(#usb)" stroke="#596b83" stroke-width="5"/>
+<rect x="214" y="58" width="120" height="239" rx="38" fill="url(#red)"/>
+<path d="M255 55h69v239h-69" fill="#b9082b" opacity=".4"/>
+<text x="390" y="164" fill="#fff" font-size="69" font-weight="700">SanDisk</text>
+<text x="395" y="232" fill="#83d9ff" font-size="35" font-weight="700">BATOCERA • RETRO GAMES</text>
+<circle cx="852" cy="175" r="47" fill="#101a29" stroke="#58677e" stroke-width="10"/>
+</g>
+<g transform="translate(85 643)">
+<rect width="480" height="94" rx="23" fill="#fff" opacity=".96"/>
+<text x="28" y="39" fill="#142244" font-size="26" font-weight="700">ONE PRODUCT • GAMES INCLUDED</text>
+<text x="28" y="75" fill="#4b5b7d" font-size="23">Optional CPU add-on • Qty selectable</text>
+</g>
+<rect x="757" y="602" width="347" height="142" rx="28" fill="#fff"/>
+<text x="793" y="659" fill="#1b2546" font-size="26" font-weight="700">FINAL PRICE</text>
+<text x="785" y="715" fill="#da093f" font-size="64" font-weight="800">₹1,999</text>
+</g>
+</svg>
