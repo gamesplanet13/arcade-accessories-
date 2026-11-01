@@ -3,7 +3,7 @@ state=Object.assign({ps2Mode:'console',storage:'64',controllers:1,pack:'top',car
 // PS2 inside an Arcade Box is a distinct configurable bundle; do not
 // re-use the console-only PS2 page's unrelated selector state.
 state.arcadePs2=Object.assign({video:'av',hdmiCable:false,storage:'64',pack:'top',card:'fmcb',warranty:'0',controllerType:'wired',controllersQty:0,extras:{}},state.arcadePs2||{});
-state.arcadePs2.extras={...(state.arcadePs2.extras||{})};
+state.arcadePs2.extras={...(state.arcadePs2.extras||{})};state.arcadePs2.card='fmcb';
 if(state.cpu==='2')state.cpu='1';if(state.cpu==='4')state.cpu='3';
 if(state.system==='cpu-2')state.system='cpu-1';if(state.system==='cpu-4')state.system='cpu-3';
 document.querySelector(`[data-type="${type}"]`).classList.add('active');
@@ -36,7 +36,7 @@ function arcadePS2Options(){
  let html='<section class="block gp-arcade-ps2"><h2>PS2 System — Complete Item-wise Setup</h2><p class="note">Arcade Box के अलावा PS2 के हर component की अलग कीमत आपके नीचे Order Summary और Cart में दिखाई देगी। कोई hidden PS2 combo charge नहीं।</p>'+included+'<div class="gp-ps2-fields">';
  html+=choice('video','PS2 Video Output — choose one',vid);
  html+=ps.video==='hdmi'?'<label class="gp-ps2-check"><input type="checkbox" data-arcade-ps2-check="hdmiCable" '+(ps.hdmiCable?'checked':'')+'> Add HDMI 1.5 Meter cable — '+m(ps2item('hdmicable').price)+' (optional)</label>':'<p class="note gp-ps2-hdmi-note">AV Cable selected — HDMI cable is not required. For HDMI output choose the converter above.</p>';
- html+=choice('card','Setup Memory Card',opt('fmcb','FMCB — PS2 Slim 7xxxx · '+m(ps2item('fmcb').price),ps.card)+opt('funtuna','FunTuna — PS2 Slim 9xxxx · '+m(ps2item('fmcb').price),ps.card));
+ html+='<p class="note gp-ps2-fmcb-included">8MB FMCB Memory Card for PS2 Slim 70000 is included in the itemized cost ('+m(ps2item('fmcb').price)+').</p>'; 
  html+=choice('storage','PS2 Games Storage',drives);
  html+=choice('pack','Game Collection',opt('top','Top Games — preloaded',ps.pack)+opt('optional','Optional Games — choose game list',ps.pack));
  html+=choice('warranty','PS2 Console Warranty (seller)',[['0','7 Days — FREE • ₹0'],['3','3 Months — ₹400'],['6','6 Months — ₹600'],['12','1 Year — ₹1,000'],['24','2 Years — ₹1,700']].map(x=>opt(...x,ps.warranty)).join(''));
