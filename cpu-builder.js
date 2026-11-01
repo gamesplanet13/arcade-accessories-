@@ -12,7 +12,7 @@ if(s.storage==='usb'){s.storage='none';s.usbQty=0;s.extraUsb=false;}
 if(!Number.isInteger(Number(s.usbQty))||Number(s.usbQty)<0)s.usbQty=0;
 const cpuAsset=src=>new URL(src,'https://gamesplanet13.github.io/arcade-accessories-/').href;
 // Batocera optional add-on should be one pictured SanDisk Ultra Flair + Batocera icon only.
-C.parts.usb.image='images/sandisk-ultra-flair-batocera-minimal.svg';
+C.parts.usb.image='images/sandisk-ultra-flair-batocera-minimal.jpg';
 const opt=(v,text,selected)=>'<option value="'+v+'" '+(selected===v?'selected':'')+'>'+e(text)+'</option>';const field=(key,title,options)=>'<label class="field">'+title+'<select data-key="'+key+'">'+options.map(([id,text])=>opt(id,text,s[key])).join('')+'</select></label>';const check=(key,text)=>'<label class="toggle"><input type="checkbox" data-check="'+key+'" '+(s[key]?'checked':'')+'>'+text+'</label>';
 function row(p,q,amount,included){return '<div class="line"><img src="'+e(cpuAsset(p.image))+'" alt="'+e(p.name)+'" loading="lazy" onclick="openCPUImage(this.src)"><div class="copy">'+e(p.name)+'<small>Qty: '+q+(included?' • Included':'')+'</small></div>'+(amount===null?'':'<b class="amount">'+m(amount)+'</b>')+'</div>';}
 // One gallery modal shared by Batocera pendrives, HDD and CPU accessories.
