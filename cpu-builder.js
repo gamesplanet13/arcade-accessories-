@@ -59,7 +59,15 @@ window.openCPUImage=src=>{
 window.addEventListener('popstate',()=>{if(cpuImageDialog)closeCPUImage(true)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&cpuImageDialog){e.preventDefault();closeCPUImage();}});
 
-function render(){const hasSSD=s.storage==='ssd'||s.extraSsd;if(!hasSSD)s.windows=false;s.fan=true;if(mode==='complete'){s.cabinet=true;s.smps=true;s.assemble=true;}s.casePower=s.cabinet?(s.smps?'both':'cabinet'):(s.smps?'smps':'none');let out='';if(mode==='complete')out+='<div class="card"><h2>Choose your ready setup</h2>'+field('preset','CPU Configuration',[1,2,3,4,5,6].map(n=>{const p=C.preset(n),c=C.calculate({...p,hdmi:s.hdmi});return[String(n),'Version '+n+' • '+(n>=5?'H110 / i5 6th / 8GB':n>=3?'H61 / i5 3rd / 4GB':'H61 / i3 3rd / 4GB')+' • '+(p.storage==='none'?'Pendrive optional':'256GB SSD')+(p.gpu?' + GT740':'')+' • '+m(c.total)]}))+'</div>';
+function render(){const hasSSD=s.storage==='ssd'||s.extraSsd;if(!hasSSD)s.windows=false;s.fan=true;if(mode==='complete'){s.cabinet=true;s.smps=true;s.assemble=true;}s.casePower=s.cabinet?(s.smps?'both':'cabinet'):(s.smps?'smps':'none');let out='';if(mode==='complete'){
+ const configCards=[1,2,3,4,5,6].map(n=>{
+  const preset=C.preset(n),built=C.calculate(preset);
+  const title=n>=5?'H110 · i5 6th Gen · DDR4 8GB':n>=3?'H61 · i5 3rd Gen · DDR3 4GB':'H61 · i3 3rd Gen · DDR3 4GB';
+  const duplicate=n===2?'Same components as Version 1':n===4?'Same components as Version 3':'';
+  return '<label class="gp-preset-choice"><input type="radio" data-key="preset" name="cpuPreset" value="'+n+'" '+(s.preset===String(n)?'checked':'')+'><span class="gp-preset-inner"><span class="gp-preset-heading"><strong>Version '+n+'</strong><b>'+m(built.total)+'</b></span><small>'+title+(preset.gpu?' + GT740 4GB GPU':'')+'</small>'+(duplicate?'<em>'+duplicate+' — no price difference</em>':'')+'</span></label>';
+ }).join('');
+ out+='<div class="card"><h2>Choose your ready setup</h2><p class="muted gp-preset-guide">Tap a version below. No full-screen dropdown.</p><div class="gp-preset-grid" role="radiogroup" aria-label="CPU Configuration">'+configCards+'</div><p class="muted gp-preset-info">All versions include CPU assembling, fan, cabinet with SMPS and 1.5m HDMI. Batocera USB/HDD and SSD are optional; choose them below. Versions 1 &amp; 2 and 3 &amp; 4 currently have identical hardware and prices.</p></div>';
+}
 out+='<div class="card"><h2>'+(mode==='complete'?'Your complete PC':'Build your CPU')+'</h2>';
 if(mode==='complete')out+='<p class="muted">'+e(C.parts[s.board].name)+' • '+e(C.parts[s.processor].name)+'<br>CPU Fan + Cabinet with SMPS + Assembling included.</p>';
 out+='<div class="fields">'+(mode==='manual'?field('board','Motherboard',[['h61','H61 • DDR3 / 3rd Gen'],['h110','H110 • DDR4 / 6th Gen']])+field('processor','Processor',s.board==='h61'?[['i3','Intel Core i3 3rd Gen'],['i5','Intel Core i5 3rd Gen']]:[['i56','Intel Core i5 6th Gen']]):'')+field('ram','RAM',s.board==='h61'?[['ddr3','DDR3 4GB • '+m(C.parts.ddr3.price)],['ddr3_8','DDR3 8GB • '+m(C.parts.ddr3_8.price)]]:[['ddr4','DDR4 8GB • '+m(C.parts.ddr4.price)]])+field('storage','Main Storage',[['none','Without storage — add optional Batocera Pendrive below'],['ssd','256GB SSD • '+m(C.parts.ssd.price)]])+'</div>';
