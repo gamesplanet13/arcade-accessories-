@@ -15,7 +15,50 @@ const cpuAsset=src=>new URL(src,'https://gamesplanet13.github.io/arcade-accessor
 C.parts.usb.image='images/sandisk-ultra-flair-batocera-minimal.svg';
 const opt=(v,text,selected)=>'<option value="'+v+'" '+(selected===v?'selected':'')+'>'+e(text)+'</option>';const field=(key,title,options)=>'<label class="field">'+title+'<select data-key="'+key+'">'+options.map(([id,text])=>opt(id,text,s[key])).join('')+'</select></label>';const check=(key,text)=>'<label class="toggle"><input type="checkbox" data-check="'+key+'" '+(s[key]?'checked':'')+'>'+text+'</label>';
 function row(p,q,amount,included){return '<div class="line"><img src="'+e(cpuAsset(p.image))+'" alt="'+e(p.name)+'" loading="lazy" onclick="openCPUImage(this.src)"><div class="copy">'+e(p.name)+'<small>Qty: '+q+(included?' • Included':'')+'</small></div>'+(amount===null?'':'<b class="amount">'+m(amount)+'</b>')+'</div>';}
-window.openCPUImage=src=>{const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:#000b;z-index:100;display:grid;place-items:center;padding:25px;cursor:zoom-out';const img=document.createElement('img');img.src=src;img.alt='Product image';img.style.cssText='max-width:95%;max-height:85vh;object-fit:contain;background:white;border-radius:12px';d.append(img);d.onclick=()=>d.remove();document.body.append(d);};
+// One gallery modal shared by Batocera pendrives, HDD and CPU accessories.
+// A dedicated history state makes Android Back close the picture, not the page.
+let cpuImageDialog=null;
+let cpuImagePreviousOverflow='';
+let cpuImageHistoryState=false;
+function closeCPUImage(fromPopstate=false){
+ if(!cpuImageDialog)return;
+ cpuImageDialog.remove();
+ cpuImageDialog=null;
+ document.body.style.overflow=cpuImagePreviousOverflow;
+ if(!fromPopstate&&cpuImageHistoryState&&history.state?.gpCpuImageOpen){
+  cpuImageHistoryState=false;
+  history.back();
+ }else cpuImageHistoryState=false;
+}
+window.openCPUImage=src=>{
+ if(cpuImageDialog){const old=cpuImageDialog.querySelector('img');if(old)old.src=src;return;}
+ const dialog=document.createElement('div');
+ dialog.id='gp-cpu-image-lightbox';
+ dialog.setAttribute('role','dialog');
+ dialog.setAttribute('aria-modal','true');
+ dialog.setAttribute('aria-label','Product picture enlarged');
+ dialog.style.cssText='position:fixed;inset:0;z-index:2147483640;background:rgba(0,0,0,.9);display:grid;place-items:center;padding:48px 12px 22px;box-sizing:border-box';
+ const img=document.createElement('img');
+ img.src=src;img.alt='Product picture enlarged';
+ img.style.cssText='display:block;width:auto;max-width:100%;max-height:83vh;object-fit:contain;background:#fff;border-radius:9px';
+ img.onerror=()=>{img.alt='Picture unavailable. Close and try again.';};
+ const close=document.createElement('button');
+ close.type='button';close.textContent='✕';
+ close.setAttribute('aria-label','Close image');
+ close.style.cssText='position:absolute;right:12px;top:12px;background:#fff;color:#142033;border:0;border-radius:50%;width:40px;height:40px;font-size:23px;cursor:pointer;z-index:1';
+ close.onclick=()=>closeCPUImage();
+ dialog.onclick=e=>{if(e.target===dialog)closeCPUImage();};
+ dialog.append(img,close);
+ cpuImagePreviousOverflow=document.body.style.overflow;
+ document.body.style.overflow='hidden';
+ document.body.append(dialog);cpuImageDialog=dialog;
+ try{history.pushState({...history.state,gpCpuImageOpen:true},'',location.href);cpuImageHistoryState=true;}
+ catch(_){cpuImageHistoryState=false;}
+ close.focus();
+};
+window.addEventListener('popstate',()=>{if(cpuImageDialog)closeCPUImage(true)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&cpuImageDialog){e.preventDefault();closeCPUImage();}});
+
 function render(){const hasSSD=s.storage==='ssd'||s.extraSsd;if(!hasSSD)s.windows=false;s.fan=true;if(mode==='complete'){s.cabinet=true;s.smps=true;s.assemble=true;}s.casePower=s.cabinet?(s.smps?'both':'cabinet'):(s.smps?'smps':'none');let out='';if(mode==='complete')out+='<div class="card"><h2>Choose your ready setup</h2>'+field('preset','CPU Configuration',[1,2,3,4,5,6].map(n=>{const p=C.preset(n),c=C.calculate({...p,hdmi:s.hdmi});return[String(n),'Version '+n+' • '+(n>=5?'H110 / i5 6th / 8GB':n>=3?'H61 / i5 3rd / 4GB':'H61 / i3 3rd / 4GB')+' • '+(p.storage==='none'?'Pendrive optional':'256GB SSD')+(p.gpu?' + GT740':'')+' • '+m(c.total)]}))+'</div>';
 out+='<div class="card"><h2>'+(mode==='complete'?'Your complete PC':'Build your CPU')+'</h2>';
 if(mode==='complete')out+='<p class="muted">'+e(C.parts[s.board].name)+' • '+e(C.parts[s.processor].name)+'<br>CPU Fan + Cabinet with SMPS + Assembling included.</p>';
