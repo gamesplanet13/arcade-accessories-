@@ -55,18 +55,59 @@ function item(name,variant,price,quantity=1,battery=false){return {name,product:
 function calculate(data,type,state){if(type==='cpu'&&state.buildVersion===2)return root.GPCPU.calculate(state);let items=[];
 if(type==='cpu'){const c=data.cpu.find(x=>x.id===state.cpu);if(!c)throw Error('Choose a CPU version');items.push(item(c.name,c.spec,c.price));const cable=root.GPCPU.parts[(state.hdmi||'1.5')==='2.2'?'hdmi22':'hdmi15'];items.push(item(cable.name,'Required HDMI cable',cable.price))}
 if(type==='arcade'){
- const a=data.arcade.find(x=>x.id===state.box);if(!a)throw Error('Choose a box');const mode=state.system||'base';
+ const a=data.arcade.find(x=>x.id===state.box);if(!a)throw Error('Choose an arcade box');const mode=state.system||'base';
  const cpuMatch=/^cpu-([1-6])$/.exec(mode);
  if(cpuMatch){
-  // Bundled CPU configurations include assembly from the CPU preset, one
-  // Batocera games pendrive and one 1.5m HDMI cable. Do not add cable twice.
   const cpuState={...root.GPCPU.preset(cpuMatch[1]),hdmi:'1.5',usbQty:1};
   const cpu=root.GPCPU.calculate(cpuState);
   items.push(item(a.name,'Prepared arcade box • CPU gaming system listed separately'+(a.id==='full'?' • TV included':''),a.base));
   items.push(...cpu.items.map(x=>({...x,arcadeCpuVersion:cpuMatch[1]})));
+ }else if(mode==='ps2'){
+  // Always price an Arcade + PS2 as its real component rows, never the old
+  // opaque box.ps2 bundle (which hid and double-counted accessories).
+  const select=(id)=>{const part=data.ps2.find(p=>p.id===id);if(!part)throw Error('PS2 component not available: '+id);return part;};
+  const add=(name,variant,price,image='',quantity=1,weight=0)=>{
+   if(!Number.isFinite(price)||price<0||!Number.isInteger(quantity)||quantity<1||quantity>99)throw Error('Invalid PS2 accessory amount or quantity');
+   const p=item(name,variant,price,quantity);p.image=image;
+   p.unitWeight=weight;p.lineWeight=weight*quantity;p.ps2Arcade=true;p.courierConfirm=true;
+   items.push(p);
+  };
+  const ps=state.arcadePs2||{};
+  const video=ps.video||'av';
+  const storage=ps.storage||'64';
+  const pack=ps.pack||'top';
+  const card=ps.card||'fmcb';
+  const warranty=String(ps.warranty??'0');
+  const qty=Number(ps.controllersQty??0);
+  const controller=ps.controllerType||'wired';
+  if(!['av','avbest','hdmi'].includes(video))throw Error('Choose AV cable or HDMI converter');
+  if(!['64','128','500'].includes(storage))throw Error('Choose PS2 64GB / 128GB / 500GB games drive');
+  if(!['top','optional'].includes(pack))throw Error('Choose Top or Optional PS2 Games');
+  if(!['fmcb','funtuna'].includes(card))throw Error('Choose FMCB or FunTuna setup card');
+  const cover={'0':0,'3':400,'6':600,'12':1000,'24':1700};
+  if(!Object.prototype.hasOwnProperty.call(cover,warranty))throw Error('Choose available PS2 warranty');
+  if(!Number.isInteger(qty)||qty<0||qty>10)throw Error('Controller quantity must be 0–10');
+  if(!['wired','crystal','wireless'].includes(controller))throw Error('Choose a PS2 controller');
+  const drive=data.ps2Packs.find(x=>x.id===storage);
+  if(!drive||!Number.isFinite(Number(drive[pack])))throw Error('PS2 games drive price not available');
+  add(a.name,'Arcade cabinet only • PS2 and accessories itemized below'+(a.id==='full'?' • 32 Inch TV included':''),a.base,a.img,a.id==='full'?1:1);
+  add('PS2 Black Slim 70000 Console','Console only • 7-day seller warranty included',8500,'images/ps2-black-70000.jpg',1,900);
+  const adapter=select('adapter');add(adapter.name,'Required for PS2 console',adapter.price,adapter.image,1);
+  const videoPart=select(video);add(videoPart.name,video==='hdmi'?'Selected PS2 HDMI output':'Selected PS2 AV output',videoPart.price,videoPart.image,1);
+  if(video==='hdmi'&&Boolean(ps.hdmiCable)){const h=select('hdmicable');add(h.name,'Optional cable for HDMI converter',h.price,h.image,1);}
+  const memory=select('fmcb');add(card==='funtuna'?'8MB FunTuna Memory Card':'8MB FMCB Memory Card',card==='funtuna'?'PS2 Slim 9xxxx — check model compatibility':'PS2 Slim 7xxxx — check model compatibility',memory.price,memory.image,1);
+  const driveImage=storage==='64'?'images/sandisk-ultra-user-photo.svg':'images/jpeg/usbhdd-1.jpeg';
+  add(drive.name+' — PS2 '+(pack==='top'?'Top Games':'Optional Games'),(pack==='top'?'Top '+drive.count+' games':'Customer-selected games')+' • '+storage+'GB • PS2 game pack',Number(drive[pack]),driveImage,1,storage==='500'?250:25);
+  add('PS2 Console Seller Warranty — '+(warranty==='0'?'7 Days Free':warranty==='12'?'1 Year':warranty==='24'?'2 Years':warranty+' Months'),warranty==='0'?'Included free • console hardware only':'Paid warranty • console hardware only',cover[warranty],'',1);
+  if(qty){const p=select(controller);add(p.name,'Optional PS2 controller',p.price,p.image,qty);}
+  for(const [key,val] of Object.entries(ps.extras||{})){
+   if(!['blank','opl','power','adapter','av','avbest','hdmi','hdmicable','fmcb','wired','crystal','wireless'].includes(key))throw Error('Unknown PS2 extra accessory');
+   const n=Number(val);if(!Number.isInteger(n)||n<0||n>10)throw Error('PS2 extra accessory quantity must be 0–10');
+   if(n){const p=select(key);add(p.name,'Extra accessory • beyond selected PS2 set',p.price,p.image,n);}
+  }
  }else{
-  if(!['base','gamebox','ps2'].includes(mode))throw Error('Choose a system');
-  items.push(item(a.name,mode==='base'?'Without game system':mode==='gamebox'?'GameBox with connectors':'PS2 gaming system',a[mode]));
+  if(!['base','gamebox'].includes(mode))throw Error('Choose a valid Arcade Box game system');
+  items.push(item(a.name,mode==='base'?'Without game system':'GameBox with connectors',a[mode]));
  }
 }
 if(type==='arcade'){
