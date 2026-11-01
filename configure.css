@@ -3,3 +3,34 @@
 .games-frame{display:block;width:100%;height:620px;border:1px solid #d5dfe5;border-radius:10px;margin:18px 0;background:#080b12}.top-video{height:300px}.game-list-link{display:inline-block;color:#007185;font-weight:bold;padding:10px 0}.addon input[type=checkbox]{width:auto;margin-right:7px}.addon input:disabled{opacity:.4}
 
 .addon-image{width:80px;height:72px;object-fit:contain;background:white;flex-shrink:0}.addon label{flex:1;min-width:0;overflow-wrap:anywhere}.tabs{flex-wrap:wrap}.layout>*{min-width:0}header{flex-wrap:wrap}@media(max-width:450px){.addon{gap:8px}.addon-image{width:55px;height:55px}.games-frame{height:500px}}
+
+/* Arcade Box PS2 setup: readable line-item selection on phones and desktop */
+.gp-arcade-ps2{border-color:#b8dce9}
+.gp-ps2-included{display:grid;gap:0;background:#f3f8fa;border:1px solid #d7e5ec;border-radius:10px;padding:8px 12px;margin:12px 0 18px}
+.gp-ps2-included>div{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid #dde8ed;font-size:13px}
+.gp-ps2-included>div:last-child{border-bottom:0}
+.gp-ps2-included strong{white-space:nowrap;color:#176546}
+.gp-ps2-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px 0}
+.gp-ps2-field{display:flex;flex-direction:column;gap:6px;min-width:0;font-weight:700;font-size:13px}
+.gp-ps2-field select{font-weight:400;font-size:14px;min-width:0}
+.gp-ps2-check{display:flex;align-items:center;gap:9px;font-size:13px;padding:10px;background:#f6fafc;border:1px solid #e2e9ee;border-radius:8px}
+.gp-ps2-check input{width:18px;height:18px;flex-shrink:0}
+.gp-ps2-hdmi-note{margin:8px 0}
+.gp-ps2-game-links{display:flex;flex-direction:column;gap:6px;margin:14px 0;background:#fff8e5;border-radius:8px;padding:10px 12px}
+.gp-ps2-game-links a{color:#075b78;font-size:13px;font-weight:750}
+.gp-ps2-game-links small{font-size:12px;color:#637183}
+.gp-ps2-controller{border-top:1px solid #e4eaf1;margin-top:18px;padding-top:14px}
+.gp-ps2-controller h3{font-size:16px;margin:0 0 8px}
+.gp-ps2-extra{border:1px solid #d8e3eb;background:#fafcfe;padding:12px;border-radius:9px;margin:10px 0}
+.gp-ps2-extra>summary{font-weight:750;cursor:pointer;font-size:14px}
+.gp-ps2-extra-line{display:grid;grid-template-columns:45px minmax(0,1fr) 64px;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid #e6edf3}
+.gp-ps2-extra-line:last-child{border:0}
+.gp-ps2-extra-line img{width:43px;height:43px;object-fit:contain;background:#fff;border-radius:7px}
+.gp-ps2-extra-line label{font-size:12px;line-height:1.45}
+.gp-ps2-extra-line small{display:block;color:#687b87}
+.gp-ps2-extra-line input[type=number]{max-width:64px;padding:6px}
+.gp-itemized-line{display:flex!important;gap:10px;align-items:flex-start}
+.gp-itemized-thumb{width:44px;height:44px;object-fit:contain;border-radius:6px;background:#fff;flex:0 0 44px}
+.gp-itemized-text{flex:1;min-width:0;overflow-wrap:anywhere}
+.gp-itemized-text b{color:#08734b}
+@media(max-width:620px){.gp-ps2-fields{grid-template-columns:1fr}.gp-ps2-included>div{font-size:12px}.gp-ps2-controller h3{font-size:15px}.gp-ps2-extra-line{grid-template-columns:40px minmax(0,1fr) 58px;gap:6px}.gp-itemized-thumb{width:38px;height:38px;flex-basis:38px}}
