@@ -76,14 +76,14 @@ if(type==='arcade'){
   const video=ps.video||'av';
   const storage=ps.storage||'64';
   const pack=ps.pack||'top';
-  const card=ps.card||'fmcb';
+  const card='fmcb';
   const warranty=String(ps.warranty??'0');
   const qty=Number(ps.controllersQty??0);
   const controller=ps.controllerType||'wired';
   if(!['av','avbest','hdmi'].includes(video))throw Error('Choose AV cable or HDMI converter');
   if(!['64','128','500'].includes(storage))throw Error('Choose PS2 64GB / 128GB / 500GB games drive');
   if(!['top','optional'].includes(pack))throw Error('Choose Top or Optional PS2 Games');
-  if(!['fmcb','funtuna'].includes(card))throw Error('Choose FMCB or FunTuna setup card');
+  if(card!=='fmcb')throw Error('Arcade PS2 Slim 70000 setup requires FMCB');
   const cover={'0':0,'3':400,'6':600,'12':1000,'24':1700};
   if(!Object.prototype.hasOwnProperty.call(cover,warranty))throw Error('Choose available PS2 warranty');
   if(!Number.isInteger(qty)||qty<0||qty>10)throw Error('Controller quantity must be 0–10');
@@ -95,7 +95,7 @@ if(type==='arcade'){
   const adapter=select('adapter');add(adapter.name,'Required for PS2 console',adapter.price,adapter.image,1);
   const videoPart=select(video);add(videoPart.name,video==='hdmi'?'Selected PS2 HDMI output':'Selected PS2 AV output',videoPart.price,videoPart.image,1);
   if(video==='hdmi'&&Boolean(ps.hdmiCable)){const h=select('hdmicable');add(h.name,'Optional cable for HDMI converter',h.price,h.image,1);}
-  const memory=select('fmcb');add(card==='funtuna'?'8MB FunTuna Memory Card':'8MB FMCB Memory Card',card==='funtuna'?'PS2 Slim 9xxxx — check model compatibility':'PS2 Slim 7xxxx — check model compatibility',memory.price,memory.image,1);
+  const memory=select('fmcb');add('8MB FMCB Memory Card','PS2 Slim 70000/7xxxx series',memory.price,memory.image,1);
   const driveImage=storage==='64'?'images/sandisk-ultra-user-photo.svg':'images/jpeg/usbhdd-1.jpeg';
   add(drive.name+' — PS2 '+(pack==='top'?'Top Games':'Optional Games'),(pack==='top'?'Top '+drive.count+' games':'Customer-selected games')+' • '+storage+'GB • PS2 game pack',Number(drive[pack]),driveImage,1,storage==='500'?250:25);
   add('PS2 Console Seller Warranty — '+(warranty==='0'?'7 Days Free':warranty==='12'?'1 Year':warranty==='24'?'2 Years':warranty+' Months'),warranty==='0'?'Included free • console hardware only':'Paid warranty • console hardware only',cover[warranty],'',1);
