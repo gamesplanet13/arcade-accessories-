@@ -24,7 +24,13 @@ if(!['1.5','2.2'].includes(s.hdmi||'1.5'))throw Error('Choose a valid HDMI cable
 add(s.board);add(s.processor);add(s.ram);add('fan');if(s.cabinet&&s.smps)add('cabinetSmps');else{if(s.cabinet)add('cabinet');if(s.smps)add('smps');}if(s.gpu)add('gpu');if(!['none','usb','ssd'].includes(s.storage))throw Error('Choose a valid main storage');if(s.mode==='complete'&&(!s.cabinet||!s.smps||!s.assemble))throw Error('Complete setup requires cabinet with SMPS, CPU fan and assembling');
 const addStorage=(key,variant='')=>{add(key,1,variant);if(key==='ssd'&&s.ssdGames)add('ssdGames',1,variant);};
 if(s.storage!=='none')addStorage(s.storage);if(s.assemble)add('assemble');if(s.windows&&(s.storage==='ssd'||s.extraSsd))add('windows');
-const hardware=a.splice(0);add((s.hdmi||'1.5')==='2.2'?'hdmi22':'hdmi15',1,'Required HDMI cable');const pendriveQty=Number(s.usbQty??(s.extraUsb?1:0));if(!Number.isInteger(pendriveQty)||pendriveQty<0||pendriveQty>99)throw Error('Batocera Pendrive quantity must be 0–99');if(pendriveQty)add('usb',pendriveQty,'Optional 64GB Batocera Games Pendrive');for(const [field,key,label] of [['usb128Qty','usb128','128GB Batocera Games Pendrive'],['hdd500Qty','hdd500','500GB Batocera Games USB HDD']]){const qty=Number(s[field]??0);if(!Number.isInteger(qty)||qty<0||qty>99)throw Error(label+' quantity must be 0–99');if(qty)add(key,qty,'Optional '+label);}if(s.extraSsd&&s.storage!=='ssd'){addStorage('ssd','Extra storage');}
+const hardware=a.splice(0);
+// Arcade Box + CPU always includes the standard 1.5m HDMI cable.
+// The CPU-only builder can still choose its own HDMI length.
+add(s.box!=='none'?'hdmi15':((s.hdmi||'1.5')==='2.2'?'hdmi22':'hdmi15'),1,s.box!=='none'?'Required 1.5m HDMI — Arcade Box + CPU':'Required HDMI cable');
+const pendriveQty=Number(s.usbQty??(s.extraUsb?1:0));
+const arcadeNeedsPendrive=s.box!=='none'&&s.storage!=='usb'&&pendriveQty===0&&Number(s.usb128Qty||0)===0;if(!Number.isInteger(pendriveQty)||pendriveQty<0||pendriveQty>99)throw Error('Batocera Pendrive quantity must be 0–99');if(pendriveQty)add('usb',pendriveQty,s.box!=='none'?'Batocera Games Pendrive — Arcade Box + CPU':'Optional 64GB Batocera Games Pendrive');
+else if(arcadeNeedsPendrive)add('usb',1,'Required 64GB Batocera Games Pendrive — Arcade Box + CPU');for(const [field,key,label] of [['usb128Qty','usb128','128GB Batocera Games Pendrive'],['hdd500Qty','hdd500','500GB Batocera Games USB HDD']]){const qty=Number(s[field]??0);if(!Number.isInteger(qty)||qty<0||qty>99)throw Error(label+' quantity must be 0–99');if(qty)add(key,qty,'Optional '+label);}if(s.extraSsd&&s.storage!=='ssd'){addStorage('ssd','Extra storage');}
 let wireless=0;for(const key of ['pc','ps3','ps4']){const q=Number(s.controllers?.[key]||0);if(!Number.isInteger(q)||q<0||q>20)throw Error('Controller quantity must be 0–20');if(q){add(key,q,'Extra controller');if(key==='ps3'||key==='ps4')add(key+'Cable',q,'Required USB charging cable for CPU controller');}if(key!=='pc')wireless+=q;}if(wireless||s.dongle)add('dongle',1,wireless?'Required for wireless controllers':'Optional connectivity');
 if(s.box!=='none'){const box=boxes[s.box];if(!box)throw Error('Choose a valid arcade box');const boxShipping={mini:[6500,[80,40,38]],counter:[16000,[92,76,45]],full:[35000,[80,76,180]]}[s.box];a.push({...box,key:'box',quantity:1,variant:s.lcd?'With TV — listed separately':'Without LCD',lineTotal:box.price,weight:boxShipping[0],dimensions:boxShipping[1],packingWeight:s.box==='full'?2500:1000});}
 if(s.lcd){const id=s.tv|| (s.box==='full'?'32':'24'),tv=displays[id];if(!tv)throw Error('Choose a valid TV');const mounted=s.box==='full';a.push({...tv,key:'tv',quantity:1,lineTotal:tv.price,variant:mounted?'Mounted inside Full Body Arcade — weight only, no separate TV carton size':'Separate TV carton',dimensions:mounted?[]:tv.dimensions,packingWeight:mounted?0:tv.packingWeight,shippingIgnoreDimensions:mounted});}
@@ -52,7 +58,10 @@ if(type==='arcade'){
  const a=data.arcade.find(x=>x.id===state.box);if(!a)throw Error('Choose a box');const mode=state.system||'base';
  const cpuMatch=/^cpu-([1-6])$/.exec(mode);
  if(cpuMatch){
-  const cpuState={...root.GPCPU.preset(cpuMatch[1]),hdmi:state.hdmi||'1.5'},cpu=root.GPCPU.calculate(cpuState);
+  // Bundled CPU configurations include assembly from the CPU preset, one
+  // Batocera games pendrive and one 1.5m HDMI cable. Do not add cable twice.
+  const cpuState={...root.GPCPU.preset(cpuMatch[1]),hdmi:'1.5',usbQty:1};
+  const cpu=root.GPCPU.calculate(cpuState);
   items.push(item(a.name,'Prepared arcade box • CPU gaming system listed separately'+(a.id==='full'?' • TV included':''),a.base));
   items.push(...cpu.items.map(x=>({...x,arcadeCpuVersion:cpuMatch[1]})));
  }else{
