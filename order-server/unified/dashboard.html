@@ -92,7 +92,8 @@ function bindActions(el){
  if(button.dataset.reject){task(()=>decision(button.dataset.reject,'cancelled'));return}
  });
 }
-bindActions($('orders'));bindActions($('historyPanel'));
+bindActions($('orders'));bindActions($('historyPanel'));bindActions($('detail'));
+
 async function load(more=false,force=false){
  const x=await api('/orders?view=summary&q='+encodeURIComponent($('search').value)+'&offset='+(more?offset:0));
  records=more?[...records,...x.orders]:x.orders;offset=x.nextOffset;$('more').hidden=offset===null;
@@ -126,20 +127,51 @@ async function loadHistoryMore(){
  $('historyMore').hidden=historyOffset===null;
 }
 function lookup(id){return records.find(r=>r.id===id)||historyOrders.find(r=>r.id===id)|| (active?.id===id?active:null)}
+
 async function decision(id,next){
- const r=lookup(id);if(!r)return;
- if(dirty&&active?.id===id)throw Error('Save changes before deciding.');
- if(r.status==='cancelled'||r.status==='dispatched')throw Error('Rejected or dispatched order cannot be accepted here.');
+ if(dirty&&active?.id===id)throw Error('Save edited order details before changing status.');
+ const r=active?.id===id?active:(await api('/orders/'+id)).order;
+ if(next===r.status)return;
+ let patch={status:next,expectedRevision:r.revision};
  if(next==='successful'){
-  const amount=num(r.payload?.order?.advanceAmount);
-  if(amount<=0)throw Error('Payment / COD advance is not entered. Open the order, record the received payment, then accept.');
-  if(!confirm('Confirm you have actually received '+money(amount)+' ('+payment(r).toUpperCase()+') for '+r.order_id+'?'))return;
- }else if(!confirm('Reject '+r.order_id+'?'))return;
- await api('/orders/'+id,'PATCH',{status:next,paymentVerified:next==='successful',invoiceApproved:next==='successful',expectedRevision:r.revision});
+  if(num(r.payload.order.advanceAmount)<=0)throw Error('Record actual payment / COD advance before accepting.');
+  if(!confirm('Confirm actual payment of '+money(r.payload.order.advanceAmount)+' received for '+r.order_id+'?'))return;
+  patch.paymentVerified=true;
+ }else if(next==='pending'){
+  if(!confirm('Move '+r.order_id+' back to Pending? Payment verification will be cleared.'))return;
+  patch.paymentVerified=false;patch.invoiceApproved=false;
+ }else if(next==='cancelled'){
+  if(!confirm('Reject '+r.order_id+'?'))return;
+  patch.invoiceApproved=false;
+ }else if(next==='deleted'){
+  const typed=prompt('Archive/delete this order from active records? Type exact Order ID: '+r.order_id,'');
+  if(typed!==r.order_id)return;
+  patch.deleteConfirmation=typed;
+ }else if(next==='delivered'){
+  if(r.status!=='dispatched')throw Error('Mark the order Dispatched first.');
+  if(!confirm('Confirm parcel delivered to customer for '+r.order_id+'?'))return;
+ }else if(next==='dispatched'){
+  throw Error('Open order and choose courier / bus details before dispatch.');
+ }
+ const saved=(await api('/orders/'+id,'PATCH',patch)).order;
  if(active?.id===id){active=null;dirty=false;$('detail').hidden=true}
  await load(false,true);
  if(!$('historyPanel').hidden)await showHistoryQuietly();
- msg(next==='successful'?'Payment verified — order accepted. Current tab is unchanged.':'Order rejected and moved to Rejected. Current tab is unchanged.','success');
+ msg('Order '+saved.order_id+' moved to '+status(saved)+'. Selected tab remains unchanged.','success');
+}
+async function confirmPayment(id){
+ if(dirty)throw Error('Save edited details first.');
+ const r=active?.id===id?active:(await api('/orders/'+id)).order;
+ if(num(r.payload.order.advanceAmount)<=0)throw Error('Enter the amount actually received and Save, then confirm payment.');
+ if(!confirm('Have you actually received '+money(r.payload.order.advanceAmount)+' for '+r.order_id+'?'))return;
+ await api('/orders/'+id,'PATCH',{paymentVerified:true,expectedRevision:r.revision});
+ await refreshAfterChange(id,'Payment confirmed. You can now accept the order.');
+}
+async function refreshAfterChange(id,feedback){
+ dirty=false;await load(false,true);
+ if(active?.id===id)await open(id,false);
+ if(!$('historyPanel').hidden)await showHistoryQuietly();
+ msg(feedback,'success');
 }
 async function showHistoryQuietly(){
  if(!historyMobile)return;
