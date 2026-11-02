@@ -183,7 +183,7 @@ if(path==='/orders/receipt'&&req.method==='POST'){
   const b=await body(req),id=clean(b.orderId,90),claim=String(b.claimToken||'');
   if(!/^[a-z0-9-]{10,90}$/.test(id)||!/^[a-f0-9]{64}$/.test(claim))fail(400,'Invalid private order receipt');
   const row=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND claim_hash=?').bind(id,await sha(claim)).first();
-  if(!row)fail(404,'Private order receipt was not found');
+  if(!row||row.status==='deleted')fail(404,'Private order receipt was not found');
   return json({order:publicOrder(row),canEdit:canCustomerChange(row)});
 }
 if(path==='/orders/receipt-edit'&&req.method==='POST'){
