@@ -340,6 +340,23 @@ function previewTotals(){
 }
 async function save(accept=false,forceStatus=''){
  if(!active||active.status==='deleted')throw Error('Restore this archived order before editing.');
+ // Status, shipping and payment approval changes must not silently reprice existing products.
+ if(!reviewDirty&&!forceStatus){
+  const shipping=shippingForm(),p=structuredClone(active.payload);
+  const busName=$('busDestination').value.trim(),busChanged=(p.order.busDestination||'')!==busName;
+  if(busChanged)p.order.busDestination=busName;
+  if(accept){
+   if(!$('verified').checked||num(p.order.advanceAmount)<=0)throw Error('Verify payment / COD advance actually received first.');
+   if(!confirm('Payment '+money(p.order.advanceAmount)+' actually received? Accept '+active.order_id+'?'))return;
+  }
+  const patch={expectedRevision:active.revision,...shipping,
+    paymentVerified:accept?true:!!$('verified').checked,invoiceApproved:!!$('invoiceApproved').checked};
+  if(busChanged)patch.payload=p;
+  if(accept)patch.status='successful';
+  await api('/orders/'+active.id,'PATCH',patch);
+  await refreshAfterChange(active.id,accept?'Payment verified — order accepted.':'Shipping or payment settings saved without changing product amounts.');
+  return;
+ }
  const p=structuredClone(active.payload),changed=reviewDirty;
  $('detail').querySelectorAll('[data-customer]').forEach(el=>p.customer[el.dataset.customer]=el.value.trim());
  p.customer.mobile=mobile(p.customer.mobile);
@@ -394,7 +411,15 @@ async function save(accept=false,forceStatus=''){
 async function dispatchOrder(){
  if(!active||active.status!=='successful')throw Error('Only Accepted orders can be dispatched.');
  if(!active.payment_verified)throw Error('Confirm actual payment / COD advance first.');
- await save(false,'dispatched');
+ if(dirty||reviewDirty)throw Error('Save edited details first. If price or quantity changes, re-accept before dispatch.');
+ const shipping=shippingForm();
+ if(!shipping.courier||!shipping.dispatchDate)throw Error('Choose a courier / bus and dispatch date first.');
+ if(!confirm('Dispatch '+active.order_id+' via '+shipping.courier+'?'))return;
+ const payload=structuredClone(active.payload);
+ const destination=$('busDestination').value.trim(),changed=(payload.order.busDestination||'')!==destination;
+ if(changed)payload.order.busDestination=destination;
+ await api('/orders/'+active.id,'PATCH',{status:'dispatched',expectedRevision:active.revision,...shipping,...(changed?{payload}:{})});
+ await refreshAfterChange(active.id,'Order dispatched. Customer login now shows courier or bus details.');
 }
 function paymentMessage(){
  if(!active)return '';
