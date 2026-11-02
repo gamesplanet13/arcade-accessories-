@@ -263,7 +263,7 @@ async function open(id,scroll=true){
  '<label>Tracking link (https://)<input id="trackingUrl" data-shipping="1" value="'+esc(r.tracking_url)+'" placeholder="https://..."></label>'+
  '<label>Bus destination / stand<input id="busDestination" data-shipping="1" value="'+esc(o.busDestination||'')+'" placeholder="City / bus stand"></label>'+
  '</div><small>Bus select करने पर AWB की जगह bus receipt/reference डाल सकते हैं। Booking number नहीं मिला हो तो खाली रख सकते हैं।</small></section>'+
- '<section class="section-panel"><h3 class="section-title">Request payment via WhatsApp</h3><div class="grid"><label>Payment QR<select id="paymentQrMode"><option value="non-gst">Non-GST QR</option><option value="gst">GST QR</option></select></label>'+
+ '<section class="section-panel"><h3 class="section-title">Request payment via WhatsApp</h3><div class="grid"><label>Payment QR<select id="paymentQrMode"><option value="non-gst">Non-GST QR</option><option value="gst">GST QR</option></select></label><label>Amount to request (₹)<input id="requestAmount" type="number" min="0" step="1" value="'+Math.ceil(r.payment_verified?Math.max(0,(String(o.paymentMode).toLowerCase()==='cod'?(o.specialM88Offer?600:500):num(o.grandTotal))-num(o.advanceAmount)):(String(o.paymentMode).toLowerCase()==='cod'?(o.specialM88Offer?600:500):num(o.grandTotal)))+'"></label>'+
  '<div><img class="qr-preview" id="qrPreview" alt="Payment QR" src="'+esc(qrUrl(o.gstInvoiceIncluded?'gst':'non-gst'))+'"><p><a id="qrDownload" href="'+esc(qrUrl(o.gstInvoiceIncluded?'gst':'non-gst'))+'" target="_blank" rel="noopener">Open QR image (share as photo)</a></p></div></div>'+
  '<p class="note">WhatsApp में payment message और QR image का link जाएगा। Actual QR photo भेजनी हो तो QR image अलग attach करें।</p></section>'+
  '<section class="section-panel"><h3>Full order actions</h3><div class="action-bar" id="orderActions">'+manageButtons(r)+'</div></section>'+
@@ -389,11 +389,11 @@ function paymentMessage(){
  if(!active)return '';
  const o=active.payload.order,c=active.payload.customer,paid=num(o.advanceAmount);
  const goal=String(o.paymentMode).toLowerCase()==='cod'?(o.specialM88Offer?600:500):num(o.grandTotal);
- const due=Math.max(0,Math.ceil(goal-paid));
+ const due=$('requestAmount')?Math.max(0,Math.ceil(Number($('requestAmount').value)||0)):Math.max(0,Math.ceil(goal-paid));
  const qr=qrUrl($('paymentQrMode')?.value);
  return 'GAMES PLANET\nOrder ID: '+active.order_id+'\nHello '+(c.name||'Customer')+
  '\nPayment mode: '+String(o.paymentMode||'').toUpperCase()+
- '\nTotal order: '+money(o.grandTotal)+'\nPayment received: '+money(paid)+
+ '\nTotal order: '+money(o.grandTotal)+'\nAmount recorded in order: '+money(paid)+' ('+(active.payment_verified?'verified':'NOT YET VERIFIED')+')'+
  '\nPayment requested now: '+money(due)+'\nPayment QR: '+qr+
  '\nAfter payment please share the UPI transaction ID / screenshot. Payment will be confirmed manually by GAMES PLANET.';
 }
