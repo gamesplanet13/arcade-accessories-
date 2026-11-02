@@ -73,7 +73,7 @@ function bindActions(el){
 }
 bindActions($('orders'));bindActions($('historyPanel'));
 async function load(more=false,force=false){
- const x=await api('/orders?q='+encodeURIComponent($('search').value)+'&offset='+(more?offset:0));
+ const x=await api('/orders?view=summary&q='+encodeURIComponent($('search').value)+'&offset='+(more?offset:0));
  records=more?[...records,...x.orders]:x.orders;offset=x.nextOffset;$('more').hidden=offset===null;
  if(force||Date.now()-cachedAt>60000){
   try{const x=await api('/customer-counts');counts=Object.fromEntries(x.counts.map(z=>[mobile(z.mobile),num(z.count)]));cachedAt=Date.now()}catch(e){console.warn('History count unavailable',e)}
