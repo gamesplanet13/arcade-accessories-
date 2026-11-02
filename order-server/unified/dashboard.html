@@ -1,11 +1,13 @@
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Orders & Labels | GAMES PLANET</title><style>*{box-sizing:border-box}body{font:14px/1.5 system-ui;margin:0;background:#f1f5f8;color:#182e40}header{background:#132b3e;color:white;padding:22px max(18px,calc((100vw - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:20px}h1{font-size:26px;margin:3px 0}.tag{font-size:10px;letter-spacing:2px;color:#9bc9e4}main{max-width:1200px;margin:22px auto;padding:0 16px}.card{background:white;border:1px solid #d9e4eb;border-radius:12px;padding:18px;margin:14px 0}button,.button{font:600 13px system-ui;background:#e5edf3;color:#17374c;border:1px solid #cddde8;border-radius:7px;padding:10px 13px;cursor:pointer;text-decoration:none;display:inline-block}.primary{background:#086888;color:white}.reject{background:#fff0eb;color:#9c3020}.accept{background:#e5f5e8;color:#236331}.toolbar,.stats,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.stat{flex:1;min-width:130px;background:white;padding:17px;border:1px solid #d9e4eb;border-radius:10px}.stat b{font-size:25px;display:block}.muted,small{color:#647a89}.orders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.order{padding:18px;background:white;border:1px solid #d9e4eb;border-radius:10px}.order h3{margin:0 0 5px}.pill{font-size:10px;padding:4px 8px;background:#eaf1f5;border-radius:15px}.order .amount{font-size:20px;font-weight:750;margin:10px 0}input,select,textarea{font:inherit;display:block;width:100%;padding:10px;border:1px solid #bfcfda;border-radius:6px;background:white}label{display:block;font-size:12px;margin:9px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.toolbar input{width:min(420px,100%)}#message{padding:12px;border-radius:8px;white-space:pre-line}#message.error{background:#fff0eb;color:#9c3020}#message.success{background:#e5f5e8;color:#236331}textarea{min-height:130px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}details{margin:14px 0}summary{cursor:pointer}header a{background:#ffd782!important;color:#17374c!important}#detail{scroll-margin-top:15px}.note{font-size:12px;color:#647a89}button:disabled{opacity:.5;cursor:wait}[hidden]{display:none!important}@media(max-width:700px){.orders,.grid{grid-template-columns:1fr}header{display:block}header a{margin-top:10px}h1{font-size:22px}}</style><script src="https://gamesplanet13.github.io/arcade-accessories-/unified-postal.js?v=20261022-orders"></script><style id="gpOwnerPolish">
+.order-photo{width:64px;height:64px;object-fit:contain;border-radius:9px;border:1px solid #d7e2eb;background:#fff;float:left;margin-right:10px}.order-thumb{width:44px;height:44px;object-fit:contain;border:1px solid #d7e2eb;border-radius:7px}.photo-missing{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid #e5edf3;border-radius:8px;background:#f5f8fa;color:#6c7885;font-size:10px}.section-panel{border:1px solid #dce6ed;padding:14px;border-radius:12px;margin:14px 0;background:#fcfdfe}.action-bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.action-bar button{min-height:41px}.warning-btn{background:#fff0eb;color:#9c3020}.status-blue{background:#e6f3fb;color:#0b506c}.order-date{color:#536879}.detail-sub{display:block;font-size:11px;color:#71808f;margin:4px 0}.qr-preview{width:150px;max-width:100%;border:1px solid #d5e0e9;padding:6px;background:white}.form-error{color:#a02f20}.order-item-catalog{display:flex;align-items:center;gap:8px}.row-secondary{color:#536879;font-size:12px}.sum-table .wideinput{min-width:105px}.pill.delivered{background:#e5f8ed;color:#155c35}.pill.dispatched{background:#e5effb;color:#194b81}.pill.deleted{background:#f4e9e9;color:#933232}
+
 .customer-count{font-size:12px;padding:5px 9px;margin-left:7px;background:#e6f3fb;border:1px solid #c9dfec}
 .item-preview{font-size:13px;color:#415466;line-height:1.5;overflow-wrap:anywhere}
 .sum-table{width:100%;border-collapse:collapse;margin:12px 0}.sum-table th,.sum-table td{padding:9px;border-bottom:1px solid #dce5ee;text-align:left;vertical-align:middle}.sum-table th{background:#eef4f8}.sum-table td:last-child,.sum-table th:last-child{text-align:right}.sum-table input{min-width:70px}.sum-table .price{width:105px}
 .totals{display:grid;grid-template-columns:1fr auto;gap:7px 16px;margin:12px 0}.totals b{text-align:right}.totals .grand{font-weight:800;font-size:18px;border-top:2px solid #cbd8e2;padding-top:9px}
 #historyPanel{border:2px solid #aacbdc}#historyPanel .orders{margin-top:10px}.print-info{font-size:12px;margin:10px 0;color:#50657a}.section-title{margin:16px 0 7px}
 @media(max-width:600px){.sum-table{font-size:12px}.sum-table th,.sum-table td{padding:5px}.sum-table .price{width:76px}.sum-table input{padding:5px}}
-</style></head><body><header><div><div class="tag">GAMES PLANET · OWNER DESK</div><h1>Orders & labels</h1><small style="color:#b8d0df">Review payment. Accept orders. Print once.</small></div><a class="button" href="/labels">Open label maker →</a></header><main><p id="message" role="status"></p><section class="stats" id="stats"></section><section class="card toolbar"><input id="search" placeholder="Search order, customer, mobile, PIN or product"><select id="filter" style="width:auto"><option value="all">All orders</option><option value="pending">Pending</option><option value="successful">Accepted</option><option value="cancelled">Rejected</option><option value="cod">COD orders</option></select><button id="refresh">Refresh</button><button id="backup">Download backup</button><span class="note">Updates every 60 seconds without changing your selected tab</span></section><p class="note">Accept — payment verified दबाने पर prepaid order label queue में जाएगा। COD और rejected orders auto labels में नहीं जाएँगे। Printed orders का record dashboard में सुरक्षित रहेगा।</p><section id="orders" class="orders"></section><button id="more" hidden>Load more</button><section id="historyPanel" class="card" hidden></section><section id="detail" class="card" hidden></section></main><script>
+</style></head><body><header><div><div class="tag">GAMES PLANET · OWNER DESK</div><h1>Orders & labels</h1><small style="color:#b8d0df">Review payment. Accept orders. Print once.</small></div><a class="button" href="/labels">Open label maker →</a></header><main><p id="message" role="status"></p><section class="stats" id="stats"></section><section class="card toolbar"><input id="search" placeholder="Search order, customer, mobile, PIN or product"><select id="filter" style="width:auto"><option value="all">All orders</option><option value="pending">Pending</option><option value="successful">Accepted</option><option value="dispatched">Dispatched</option><option value="delivered">Delivered</option><option value="cancelled">Rejected</option><option value="deleted">Deleted / Archive</option><option value="cod">COD orders</option></select><button id="refresh">Refresh</button><button id="backup">Download backup</button><span class="note">Updates every 60 seconds without changing your selected tab</span></section><p class="note">Accept — payment verified दबाने पर prepaid order label queue में जाएगा। COD और rejected orders auto labels में नहीं जाएँगे। Printed orders का record dashboard में सुरक्षित रहेगा।</p><section id="orders" class="orders"></section><button id="more" hidden>Load more</button><section id="historyPanel" class="card" hidden></section><section id="detail" class="card" hidden></section></main><script>
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -18,14 +20,33 @@ function msg(s,type=''){$('message').className=type;$('message').textContent=s;}
 async function api(path,method='GET',data){const r=await fetch('/api'+path,{method,headers:{'Content-Type':'application/json'},body:data?JSON.stringify(data):undefined});const x=await r.json();if(!r.ok)throw Error(x.error||'Request failed');return x;}
 async function task(fn){if(busy)return;busy=true;try{await fn()}catch(e){msg(e.message||String(e),'error')}finally{busy=false}}
 const payment=r=>String(r.payload?.order?.paymentMode||'unknown').toLowerCase();
-const status=r=>r.status==='successful'?'Accepted':r.status==='cancelled'?'Rejected':r.status==='dispatched'?'Dispatched':'Pending';
+const status=r=>({successful:'Accepted',cancelled:'Rejected',dispatched:'Dispatched',delivered:'Delivered',deleted:'Deleted / Archived',pending:'Pending'}[r.status]||r.status);
 const itemName=i=>[i.name||i.product||'Product',i.variant].filter(Boolean).join(' — ');
 const itemTotal=i=>Number.isFinite(Number(i.lineTotal))?Number(i.lineTotal):num(i.quantity)*num(i.unitPrice);
-function productsTable(items,editable=false){
-  if(!items?.length)return '<p>Products not supplied — verify order details.</p>';
-  return '<div style="overflow-x:auto"><table class="sum-table"><thead><tr><th>Product / Variant</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead><tbody>'+
-  items.map((i,index)=>'<tr><td>'+(editable?'<input aria-label="Product name" data-item="'+index+'" data-key="name" value="'+esc(i.name||i.product||'')+'"><input aria-label="Variant" data-item="'+index+'" data-key="variant" value="'+esc(i.variant||'')+'" placeholder="Variant">':esc(itemName(i)))+'</td><td>'+(editable?'<input aria-label="Quantity" type="number" min="1" step="1" data-item="'+index+'" data-key="quantity" value="'+Math.max(1,num(i.quantity))+'">':num(i.quantity))+'</td><td>'+(editable?'<input class="price" aria-label="Unit price" type="number" min="0" step=".01" data-item="'+index+'" data-key="unitPrice" value="'+num(i.unitPrice)+'">':money(i.unitPrice))+'</td><td>'+money(itemTotal(i))+'</td></tr>').join('')+
-  '</tbody><tfoot><tr><th colspan="3">Products subtotal</th><th>'+money(items.reduce((n,i)=>n+itemTotal(i),0))+'</th></tr></tfoot></table></div>';
+function safeImage(value,source){
+ const raw=String(value||'').trim();if(!raw)return '';
+ try{const base='https://gamesplanet13.github.io/'+encodeURIComponent(String(source||'arcade-accessories-').replace(/[^a-z0-9_-]/gi,''))+'/';
+ const url=new URL(raw,base);
+ return ['https:','http:'].includes(url.protocol)?url.href:'';}catch{return ''}
+}
+function imageHTML(i,source){
+ const url=safeImage(i.image||i.imageUrl||i.thumbnail||i.photo||(Array.isArray(i.images)?i.images[0]:''),source);
+ return url?'<img class="order-thumb" loading="lazy" referrerpolicy="no-referrer" src="'+esc(url)+'" alt="Product photo">':'<span class="photo-missing">No photo</span>';
+}
+function itemPhoto(i,source){const url=safeImage(i.image||i.imageUrl||i.thumbnail||i.photo||(Array.isArray(i.images)?i.images[0]:''),source);return url?'<img class="order-photo" loading="lazy" src="'+esc(url)+'" alt="Product">':''}
+function productsTable(items,editable=false,source='arcade-accessories-'){
+ if(!items?.length)return '<p>Product information not supplied.</p>';
+ return '<div style="overflow-x:auto"><table class="sum-table"><thead><tr><th>Photo</th><th>Product / Variant</th><th>Quantity</th><th>Rate</th><th>Amount</th>'+(editable?'<th></th>':'')+'</tr></thead><tbody>'+
+ items.map((i,index)=>'<tr><td>'+imageHTML(i,source)+'</td><td>'+(editable?
+ '<input aria-label="Product name" data-item="'+index+'" data-key="name" value="'+esc(i.name||i.product||'')+'"><input aria-label="Variant" data-item="'+index+'" data-key="variant" value="'+esc(i.variant||'')+'" placeholder="Variant"><span class="detail-sub">Weight in g / Dimensions / Image</span>'+
+ '<input aria-label="Unit weight in grams" type="number" min="0" data-item="'+index+'" data-key="unitWeight" value="'+num(i.unitWeight)+'" placeholder="Weight g">'+
+ '<input aria-label="Dimensions" data-item="'+index+'" data-key="dimensions" value="'+esc(Array.isArray(i.dimensions)?i.dimensions.join(' × '):(i.dimensions||''))+'" placeholder="Dimensions cm">'+
+ '<input aria-label="Product photo URL" data-item="'+index+'" data-key="image" value="'+esc(i.image||i.imageUrl||i.thumbnail||'')+'" placeholder="Image URL">'
+ :esc(itemName(i))+'<span class="detail-sub">Unit weight: '+(i.unitWeight??'—')+'g · Dimensions: '+esc(Array.isArray(i.dimensions)?i.dimensions.join(' × '):(i.dimensions||'—'))+'</span>')+'</td>'+
+ '<td>'+(editable?'<input aria-label="Quantity" type="number" min="1" step="1" data-item="'+index+'" data-key="quantity" value="'+Math.max(1,num(i.quantity))+'">':num(i.quantity))+'</td>'+
+ '<td>'+(editable?'<input class="price" aria-label="Unit price" type="number" min="0" step=".01" data-item="'+index+'" data-key="unitPrice" value="'+num(i.unitPrice)+'">':money(i.unitPrice))+'</td><td>'+money(itemTotal(i))+'</td>'+
+ (editable?'<td><button type="button" data-removeitem="'+index+'" class="warning-btn" title="Remove this product">Remove</button></td>':'')+'</tr>').join('')+
+ '</tbody><tfoot><tr><th colspan="4">Products subtotal</th><th>'+money(items.reduce((n,i)=>n+itemTotal(i),0))+'</th>'+(editable?'<th></th>':'')+'</tr></tfoot></table></div>';
 }
 function totalBlock(r){
  const o=r.payload.order||{},c=r.payload.customer||{};
@@ -45,13 +66,13 @@ function totalBlock(r){
 function card(r){
  const c=r.payload.customer||{},o=r.payload.order||{},m=mobile(c.mobile);
  const n=counts[m]||records.filter(x=>mobile(x.payload?.customer?.mobile)===m).length||1;
- const editable=r.status!=='cancelled'&&r.status!=='dispatched';
- return '<article class="order"><span class="pill">'+esc(status(r))+' · '+esc(payment(r).toUpperCase())+'</span><h3>'+esc(c.name||'No name')+' <button class="customer-count" data-history="'+esc(m)+'" data-cname="'+esc(c.name)+'">'+n+' order(s) · History</button></h3>'+
+ const editable=r.status!=='deleted';
+ return '<article class="order"><span class="pill '+esc(r.status)+'">'+esc(status(r))+' · '+esc(payment(r).toUpperCase())+'</span><h3>'+esc(c.name||'No name')+' <button class="customer-count" data-history="'+esc(m)+'" data-cname="'+esc(c.name)+'">'+n+' order(s) · History</button></h3>'+
  '<small>'+esc(r.order_id)+' · '+esc(r.created_at||'')+'</small><p>'+esc(c.city||'')+' '+esc(c.pincode||'')+' · '+esc(c.mobile||'')+'</p>'+
- '<div class="item-preview">'+(o.items||[]).map(i=>esc(itemName(i))+' × '+num(i.quantity)+' = '+money(itemTotal(i))).join('<br>')+'</div>'+
+ '<div class="item-preview">'+(o.items||[]).map(i=>itemPhoto(i,r.source)+esc(itemName(i))+' × '+num(i.quantity)+' = '+money(itemTotal(i))+'<div style="clear:both"></div>').join('')+'</div>'+
  '<div class="amount">'+money(o.grandTotal)+'</div><small>Payment: '+(r.payment_verified?'Verified':'Not verified')+' · '+(r.printed_revision>=r.revision?'Label printed':'Not printed')+'</small>'+
  '<div class="actions" style="margin-top:12px"><button data-open="'+esc(r.id)+'">'+(editable?'Open / edit':'View order')+'</button><button data-print="'+esc(r.id)+'">Print order summary</button>'+
- (editable?'<button class="accept" data-accept="'+esc(r.id)+'">Accept — payment received</button><button class="reject" data-reject="'+esc(r.id)+'">Reject</button>':'')+'</div></article>';
+ (r.status==='pending'?'<button class="accept" data-accept="'+esc(r.id)+'">Accept — payment confirmed</button>':'')+(r.status==='successful'?'<button data-open="'+esc(r.id)+'">Dispatch details</button>':'')+'</div></article>';
 }
 function render(force=false){
  const filter=$('filter').value;
@@ -81,7 +102,7 @@ async function load(more=false,force=false){
  render(force||more);
  if(force||Date.now()-metricsAt>60000){
   const m=await api('/metrics'),stats=Object.fromEntries(m.counts.map(x=>[x.status,x.n]));
-  $('stats').innerHTML=[['Pending',stats.pending||0],['Accepted',stats.successful||0],['Rejected',stats.cancelled||0],['Labels ready',m.queued]].map(([k,v])=>'<div class="stat"><small>'+k+'</small><b>'+v+'</b></div>').join('');
+  $('stats').innerHTML=[['Pending',stats.pending||0],['Accepted',stats.successful||0],['Dispatched',stats.dispatched||0],['Delivered',stats.delivered||0],['Rejected',stats.cancelled||0],['Archived',stats.deleted||0],['Labels ready',m.queued]].map(([k,v])=>'<div class="stat"><small>'+k+'</small><b>'+v+'</b></div>').join('');
   metricsAt=Date.now();
  }
 }
