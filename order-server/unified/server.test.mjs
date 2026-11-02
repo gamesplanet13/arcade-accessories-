@@ -99,7 +99,7 @@ r=await call('/orders/'+cid,'PATCH',{status:'pending',paymentVerified:false,invo
 assert.equal(r.status,200);
 assert.equal(r.data.order.status,'pending');
 // Bus orders should preserve transport mode without mandatory AWB.
-const bus=payload('gg','cod'),busId=(await call('/orders','POST',bus)).data.id;
+const bus=payload('ab','cod'),busId=(await call('/orders','POST',bus)).data.id;
 r=await call('/orders/'+busId,'PATCH',{status:'successful',paymentVerified:true},true);
 assert.equal(r.status,200);
 r=await call('/orders/'+busId,'PATCH',{status:'dispatched',dispatchBy:'bus',courier:'Bus',dispatchDate:'2026-11-03',trackingNumber:'BUS-R-13'},true);
