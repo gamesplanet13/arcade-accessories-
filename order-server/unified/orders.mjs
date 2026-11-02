@@ -262,11 +262,11 @@ if(b.status==='deleted'&&row.status!=='deleted'&&clean(b.deleteConfirmation,120)
 if(next.status==='deleted')next.invoice_approved=0;
 if(b.payload&&b.payload.order?.items?.some(i=>!i.name&&!i.product||!Number.isInteger(Number(i.quantity))||Number(i.quantity)<1||Number(i.unitPrice)<0||!Number.isFinite(Number(i.unitPrice))))
   fail(400,'Product name, positive integer quantity and valid unit price are required.');
-if(b.payload&&b.payload.order?.items?.length>200)fail(400,'Too many products.');if(next.status!==row.status){
- const oldPayload=JSON.parse(next.payload),details=oldPayload.order||{};
- details.statusChangedAt=new Date().toISOString();
- if(next.status==='delivered')details.deliveredAt=details.statusChangedAt;
- if(next.status==='dispatched')details.dispatchedAt=details.statusChangedAt;
+if(b.payload&&b.payload.order?.items?.length>200)fail(400,'Too many products.');if(next.status!==row.status&&['dispatched','delivered'].includes(next.status)){
+ const oldPayload=JSON.parse(next.payload),details=oldPayload.order||{},changedAt=new Date().toISOString();
+ details.statusChangedAt=changedAt;
+ if(next.status==='delivered')details.deliveredAt=changedAt;
+ if(next.status==='dispatched')details.dispatchedAt=changedAt;
  oldPayload.order=details;next.payload=JSON.stringify(oldPayload);
 }
 const revision=next.payload===row.payload?row.revision:row.revision+1;if(next.tracking_url&&!/^https:\/\//.test(next.tracking_url))fail(400,'Tracking URL must use HTTPS');const now=new Date().toISOString();const writes=await env.DB.batch([env.DB.prepare('UPDATE orders SET status=?,payment_verified=?,invoice_approved=?,dispatch_by=?,dispatch_date=?,courier=?,tracking_number=?,tracking_url=?,payload=?,search_text=?,updated_at=?,revision=? WHERE id=? AND revision=?').bind(next.status,next.payment_verified,next.invoice_approved,next.dispatch_by,next.dispatch_date,next.courier,next.tracking_number,next.tracking_url,next.payload,searchText(JSON.parse(next.payload)),now,revision,row.id,row.revision),env.DB.prepare('INSERT INTO audit SELECT ?,?,?,?,?,? WHERE changes()=1').bind(crypto.randomUUID(),row.id,a.account_id,now,JSON.stringify(publicOrder(row)),JSON.stringify(publicOrder({...next,revision})))]);if(writes[0].meta.changes!==1)fail(409,'Order changed while saving. Reload before editing.');return json({order:publicOrder({...next,revision})});}}
