@@ -9,7 +9,7 @@ function init(){
  ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
  ['Game Consoles · PS4',shop+'consoles.html'],
  ['PS2 Console',base+'ps2/'],
- ['PS2 FMCB & USB',base+'ps2fmcb/'],
+ ['PS2 FMCB & USB',base+'ps2fmcb/Simple.html'],
  ['CPU Models / CPU Box',shop+'cpu-setup.html'],
  ['Arcade Box',shop+'arcade-box.html']]],
  ['Parts & Accessories',[
