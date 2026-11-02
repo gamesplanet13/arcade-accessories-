@@ -1197,7 +1197,7 @@ img,canvas{
 
 </style>
 
-<script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js?v=20261102-ps2-ps3-accessories-fixed"></script><link rel="stylesheet" href="category-pages.css?v=20261027-console-media"><style id="compact-variant-final-v3">
+<script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js?v=20261102-gamepack-shipping-cod-double"></script><link rel="stylesheet" href="category-pages.css?v=20261027-console-media"><style id="compact-variant-final-v3">
 #products .product .variant-row{display:grid!important;grid-template-columns:minmax(0,1fr) 96px!important;grid-template-rows:auto!important;align-items:center!important;gap:6px!important;padding:6px!important;margin:0!important;min-height:44px!important;height:auto!important}
 #products .product .variant-label{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;gap:7px!important;align-items:center!important;min-width:0!important;width:100%!important}
 #products .product .variant-thumb{position:static!important;width:32px!important;height:32px!important;max-width:32px!important;margin:0!important;object-fit:contain!important}
@@ -2208,8 +2208,8 @@ function onDeliverySpeedChange(){
 function onPaymentModeChange(){
  if(getPaymentMode()==="cod"){
    const productTotal=buildOrderSummary().productTotal;
-   if(productTotal<2500){
-     alert("COD is available only for product orders of ₹2,500 or more.");
+   if(productTotal<1300){
+     alert("COD is available only for product orders of ₹1,300 or more.");
      const prepaidRadio=document.querySelector('input[name="paymentMode"][value="prepaid"]');
      if(prepaidRadio) prepaidRadio.checked=true;
    }
@@ -2264,9 +2264,8 @@ function getCourierCalculation(chargeableKg){
  const courier=document.getElementById("courier")?.value || "Trackon.in";
  const meta=DELIVERY_SPEEDS[speed];
  const paymentMode=getPaymentMode();
- const speedMultiplier=paymentMode==="cod" ? 1 : meta.multiplier;
- const calculatedCourierCharge=Math.round(chargeableKg*courierBaseRate(courier)*speedMultiplier);
- const courierCharge=paymentMode==="cod"?Math.max(200,calculatedCourierCharge):calculatedCourierCharge;
+ const prepaidCourierCharge=Math.round(chargeableKg*courierBaseRate(courier)*meta.multiplier);
+ const courierCharge=paymentMode==="cod"?prepaidCourierCharge*2:prepaidCourierCharge;
  return {speed,courier,courierCharge,label:meta.label,paymentMode};
 }
 
@@ -2604,7 +2603,7 @@ function orderWhatsApp(){
 
  if(!lines.length){alert("Please select products first");return;}
  if(getPaymentMode()==="cod" && total<2500){
-   alert("COD is available only for product orders of ₹2,500 or more.");
+   alert("COD is available only for product orders of ₹1,300 or more.");
    return;
  }
 
