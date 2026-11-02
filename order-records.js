@@ -9,15 +9,55 @@ function build(message,structured){const m=parse(message);m.header=message.split
 if(!order.paymentMode)order.paymentMode=/COD Order on WhatsApp/i.test(message)?'cod':/Prepaid Order on WhatsApp/i.test(message)?'prepaid':selectedMode(m);
 if(!Array.isArray(order.items)||!order.items.length){let product=m.product||m.console||val('product','otherProduct')||'Selected PS2 setup';let qty=number(m.quantity)||1,amount=number(m.mainproductamount??m.baseamount??m.productamount??m.baseprice);if(m.console){const n=m.console.match(/₹\s*([\d,.]+)/);if(n)amount=number(n[1]);}order.items=[{name:product,variant:m.variant||m.storage||'',quantity:qty,unitPrice:amount===null?null:amount/qty,lineTotal:amount}];order.productTotal=amount;order.grandTotal=number(m.finalordertotal??m.grandtotal??m.total??m.amountpaid??m.mainproductamount??m.baseamount);order.advanceAmount=number(m.amountpaid??m.advancepaid??m.codadvance);order.restAmount=number(m.remainingamount??m.restondelivery);order.courier=m.couriercompany||val('courier');}
 order.delivery={...(order.delivery||{}),destination:customer.pincode,origin:'244901',distance:m.distance||val('distance'),etaPrepaid:m.prepaidordereta||val('etaText'),etaCod:m.codordereta||val('etaTextCod'),estimatedDelivery:order.paymentMode==='cod'?(val('dateRange')||''):(m.estimateddelivery||val('dateRange')),estimatedDeliveryCod:order.paymentMode==='cod'?(m.estimateddelivery||val('dateRangeCOD')):val('dateRangeCOD')};
-let id=m.orderid||val('orderId');if(!id)id=crypto.randomUUID();const source=new URLSearchParams(location.search).get('storeSource')||location.pathname.split('/').filter(Boolean)[0]||'store';let keys=read(secrets,{}),pair=keys[id];if(!pair){pair={submissionKey:random(),claimToken:random()};keys[id]=pair;write(secrets,keys)}return{...pair,source,orderId:id,customer,order,message};}
-async function post(entry){if(!API())throw Error('Order server is not configured');const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),15000);try{const r=await fetch(API()+'/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry),signal:ctrl.signal,keepalive:JSON.stringify(entry).length<50000});const x=await r.json();if(!r.ok)throw Error(x.error||'Order was not saved');const receipts=read('gp_private_order_receipts',[]);if(!receipts.some(y=>y.id===x.id)){receipts.push({id:x.id,orderId:entry.orderId,claimToken:entry.claimToken});write('gp_private_order_receipts',receipts)}return x}finally{clearTimeout(timer)}}
+let id=m.orderid||val('orderId');if(!id)id=crypto.randomUUID();const source=new URLSearchParams(location.search).get('storeSource')||location.pathname.split('/').filter(Boolean)[0]||'store';let keys=read(secrets,{}),pair=keys[id];if(!pair){pair={submissionKey:random(),claimToken:random()};keys[id]=pair;write(secrets,keys)}const previous=read('gp_private_order_receipts',[]).filter(x=>
+  x.id&&x.claimToken&&x.orderId!==id&&mobile(x.customerMobile)===customer.mobile&&
+  Number.isFinite(Date.parse(x.createdAt||''))&&Date.now()-Date.parse(x.createdAt)<72*3600000&&Date.now()-Date.parse(x.createdAt)>=0
+).sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt))[0];
+return{...pair,source,orderId:id,customer,order,message,
+  ...(previous?{previousOrderId:previous.id,previousClaimToken:previous.claimToken}:{})};}
+async function post(entry){if(!API())throw Error('Order server is not configured');const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),15000);try{const r=await fetch(API()+'/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry),signal:ctrl.signal,keepalive:JSON.stringify(entry).length<50000});const x=await r.json();if(!r.ok)throw Error(x.error||'Order was not saved');const receipts=read('gp_private_order_receipts',[]);if(!x.merged&&!receipts.some(y=>y.id===x.id)){
+  receipts.push({id:x.id,orderId:entry.orderId,claimToken:entry.claimToken,
+    customerMobile:entry.customer.mobile,createdAt:new Date().toISOString(),
+    summary:(entry.order.items||[]).map(i=>String(i.name||i.product)+' × '+(i.quantity||1)).join(', '),
+    grandTotal:entry.order.grandTotal});
+  write('gp_private_order_receipts',receipts);
+}
+return x}finally{clearTimeout(timer)}}
 function outbox(){return read(store,memory)}function retain(entry){const all=outbox(),at=all.findIndex(x=>x.orderId===entry.orderId);if(at<0)all.push(entry);else all[at]=entry;memory=all;return write(store,all)}function remove(id){const all=outbox().filter(x=>x.orderId!==id);memory=all;write(store,all)}
 async function flush(){if(flushing||busy||!navigator.onLine)return;flushing=true;let count=0;try{for(const entry of outbox()){try{await post(entry);remove(entry.orderId);count++;}catch(e){notice('Order '+entry.orderId+' is still waiting to sync: '+e.message,true);break;}}if(count)notice(count+' pending order(s) saved online. Payment verification is pending.')}finally{flushing=false}}
 async function send(message,order){if(busy)return;busy=true;const popup=window.open('about:blank','_blank');if(popup)popup.opener=null;let entry;try{notice('Saving your order…');entry=build(message,order);if(!entry.customer.name||!entry.customer.mobile||!entry.order.items.length)throw Error('Customer name, mobile and product are required');if(root.GPPostal&&/^\d{6}$/.test(entry.customer.pincode)){try{const p=await root.GPPostal.lookup(entry.customer.pincode);if(p){entry.order.delivery={...entry.order.delivery,...p.delivery};if(!entry.customer.state)entry.customer.state=p.state;if(!entry.customer.city)entry.customer.city=p.city;if(!entry.customer.postoffice)entry.customer.postoffice=p.postoffices[0]||''}}catch{}}
 const d=entry.order.delivery||{},fields={Distance:d.distance,[entry.order.paymentMode==='cod'?'COD Order ETA':'Prepaid Order ETA']:entry.order.paymentMode==='cod'?d.etaCod:d.etaPrepaid,'Estimated Delivery':entry.order.paymentMode==='cod'?d.estimatedDeliveryCod:d.estimatedDelivery};for(const [label,value]of Object.entries(fields)){if(!value)continue;const escaped=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),re=new RegExp('^([^\\n]*?'+escaped+'\\s*:\\s*)[^\\n]*$','mi');if(re.test(message))message=message.replace(re,(_,prefix)=>prefix+value);else message+='\n'+label+': '+value;}entry.message=message;
-for(const [label,value]of [['Mobile',entry.customer.mobile],['Alt Mobile',entry.customer.altMobile]]){const re=new RegExp('^([^\\n]*?'+label+'\\s*:\\s*)[^\\n]*$','mi');message=message.replace(re,(_,prefix)=>prefix+value);}entry.message=message;const local=retain(entry);let result;try{result=await post(entry);remove(entry.orderId);notice('Order '+entry.orderId+' saved online ✓ Payment verification is pending. You can now send the WhatsApp message.');}catch(e){notice((local?'Your order is saved on this device and will retry when this page is online. ':'Browser storage is blocked. Keep this page open and retry. ')+e.message+' WhatsApp is a separate backup.',true);}
+for(const [label,value]of [['Mobile',entry.customer.mobile],['Alt Mobile',entry.customer.altMobile]]){const re=new RegExp('^([^\\n]*?'+label+'\\s*:\\s*)[^\\n]*$','mi');message=message.replace(re,(_,prefix)=>prefix+value);}entry.message=message;const local=retain(entry);let result;try{result=await post(entry);remove(entry.orderId);
+if(result?.duplicate){
+  popup?.close();
+  notice('यह सामान आपके पिछले Order '+result.orderId+' में पहले से है। दोबारा ऑर्डर नहीं बनाया गया।');
+  return result;
+}
+if(result?.merged){
+  message=message.replace(/^(\\s*Order ID:\\s*).+$/mi,(_,prefix)=>prefix+result.orderId);
+  notice('नया सामान Order '+result.orderId+' में जोड़ दिया गया है। Payment confirmation के लिए Order फिर Pending है।');
+}else notice('Order '+entry.orderId+' saved online ✓ Payment verification is pending. You can now send the WhatsApp message.');}catch(e){notice((local?'Your order is saved on this device and will retry when this page is online. ':'Browser storage is blocked. Keep this page open and retry. ')+e.message+' WhatsApp is a separate backup.',true);}
 const url='https://wa.me/917983624797?text='+encodeURIComponent(message);if(popup)popup.location.href=url;else location.href=url;return result;}catch(e){popup?.close();notice(e.message,true);alert(e.message)}finally{busy=false}}
+
+function repeatNotice(){
+  let n=document.getElementById('gpRepeatOrderNotice');
+  if(!n){n=document.createElement('section');n.id='gpRepeatOrderNotice';n.style.cssText='display:none;margin:12px;padding:12px;border:1px solid #bbd3df;border-radius:10px;background:#f2f8fc;color:#18384d;font:14px/1.5 system-ui';
+    const target=document.getElementById('checkoutInvoices')||document.querySelector('form')||document.body;
+    target.parentElement?.insertBefore(n,target);
+  }
+  const phone=mobile(val('mobile')),receipts=read('gp_private_order_receipts',[]);
+  const mine=receipts.filter(x=>x.customerMobile&&mobile(x.customerMobile)===phone).sort((a,b)=>Date.parse(b.createdAt||0)-Date.parse(a.createdAt||0));
+  if(phone.length!==10||!mine.length){n.style.display='none';return;}
+  n.style.display='';
+  const recent=mine.find(x=>Date.now()-Date.parse(x.createdAt||0)<=72*3600000);
+  const title=document.createElement('b');title.textContent='आपके पिछले ऑर्डर: '+mine.length;
+  const a=document.createElement('a');a.href='https://gamesplanet13.github.io/arcade-accessories-/customer-orders.html';a.textContent=' सभी ऑर्डर देखें / Edit के लिए Login';a.style.marginLeft='8px';
+  const info=document.createElement('p');info.style.margin='6px 0 0';info.textContent=recent?
+    'हालिया Order '+recent.orderId+': '+(recent.summary||'Previous order')+'. नया अलग प्रोडक्ट भेजने पर, अगर ऑर्डर dispatch नहीं हुआ, तो इसी ऑर्डर में जुड़ सकता है।':
+    'पुराने ऑर्डर देखने के लिए अपना customer account खोलें।';
+  n.replaceChildren(title,a,info);
+}
 function sendURL(url,order){let text='';try{text=new URL(url).searchParams.get('text')||''}catch{}return send(text,order)}
-root.GPOrderRecords={send,sendURL,flush,build};function mount(){flush();if('serviceWorker'in navigator){const name=root.GP_NATIVE_POSTAL?'pincode-offline-sw.js?v=20261022-orders':'gp-orders-offline-sw.js?v=20261022-orders';navigator.serviceWorker.register(new URL(name,location.href).href).catch(()=>{})}const invoices=document.getElementById('checkoutInvoices');if(invoices)invoices.innerHTML='<h2>Invoice / My Orders</h2><p>Your order is saved online before WhatsApp. Invoice download opens after payment verification and approval.</p><a href="https://gamesplanet13.github.io/arcade-accessories-/customer-orders.html">My Orders / Customer Login →</a>';}
+root.GPOrderRecords={send,sendURL,flush,build};function mount(){flush();document.addEventListener('change',e=>{if(e.target?.id==='mobile')repeatNotice()});repeatNotice();if('serviceWorker'in navigator){const name=root.GP_NATIVE_POSTAL?'pincode-offline-sw.js?v=20261022-orders':'gp-orders-offline-sw.js?v=20261022-orders';navigator.serviceWorker.register(new URL(name,location.href).href).catch(()=>{})}const invoices=document.getElementById('checkoutInvoices');if(invoices)invoices.innerHTML='<h2>Invoice / My Orders</h2><p>Your order is saved online before WhatsApp. Invoice download opens after payment verification and approval.</p><a href="https://gamesplanet13.github.io/arcade-accessories-/customer-orders.html">My Orders / Customer Login →</a>';}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();window.addEventListener('online',flush);setInterval(flush,20000);
 })(window);
