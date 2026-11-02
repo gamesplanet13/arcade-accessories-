@@ -14,7 +14,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const money=n=>(n===null||n===undefined||n==='')?'—':'₹'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:2});
 const num=n=>Number.isFinite(Number(n))?Number(n):0;
 const mobile=v=>String(v||'').replace(/\D/g,'').replace(/^91(?=\d{10}$)/,'').replace(/^0(?=\d{10}$)/,'');
-let records=[],offset=0,active=null,dirty=false,busy=false,counts={},cachedAt=0,metricsAt=0,lastView='',historyOrders=[],historyMobile='',historyName='',historyOffset=null;
+let records=[],offset=0,active=null,dirty=false,reviewDirty=false,busy=false,counts={},cachedAt=0,metricsAt=0,lastView='',historyOrders=[],historyMobile='',historyName='',historyOffset=null;
 try{$('filter').value=sessionStorage.getItem('gpz_owner_filter')||'all'}catch{}
 function msg(s,type=''){$('message').className=type;$('message').textContent=s;}
 async function api(path,method='GET',data){const r=await fetch('/api'+path,{method,headers:{'Content-Type':'application/json'},body:data?JSON.stringify(data):undefined});const x=await r.json();if(!r.ok)throw Error(x.error||'Request failed');return x;}
@@ -168,7 +168,7 @@ async function confirmPayment(id){
  await refreshAfterChange(id,'Payment confirmed. You can now accept the order.');
 }
 async function refreshAfterChange(id,feedback){
- dirty=false;await load(false,true);
+ dirty=false;reviewDirty=false;await load(false,true);
  if(active?.id===id)await open(id,false);
  if(!$('historyPanel').hidden)await showHistoryQuietly();
  msg(feedback,'success');
@@ -229,7 +229,7 @@ function manageButtons(r){
 }
 async function open(id,scroll=true){
  if(dirty&&active?.id!==id&&!confirm('Unsaved changes will be lost. Open this order?'))return;
- active=(await api('/orders/'+id)).order;dirty=false;
+ active=(await api('/orders/'+id)).order;dirty=false;reviewDirty=false;
  const r=active,p=r.payload,c=p.customer||{},o=p.order||{},editing=r.status!=='deleted';
  const box=Array.isArray(o.boxDimensions)?o.boxDimensions:[0,0,0];
  const method=r.dispatch_by==='bus'||/^bus$/i.test(r.courier)?'bus':'courier';
@@ -274,17 +274,18 @@ async function open(id,scroll=true){
  if(!editing)$('detail').querySelectorAll('input,select,textarea').forEach(el=>{if(el.id!=='paymentQrMode')el.disabled=true});
  $('paymentQrMode').onchange=()=>{const url=qrUrl($('paymentQrMode').value);$('qrPreview').src=url;$('qrDownload').href=url};
  if(editing){
-  $('detail').querySelectorAll('[data-customer],[data-item],[data-finance],#payment,#verified,#invoiceApproved,#packingWeight,#boxL,#boxW,#boxH').forEach(el=>{
-   el.addEventListener('input',()=>{dirty=true;previewTotals()});
+  $('detail').querySelectorAll('[data-customer],[data-item],[data-finance],#payment,#packingWeight,#boxL,#boxW,#boxH').forEach(el=>{
+   el.addEventListener('input',()=>{dirty=true;reviewDirty=true;previewTotals()});
   });
+  $('detail').querySelectorAll('#verified,#invoiceApproved').forEach(el=>el.addEventListener('change',()=>{dirty=true;previewTotals()}));
   $('addProduct').onclick=()=>{
    const items=collectItems();items.push({name:'',variant:'',quantity:1,unitPrice:0,lineTotal:0,unitWeight:0,dimensions:'',image:''});
-   active.payload.order.items=items;dirty=true;drawItems();
+   active.payload.order.items=items;dirty=true;reviewDirty=true;drawItems();
   };
   $('itemsEditor').onclick=e=>{
    const btn=e.target.closest('button[data-removeitem]');if(!btn)return;
    const items=collectItems();if(items.length<=1){msg('At least one product is required.','error');return}
-   items.splice(Number(btn.dataset.removeitem),1);active.payload.order.items=items;dirty=true;drawItems();
+   items.splice(Number(btn.dataset.removeitem),1);active.payload.order.items=items;dirty=true;reviewDirty=true;drawItems();
   };
  }
  $('orderActions').onclick=e=>{
@@ -315,7 +316,7 @@ async function open(id,scroll=true){
 }
 function drawItems(){
  $('itemsEditor').innerHTML=productsTable(active.payload.order.items,true,active.source);
- $('itemsEditor').querySelectorAll('[data-item]').forEach(el=>el.addEventListener('input',()=>{dirty=true;previewTotals()}));
+ $('itemsEditor').querySelectorAll('[data-item]').forEach(el=>el.addEventListener('input',()=>{dirty=true;reviewDirty=true;previewTotals()}));
  previewTotals();
 }
 function previewTotals(){
@@ -332,7 +333,7 @@ function previewTotals(){
 }
 async function save(accept=false,forceStatus=''){
  if(!active||active.status==='deleted')throw Error('Restore this archived order before editing.');
- const p=structuredClone(active.payload),changed=dirty;
+ const p=structuredClone(active.payload),changed=reviewDirty;
  $('detail').querySelectorAll('[data-customer]').forEach(el=>p.customer[el.dataset.customer]=el.value.trim());
  p.customer.mobile=mobile(p.customer.mobile);
  if(!/^\d{10}$/.test(p.customer.mobile))throw Error('Valid 10-digit mobile is required.');
