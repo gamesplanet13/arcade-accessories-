@@ -39,11 +39,55 @@ if(result?.merged){
 }else notice('Order '+entry.orderId+' saved online ✓ Payment verification is pending. You can now send the WhatsApp message.');}catch(e){notice((local?'Your order is saved on this device and will retry when this page is online. ':'Browser storage is blocked. Keep this page open and retry. ')+e.message+' WhatsApp is a separate backup.',true);}
 const url='https://wa.me/917983624797?text='+encodeURIComponent(message);if(popup)popup.location.href=url;else location.href=url;return result;}catch(e){popup?.close();notice(e.message,true);alert(e.message)}finally{busy=false}}
 
+async function editRecentReceipt(receipt,container){
+  const apiUrl=API();if(!apiUrl){notice('Order service is not available. Please contact Games Planet.',true);return;}
+  const request=async(path,data)=>{const response=await fetch(apiUrl+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),result=await response.json();
+    if(!response.ok)throw Error(result.error||'Could not update your order');return result;};
+  const proof={orderId:receipt.id,claimToken:receipt.claimToken};
+  let data;
+  try{data=await request('/orders/receipt',proof)}catch(e){notice(e.message,true);return;}
+  const r=data.order,o=r.payload.order||{},items=o.items||[];
+  const panel=document.createElement('section');panel.style.cssText='padding:12px;margin-top:9px;background:white;border:1px solid #a9cede;border-radius:8px';
+  const heading=document.createElement('h3');heading.textContent='Order '+r.order_id+' · '+(r.status==='successful'?'Accepted':r.status==='pending'?'Pending':r.status);
+  panel.append(heading);
+  const address=document.createElement('p');address.textContent='Customer: '+r.payload.customer.name+' | '+r.payload.customer.city+' | '+r.payload.customer.pincode;panel.append(address);
+  const controls=[];
+  for(const item of items){
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eef2f5';
+    const label=document.createElement('span');label.textContent=(item.name||item.product||'Product')+(item.variant?' — '+item.variant:'')+' • ₹'+Number(item.unitPrice||0)+' each';
+    const inp=document.createElement('input');inp.type='number';inp.min='0';inp.max='1000';inp.step='1';inp.value=String(item.quantity||1);inp.style.cssText='width:70px;padding:6px;border:1px solid #ced9e0;border-radius:5px';
+    row.append(label,inp);panel.append(row);controls.push(inp);
+  }
+  const total=document.createElement('p');total.textContent='Previous quoted total: ₹'+Number(o.grandTotal||0).toLocaleString('en-IN')+' | Payment: '+String(o.paymentMode||'unknown').toUpperCase();panel.append(total);
+  const help=document.createElement('p');help.textContent='Quantity 0 means remove that line. For additional different products, use the checkout normally; they will join this unprocessed order. After changes, payment and courier are reconfirmed.';panel.append(help);
+  const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+  const save=document.createElement('button');save.type='button';save.textContent='Save order changes';
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Close';
+  actions.append(save,cancel);panel.append(actions);
+  cancel.onclick=()=>panel.remove();
+  save.disabled=!data.canEdit;
+  if(!data.canEdit)help.textContent='This order is no longer editable (older than 3 days, rejected, printed or dispatched). Contact Games Planet.';
+  save.onclick=async()=>{save.disabled=true;try{
+    const quantities=controls.map(c=>Number(c.value));
+    if(quantities.some(v=>!Number.isInteger(v)||v<0||v>1000)||!quantities.some(v=>v>0))throw Error('Choose valid quantities; at least one product must remain.');
+    const updated=await request('/orders/receipt-edit',{...proof,expectedRevision:r.revision,quantities});
+    const receipts=read('gp_private_order_receipts',[]);
+    for(const rec of receipts)if(rec.id===receipt.id){
+      rec.summary=updated.order.payload.order.items.map(i=>(i.name||i.product)+' × '+i.quantity).join(', ');
+      rec.grandTotal=updated.order.payload.order.grandTotal;
+    }
+    write('gp_private_order_receipts',receipts);
+    repeatNotice();
+    notice('Order '+updated.orderId+' updated. It is Pending again until Games Planet verifies payment and courier.',false);
+  }catch(e){notice(e.message,true)}finally{save.disabled=false}};
+  container.querySelector('#gpReceiptEdit')?.remove();
+  panel.id='gpReceiptEdit';container.append(panel);
+}
 function repeatNotice(){
   let n=document.getElementById('gpRepeatOrderNotice');
   if(!n){n=document.createElement('section');n.id='gpRepeatOrderNotice';n.style.cssText='display:none;margin:12px;padding:12px;border:1px solid #bbd3df;border-radius:10px;background:#f2f8fc;color:#18384d;font:14px/1.5 system-ui';
     const target=document.getElementById('checkoutInvoices')||document.querySelector('form')||document.body;
-    target.parentElement?.insertBefore(n,target);
+    if(target===document.body)document.body.prepend(n);else target.parentElement?.insertBefore(n,target);
   }
   const phone=mobile(val('mobile')),receipts=read('gp_private_order_receipts',[]);
   const mine=receipts.filter(x=>x.customerMobile&&mobile(x.customerMobile)===phone).sort((a,b)=>Date.parse(b.createdAt||0)-Date.parse(a.createdAt||0));
@@ -56,6 +100,10 @@ function repeatNotice(){
     'हालिया Order '+recent.orderId+': '+(recent.summary||'Previous order')+'. नया अलग प्रोडक्ट भेजने पर, अगर ऑर्डर dispatch नहीं हुआ, तो इसी ऑर्डर में जुड़ सकता है।':
     'पुराने ऑर्डर देखने के लिए अपना customer account खोलें।';
   n.replaceChildren(title,a,info);
+  if(recent){
+    const btn=document.createElement('button');btn.type='button';btn.textContent='Edit this order / Quantity बदलें';btn.style.cssText='margin:9px 0;padding:9px 11px;border-radius:8px;border:1px solid #9dc1d3;background:#fff;color:#153d55;font-weight:600;cursor:pointer';
+    btn.onclick=()=>editRecentReceipt(recent,n);n.append(btn);
+  }
 }
 function sendURL(url,order){let text='';try{text=new URL(url).searchParams.get('text')||''}catch{}return send(text,order)}
 root.GPOrderRecords={send,sendURL,flush,build};function mount(){flush();document.addEventListener('change',e=>{if(e.target?.id==='mobile')repeatNotice()});repeatNotice();if('serviceWorker'in navigator){const name=root.GP_NATIVE_POSTAL?'pincode-offline-sw.js?v=20261022-orders':'gp-orders-offline-sw.js?v=20261022-orders';navigator.serviceWorker.register(new URL(name,location.href).href).catch(()=>{})}const invoices=document.getElementById('checkoutInvoices');if(invoices)invoices.innerHTML='<h2>Invoice / My Orders</h2><p>Your order is saved online before WhatsApp. Invoice download opens after payment verification and approval.</p><a href="https://gamesplanet13.github.io/arcade-accessories-/customer-orders.html">My Orders / Customer Login →</a>';}
