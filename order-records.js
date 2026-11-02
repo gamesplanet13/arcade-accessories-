@@ -15,7 +15,12 @@ let id=m.orderid||val('orderId');if(!id)id=crypto.randomUUID();const source=new 
 ).sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt))[0];
 return{...pair,source,orderId:id,customer,order,message,
   ...(previous?{previousOrderId:previous.id,previousClaimToken:previous.claimToken}:{})};}
-async function post(entry){if(!API())throw Error('Order server is not configured');const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),15000);try{const r=await fetch(API()+'/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry),signal:ctrl.signal,keepalive:JSON.stringify(entry).length<50000});const x=await r.json();if(!r.ok)throw Error(x.error||'Order was not saved');const receipts=read('gp_private_order_receipts',[]);if(!x.merged&&!receipts.some(y=>y.id===x.id)){
+async function post(entry){if(!API())throw Error('Order server is not configured');const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),15000);try{let savedSession=null;try{savedSession=JSON.parse(sessionStorage.getItem('gp_order_session_customer')||'null')}catch{}
+let token=String(savedSession?.token||'');
+const submit=authToken=>fetch(API()+'/orders',{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:'Bearer '+authToken}:{})},body:JSON.stringify(entry),signal:ctrl.signal,keepalive:JSON.stringify(entry).length<50000});
+let r=await submit(token);
+if(r.status===401&&token){sessionStorage.removeItem('gp_order_session_customer');token='';r=await submit('');}
+const x=await r.json();if(!r.ok)throw Error(x.error||'Order was not saved');const receipts=read('gp_private_order_receipts',[]);if(!x.merged&&!receipts.some(y=>y.id===x.id)){
   receipts.push({id:x.id,orderId:entry.orderId,claimToken:entry.claimToken,
     customerMobile:entry.customer.mobile,createdAt:new Date().toISOString(),
     summary:(entry.order.items||[]).map(i=>String(i.name||i.product)+' × '+(i.quantity||1)).join(', '),
