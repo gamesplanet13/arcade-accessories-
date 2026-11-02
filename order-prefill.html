@@ -327,42 +327,37 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
     </div>
     <div class="label">Choose Preferred Courier</div>
     <select id="courier" onchange="computeTotals()"></select>
-    <div class="hint" id="courierServiceNote">पहले valid pincode भरें। Final courier serviceability destination pincode पर depend करेगी।</div><div class="hint" id="codCityRateNotice" style="display:none;margin-top:8px"><b>COD Courier:</b> Charges depend on city, pincode, packed weight and COD amount. Charges are rounded up to the next ₹100, with applicable VAS extra. If the final carrier charge changes, any additional difference will be added to the COD balance payable on delivery. Screenshot-based rates are estimates until booking is confirmed.</div>
+    <div class="hint" id="courierServiceNote" style="display:none" aria-hidden="true"></div><div class="hint" id="codCityRateNotice" style="display:none;margin-top:8px">कूरियर चार्ज शहर के अनुसार हैं। अंतिम कूरियर चार्ज बढ़ने पर अतिरिक्त रकम डिलीवरी पर COD में जुड़ सकती है।</div>
     </div><!-- /gpzCourierDeliveryFields -->
-    <div class="label">Actual Packing Box Size (cm)</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-      <input id="actualBoxLength" type="number" min="1" placeholder="Length" oninput="computeTotals()">
-      <input id="actualBoxWidth" type="number" min="1" placeholder="Width" oninput="computeTotals()">
-      <input id="actualBoxHeight" type="number" min="1" placeholder="Height" oninput="computeTotals()">
+    <!-- Internal shipping tools are retained only for calculation compatibility; not customer-facing. -->
+    <div id="gpzInternalShippingTools" style="display:none" aria-hidden="true">
+      <input id="actualBoxLength" type="number" min="1" tabindex="-1">
+      <input id="actualBoxWidth" type="number" min="1" tabindex="-1">
+      <input id="actualBoxHeight" type="number" min="1" tabindex="-1">
+      <div id="bigshipRateStatus"></div>
+      <div id="courierRateGuide" style="display:none"></div>
     </div>
-    <div class="hint">भरा हुआ actual box size हमेशा final माना जाएगा। खाली छोड़ने पर saved packing profile लगेगा।</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-      <button type="button" class="ghost" onclick="openBigshipCalculator()">🚚 Bigship Rate Calculator</button>
-      <button type="button" class="ghost" onclick="clearBigshipRate()">Clear Bigship Rate</button>
-    </div>
-    <div class="hint" id="bigshipRateStatus">Bigship calculator order का PIN, box, weight, payment mode और invoice amount अपने आप लेगा।</div>
-    <div id="courierRateGuide"></div>
   </div>
 
   <div class="card">
-    <span class="badge">Price & Weight Breakdown</span>
+    <span class="badge">Order Summary</span>
     <div id="itemBreakdown"></div>
     <div class="summary-grid">
       <span>Products Amount</span><b id="sumProducts">₹0</b>
       <span hidden>Discount Applied</span><b id="sumDiscount">₹0</b>
       <span>Product GST (optional 18%)</span><b id="sumProductGst">₹0</b>
-      <span>Product Weight</span><b id="sumWeight">0g</b>
-      <span>Packaging Weight</span><b>250g</b>
-      <span>Packed Weight</span><b id="sumPacked">250g</b>
-      <span>Recommended Box</span><b id="sumBox">—</b>
-      <span>Actual Weight</span><b id="sumActual">0kg</b>
-      <span>Volumetric Weight</span><b id="sumVolumetric">0kg</b>
-      <span>Chargeable Weight</span><b id="sumChargeable">1kg</b>
+      <span hidden>Product Weight</span><b id="sumWeight" hidden>0g</b>
+      <span hidden>Packaging Weight</span><b hidden>250g</b>
+      <span hidden>Packed Weight</span><b id="sumPacked" hidden>250g</b>
+      <span hidden>Recommended Box</span><b id="sumBox" hidden>—</b>
+      <span hidden>Actual Weight</span><b id="sumActual" hidden>0kg</b>
+      <span hidden>Volumetric Weight</span><b id="sumVolumetric" hidden>0kg</b>
+      <span hidden>Chargeable Weight</span><b id="sumChargeable" hidden>1kg</b>
       <span>VAS (2%)</span><b id="sumVas">₹0</b>
-      <span id="sumCourierBaseLabel">Courier Base Charge</span><b id="sumCourierBase">₹0</b>
-      <span>Extra Courier GST</span><b id="sumCourierGst">₹0</b>
+      <span id="sumCourierBaseLabel" hidden>Courier Base Charge</span><b id="sumCourierBase" hidden>₹0</b>
+      <span hidden>Extra Courier GST</span><b id="sumCourierGst" hidden>₹0</b>
       <span id="sumCourierLabel">Courier Total</span><b id="sumCourier">₹0</b>
-      <span id="sumRateSourceLabel">Courier Rate Source</span><b id="sumRateSource">Configured rate</b>
+      <span id="sumRateSourceLabel" hidden>Courier Rate Source</span><b id="sumRateSource" hidden>Configured rate</b>
       <span class="grand-row">Grand Total</span><b class="grand-row" id="sumGrand">₹0</b>
       <span>Pay Now / Advance</span><b id="sumPaid">₹0</b>
       <span id="restLabel">Rest on Delivery</span><b id="sumRest">₹0</b>
@@ -1395,22 +1390,8 @@ function setMode(nextMode){
   document.getElementById("couponCodNotice").style.display="none";
   syncCourierOptions();
 }
-function gpzRenderRateGuide(kg){
-  document.getElementById("courierRateGuide").innerHTML=`
-  <div class="rate-table-wrap"><table class="rate-table">
-    <thead><tr><th>Mode</th><th>Courier charge</th><th>VAS</th></tr></thead>
-    <tbody>
-      <tr><td>Surface: Trackon / Shree Maruti / DTDC</td><td><b>₹99/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Delhivery Forward COD</td><td><b>City / weight / COD amount based; next ₹100 (minimum ₹200)</b></td><td>VAS 2% extra</td></tr><tr><td>Other COD courier partners</td><td><b>Current provisional COD quote; next ₹100</b></td><td>VAS as applicable</td></tr>
-      <tr><td>Surface: Speed Post</td><td><b>₹100/500g</b></td><td>No VAS</td></tr>
-      <tr><td>Air: Trackon / Shree Maruti</td><td><b>₹150/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Prime: Trackon</td><td><b>₹200/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Prime: Shree Maruti</td><td><b>₹250/kg</b></td><td>No VAS</td></tr>
-      <tr><td>COD prices</td><td><b>Forward COD charge, NOT RTO; unknown cities need final provider confirmation</b></td><td>VAS extra</td></tr>
-    </tbody>
-  </table></div>
-  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. Prepaid courier rates remain unchanged. COD rate depends on the city, chargeable weight and COD collection amount.  Actual और volumetric में जो अधिक हो वही chargeable है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
-}
+// Staff-only rate tables are never rendered to customers.
+function gpzRenderRateGuide(kg){return;}
 function computeTotals(){
   const items=gpzAllItems();
   const emptyOrder=items.length===0;
@@ -1516,7 +1497,7 @@ function computeTotals(){
   document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
   document.getElementById("codNote").textContent=bus?"Bus dispatch: full prepaid payment required; bus fare paid directly to bus operator.":m88Offer
     ? "M88 COD: ₹600 advance per unit. COD courier charge is 2× the standard prepaid courier rate, added separately."
-    : codAvailable?"COD available. Courier charges are 2× prepaid shipping for the same courier.":"COD is available when products + add-ons total is ₹1,300 or more."
+    : codAvailable?"COD available. Shipping depends on destination city and packed weight.":"COD is available when products + add-ons total is ₹1,300 or more."
   const showCoupon=couponItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
   document.body.classList.toggle('gpz-coupon-checkout',showCoupon);
   document.getElementById("couponCard").hidden=!showCoupon;
@@ -1532,8 +1513,7 @@ function computeTotals(){
     if(i.pack) details.push(`Pack: <b>${gpzEscape(i.pack)}</b>`);
     details.push(`Quantity: <b>${i.quantity}</b>`);
     details.push(`Price: ${gpzMoney(i.unitPrice)} × ${i.quantity} = <b>${gpzMoney(i.lineTotal)}</b>`);
-    details.push(`Weight: ${i.unitWeight}g × ${i.quantity} = <b>${i.lineWeight}g</b>`);
-    details.push(`Dimensions: <b>${gpzEscape(gpzItemDimensions(i))}</b>`);
+    // Weight and box dimensions stay in calculations and staff-facing order data only.
     return `<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${details.join("<br>")}</div>`;
   }).join("");
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:appliedDiscount?"-"+gpzMoney(appliedDiscount):gpzMoney(0),sumProductGst:(m88Offer&&invoiceIncluded?'Included: ':'')+gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
