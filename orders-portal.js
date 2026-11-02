@@ -51,12 +51,11 @@ async function details(id){
    (order.busDestination?panel('Bus destination',esc(order.busDestination)):'')+
    (o.status==='delivered'?panel('Delivered on',esc(readableDate(order.deliveredAt))):'')+
    '</div>'+tracking+'</section>':'';
- const due=String(order.paymentMode||'').toLowerCase()==='cod'?
-  Math.max(0,(order.specialM88Offer?600:500)-Number(order.advanceAmount||0)):
-  Math.max(0,Number(order.grandTotal||0)-Number(order.advanceAmount||0));
+ const expected=String(order.paymentMode||'').toLowerCase()==='cod'?(order.specialM88Offer?600:500):Number(order.grandTotal||0);
+ const due=o.payment_verified?Math.max(0,expected-Number(order.advanceAmount||0)):expected;
  const qr= 'https://gamesplanet13.github.io/arcade-accessories-/'+(order.gstInvoiceIncluded?'GSTcurrentQR.png':'NonGSTcurrentQR.jpg');
  const paymentHelp=!o.payment_verified?
-  '<section class="customer-detail-box"><h3>Payment not yet verified</h3><p>Payment required for confirmation: '+money(due)+'. Send payment proof to GAMES PLANET for verification.</p>'+
+  '<section class="customer-detail-box"><h3>Payment not yet verified</h3><p>Indicative payment / COD advance: '+money(due)+'. If you have already paid, please do not pay again; send your UPI transaction proof to GAMES PLANET for verification.</p>'+
   '<a href="'+qr+'" target="_blank" rel="noopener"><img class="customer-qr" src="'+qr+'" alt="Games Planet payment QR"></a>'+
   '<p><a href="'+qr+'" target="_blank" rel="noopener">Open payment QR</a></p></section>':'';
  let html='<div class="customer-order-head"><h2>'+esc(o.order_id)+'</h2><span class="customer-status '+esc(o.status)+'">'+esc(statusLabel(o.status))+'</span></div>'+
@@ -73,7 +72,7 @@ async function details(id){
  panel('VAS',moneySafe(order.vasCharge))+
  panel('Discount',moneySafe(order.discountApplied))+
  (order.gstInvoiceIncluded?panel('GST',moneySafe(order.productGst)):'')+
- panel('**Grand total**',moneySafe(order.grandTotal))+
+ panel('Grand total',moneySafe(order.grandTotal))+
  panel('Payment mode',esc(String(order.paymentMode||'—').toUpperCase()))+
  panel('Amount recorded',moneySafe(order.advanceAmount))+
  panel('Payment verified',o.payment_verified?'Yes':'Awaiting verification')+
