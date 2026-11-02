@@ -183,71 +183,232 @@ async function showHistoryQuietly(){
 }
 function field(key,label,value){return '<label>'+esc(label)+'<input data-customer="'+esc(key)+'" value="'+esc(value)+'"></label>'}
 function moneyField(key,label,value){return '<label>'+esc(label)+'<input type="number" min="0" step=".01" data-finance="'+key+'" value="'+num(value)+'"></label>'}
+
+const providers=['Delhivery','Trackon','Shree Maruti','DTDC','India Post / Speed Post','Blue Dart','Professional Couriers','Other'];
+const QR_BASE='https://gamesplanet13.github.io/arcade-accessories-/';
+function qrUrl(choice){return QR_BASE+(choice==='gst'?'GSTcurrentQR.png':'NonGSTcurrentQR.jpg')}
+function formatDate(s){if(!s)return 'Not recorded';const d=new Date(s);return Number.isNaN(d.valueOf())?String(s):d.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})}
+function currentCourier(){
+ const method=$('dispatchMethod')?.value||'courier';
+ if(method==='bus')return 'Bus';
+ const chosen=$('courierSelect')?.value||'';
+ return chosen==='Other'?$('courierOther')?.value.trim():chosen;
+}
+function shippingForm(){
+ const method=$('dispatchMethod').value,company=currentCourier();
+ const date=$('dispatchDate').value;
+ const trackingNumber=$('trackingNumber').value.trim();
+ const trackingUrl=$('trackingUrl').value.trim();
+ if(trackingUrl&&!/^https:\/\//i.test(trackingUrl))throw Error('Tracking URL must start with https://');
+ return {dispatchBy:method,dispatchDate:date,courier:company,trackingNumber,trackingUrl};
+}
+function collectItems(){
+ const out=active.payload.order.items.map(i=>({...i}));
+ $('detail').querySelectorAll('[data-item]').forEach(el=>{
+  const item=out[Number(el.dataset.item)];if(!item)return;
+  const key=el.dataset.key;item[key]=['quantity','unitPrice','unitWeight'].includes(key)?Number(el.value):el.value.trim();
+ });
+ return out.map(i=>({...i,lineTotal:Math.round(num(i.quantity)*num(i.unitPrice)*100)/100,lineWeight:Math.round(num(i.quantity)*num(i.unitWeight))}));
+}
+function manageButtons(r){
+ const id=esc(r.id),buttons=[];
+ const b=(label,callback,cls='')=>buttons.push('<button class="'+cls+'" type="button" data-work="'+callback+'">'+label+'</button>');
+ if(r.status==='deleted'){b('Restore → Pending','restore','primary');return buttons.join('')}
+ b('Save all changes','save','primary');
+ if(!r.payment_verified)b('✓ Confirm payment received','confirm','accept');
+ if(r.status!=='pending')b('↩ Move to Pending','pending');
+ if(r.status!=='successful')b('✓ Accept after payment','accept','accept');
+ if(r.status==='successful')b('🚚 Dispatch order','dispatch','primary');
+ if(r.status==='dispatched')b('✓ Mark Delivered','delivered','accept');
+ if(r.status!=='cancelled')b('Reject','reject','reject');
+ b('Payment message + QR','request');
+ b('Print order summary','print');
+ if(r.status==='dispatched'||r.status==='delivered')b('Notify customer of dispatch','notify');
+ b('Archive / Delete','delete','warning-btn');
+ return buttons.join('');
+}
 async function open(id,scroll=true){
  if(dirty&&active?.id!==id&&!confirm('Unsaved changes will be lost. Open this order?'))return;
  active=(await api('/orders/'+id)).order;dirty=false;
- const r=active,p=r.payload,c=p.customer||{},o=p.order||{},edit=r.status!=='cancelled'&&r.status!=='dispatched';
- let html='<h2>'+esc(r.order_id)+' — '+esc(status(r))+'</h2><p class="note">Customer details, items, unit rates, quantities, delivery and payments. No HTML/JSON editing.</p>'+
- '<h3 class="section-title">Customer & delivery</h3><div class="grid">'+
- [['name','Customer name'],['mobile','Mobile'],['altMobile','Alt mobile'],['email','Email'],['businessName','Business name'],['gstin','Buyer GSTIN'],['house','House'],['address','Address'],['landmark','Landmark'],['pincode','Pincode'],['state','State'],['city','District / City'],['postoffice','Post office'],['billingAddress','GST billing address']].map(([k,l])=>field(k,l,c[k])).join('')+'</div>'+
- '<h3 class="section-title">Products, quantity and price</h3>'+productsTable(o.items,true)+
- '<h3 class="section-title">Price & payment</h3><div class="grid">'+
- '<label>Payment mode<select id="payment"><option value="prepaid">Prepaid</option><option value="cod">COD</option><option value="unknown">Not supplied — verify</option></select></label>'+
- moneyField('courierCharge','Courier charge',o.courierCharge)+moneyField('vasCharge','VAS',o.vasCharge)+moneyField('discountApplied','Discount',o.discountApplied)+moneyField('productGst','GST (if applicable)',o.productGst)+
- moneyField('advanceAmount','Amount actually received / advance',o.advanceAmount)+
- '</div>'+
- '<label><input type="checkbox" id="verified" style="display:inline;width:auto" '+(r.payment_verified?'checked':'')+'> I confirm the payment / COD advance was actually received</label>'+
- '<label><input type="checkbox" id="invoiceApproved" style="display:inline;width:auto" '+(r.invoice_approved?'checked':'')+'> Allow invoice download</label>'+
- '<h3 class="section-title">Current order breakdown</h3>'+totalBlock(r)+
- (o.shippingRequoteNeeded?'<p class="note">Added products: confirm packed weight and courier charge again before accepting.</p>':'')+
- '<div class="actions"><button data-print="'+esc(r.id)+'">Print detailed order summary</button>'+
- (edit?'<button class="primary" id="saveOrder">Save changes</button><button class="accept" id="acceptOrder">Save & accept — payment verified</button><button class="reject" id="rejectOrder">Reject order</button>':'')+'</div>';
- $('detail').hidden=false;$('detail').innerHTML=html;$('payment').value=o.paymentMode||'unknown';
- if(!edit){$('detail').querySelectorAll('input,textarea,select').forEach(e=>e.disabled=true)}
- else{
-  $('detail').querySelectorAll('input,textarea,select').forEach(e=>e.addEventListener('input',()=>dirty=true));
-  $('saveOrder').onclick=()=>task(()=>save(false));
-  $('acceptOrder').onclick=()=>task(()=>save(true));
-  $('rejectOrder').onclick=()=>task(()=>decision(r.id,'cancelled'));
+ const r=active,p=r.payload,c=p.customer||{},o=p.order||{},editing=r.status!=='deleted';
+ const box=Array.isArray(o.boxDimensions)?o.boxDimensions:[0,0,0];
+ const method=r.dispatch_by==='bus'||/^bus$/i.test(r.courier)?'bus':'courier';
+ const company=providers.includes(r.courier)?r.courier:'Other';
+ const originalDate=r.dispatch_date||new Date().toLocaleDateString('en-CA');
+ const html='<div class="actions"><h2>'+esc(r.order_id)+' — '+esc(status(r))+'</h2><span class="pill '+esc(r.status)+'">'+esc(payment(r).toUpperCase())+'</span></div>'+
+ '<p class="order-date"><b>Order placed:</b> '+esc(formatDate(r.created_at))+' · <b>Last updated:</b> '+esc(formatDate(r.updated_at))+' · <b>Source:</b> '+esc(r.source)+'</p>'+
+ '<section class="section-panel"><h3 class="section-title">Customer & address</h3><div class="grid">'+
+ [['name','Full name'],['mobile','Mobile'],['altMobile','Alternate mobile'],['email','Email'],['businessName','Business name'],['gstin','GSTIN'],['house','House / shop'],['address','Complete address'],['landmark','Landmark'],['pincode','Pincode'],['state','State'],['city','City / District'],['postoffice','Post office'],['billingAddress','GST billing address']].map(([k,label])=>field(k,label,c[k])).join('')+'</div></section>'+
+ '<section class="section-panel"><h3 class="section-title">Products purchased — photos, price, quantity</h3><div id="itemsEditor">'+productsTable(o.items,editing,r.source)+'</div>'+
+ (editing?'<button type="button" id="addProduct">+ Add product / add-on</button>':'')+
+ '<h3 class="section-title">Packaging & weight</h3><div class="grid">'+
+ '<label>Packing weight (g)<input id="packingWeight" type="number" min="0" value="'+num(o.packingWeight)+'"></label>'+
+ '<label>Box length (cm)<input id="boxL" type="number" min="0" value="'+num(box[0])+'"></label>'+
+ '<label>Box width (cm)<input id="boxW" type="number" min="0" value="'+num(box[1])+'"></label>'+
+ '<label>Box height (cm)<input id="boxH" type="number" min="0" value="'+num(box[2])+'"></label>'+
+ '</div><p class="note">Saved packed weight: '+esc(o.packedWeight??'—')+'g · Actual: '+esc(o.actualKg??'—')+'kg · Volumetric: '+esc(o.volumetricKg??'—')+'kg · Chargeable: '+esc(o.chargeableKg??'—')+'kg</p></section>'+
+ '<section class="section-panel"><h3 class="section-title">Payment & complete amounts</h3><div class="grid">'+
+ '<label>Payment mode<select id="payment"><option value="prepaid">Prepaid</option><option value="cod">COD</option><option value="unknown">Unknown</option></select></label>'+
+ moneyField('courierCharge','Courier charge',o.courierCharge)+moneyField('vasCharge','VAS',o.vasCharge)+moneyField('discountApplied','Discount',o.discountApplied)+
+ moneyField('productGst','GST if applicable',o.productGst)+moneyField('advanceAmount','Actual amount received / COD advance',o.advanceAmount)+
+ '</div><label><input type="checkbox" id="verified" style="display:inline;width:auto" '+(r.payment_verified?'checked':'')+'> I verified payment in bank / UPI / cash</label>'+
+ '<label><input type="checkbox" id="invoiceApproved" style="display:inline;width:auto" '+(r.invoice_approved?'checked':'')+'> Allow customer invoice download</label>'+
+ '<div id="totalsPreview">'+totalBlock(r)+'</div></section>'+
+ '<section class="section-panel"><h3 class="section-title">Dispatch details (Courier or Bus)</h3><div class="grid">'+
+ '<label>Send by<select id="dispatchMethod" data-shipping="1"><option value="courier">Courier</option><option value="bus">Bus transport</option></select></label>'+
+ '<label>Courier company<select id="courierSelect" data-shipping="1">'+providers.map(name=>'<option value="'+esc(name)+'">'+esc(name)+'</option>').join('')+'</select></label>'+
+ '<label>Other courier company<input id="courierOther" data-shipping="1" value="'+esc(company==='Other'&&r.courier!=='Bus'?r.courier:'')+'" placeholder="Courier name"></label>'+
+ '<label>Dispatch date<input id="dispatchDate" data-shipping="1" type="date" value="'+esc(originalDate)+'"></label>'+
+ '<label>AWB / Tracking / Bus receipt number<input id="trackingNumber" data-shipping="1" value="'+esc(r.tracking_number)+'"></label>'+
+ '<label>Tracking link (https://)<input id="trackingUrl" data-shipping="1" value="'+esc(r.tracking_url)+'" placeholder="https://..."></label>'+
+ '<label>Bus destination / stand<input id="busDestination" data-shipping="1" value="'+esc(o.busDestination||'')+'" placeholder="City / bus stand"></label>'+
+ '</div><small>Bus select करने पर AWB की जगह bus receipt/reference डाल सकते हैं। Booking number नहीं मिला हो तो खाली रख सकते हैं।</small></section>'+
+ '<section class="section-panel"><h3 class="section-title">Request payment via WhatsApp</h3><div class="grid"><label>Payment QR<select id="paymentQrMode"><option value="non-gst">Non-GST QR</option><option value="gst">GST QR</option></select></label>'+
+ '<div><img class="qr-preview" id="qrPreview" alt="Payment QR" src="'+esc(qrUrl(o.gstInvoiceIncluded?'gst':'non-gst'))+'"><p><a id="qrDownload" href="'+esc(qrUrl(o.gstInvoiceIncluded?'gst':'non-gst'))+'" target="_blank" rel="noopener">Open QR image (share as photo)</a></p></div></div>'+
+ '<p class="note">WhatsApp में payment message और QR image का link जाएगा। Actual QR photo भेजनी हो तो QR image अलग attach करें।</p></section>'+
+ '<section class="section-panel"><h3>Full order actions</h3><div class="action-bar" id="orderActions">'+manageButtons(r)+'</div></section>'+
+ '<section class="section-panel"><h3>Audit / status history</h3><div id="historyTimeline" class="note">Loading history…</div></section>';
+ $('detail').hidden=false;$('detail').innerHTML=html;
+ $('payment').value=o.paymentMode||'unknown';$('dispatchMethod').value=method;
+ $('courierSelect').value=company;$('paymentQrMode').value=o.gstInvoiceIncluded?'gst':'non-gst';
+ if(!editing)$('detail').querySelectorAll('input,select,textarea').forEach(el=>{if(el.id!=='paymentQrMode')el.disabled=true});
+ $('paymentQrMode').onchange=()=>{const url=qrUrl($('paymentQrMode').value);$('qrPreview').src=url;$('qrDownload').href=url};
+ if(editing){
+  $('detail').querySelectorAll('[data-customer],[data-item],[data-finance],#payment,#verified,#invoiceApproved,#packingWeight,#boxL,#boxW,#boxH').forEach(el=>{
+   el.addEventListener('input',()=>{dirty=true;previewTotals()});
+  });
+  $('addProduct').onclick=()=>{
+   const items=collectItems();items.push({name:'',variant:'',quantity:1,unitPrice:0,lineTotal:0,unitWeight:0,dimensions:'',image:''});
+   active.payload.order.items=items;dirty=true;drawItems();
+  };
+  $('itemsEditor').onclick=e=>{
+   const btn=e.target.closest('button[data-removeitem]');if(!btn)return;
+   const items=collectItems();if(items.length<=1){msg('At least one product is required.','error');return}
+   items.splice(Number(btn.dataset.removeitem),1);active.payload.order.items=items;dirty=true;drawItems();
+  };
  }
+ $('orderActions').onclick=e=>{
+  const button=e.target.closest('button[data-work]');if(!button)return;
+  const work=button.dataset.work,id=active.id;
+  if(work==='print'){window.open('/api/orders/'+encodeURIComponent(id)+'/summary','_blank','noopener');return;}
+  if(work==='request'){sendPaymentRequest();return;}
+  if(work==='notify'){sendDispatchMessage();return;}
+  task(async()=>{
+   if(work==='save')await save(false);
+   else if(work==='accept')await save(true);
+   else if(work==='dispatch')await dispatchOrder();
+   else if(work==='confirm')await confirmPayment(id);
+   else if(work==='pending')await decision(id,'pending');
+   else if(work==='delivered')await decision(id,'delivered');
+   else if(work==='reject')await decision(id,'cancelled');
+   else if(work==='delete')await decision(id,'deleted');
+   else if(work==='restore')await decision(id,'pending');
+  });
+ };
+ try{
+ const history=await api('/orders/'+id+'/history');
+ if(active?.id===id&&$('historyTimeline'))$('historyTimeline').innerHTML=history.history.length?
+ history.history.map(x=>'<p>'+esc(formatDate(x.changedAt))+' — '+esc(x.beforeStatus)+' → <b>'+esc(x.afterStatus)+'</b></p>').join(''):
+ 'No status changes recorded yet.';
+ }catch(e){if($('historyTimeline'))$('historyTimeline').textContent='History not available.'}
  if(scroll)$('detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
-async function save(accept){
- if(!active||active.status==='cancelled'||active.status==='dispatched')throw Error('This order is read-only.');
+function drawItems(){
+ $('itemsEditor').innerHTML=productsTable(active.payload.order.items,true,active.source);
+ $('itemsEditor').querySelectorAll('[data-item]').forEach(el=>el.addEventListener('input',()=>{dirty=true;previewTotals()}));
+ previewTotals();
+}
+function previewTotals(){
+ if(!active||!$('totalsPreview'))return;
+ try{
+ const items=collectItems(),o={...active.payload.order},c=active.payload.customer;
+ o.productTotal=items.reduce((n,i)=>n+itemTotal(i),0);
+ for(const el of $('detail').querySelectorAll('[data-finance]'))o[el.dataset.finance]=num(el.value);
+ o.grandTotal=Math.max(0,Math.round((o.productTotal+num(o.courierCharge)+num(o.vasCharge)+num(o.productGst)-num(o.discountApplied))*100)/100);
+ o.restAmount=Math.max(0,Math.round((o.grandTotal-num(o.advanceAmount))*100)/100);
+ o.paymentMode=$('payment').value;
+ $('totalsPreview').innerHTML=totalBlock({payload:{order:o,customer:c},payment_verified:$('verified').checked});
+ }catch(e){}
+}
+async function save(accept=false,forceStatus=''){
+ if(!active||active.status==='deleted')throw Error('Restore this archived order before editing.');
  const p=structuredClone(active.payload),changed=dirty;
- $('detail').querySelectorAll('[data-customer]').forEach(e=>p.customer[e.dataset.customer]=e.value.trim());
+ $('detail').querySelectorAll('[data-customer]').forEach(el=>p.customer[el.dataset.customer]=el.value.trim());
  p.customer.mobile=mobile(p.customer.mobile);
- if(!/^\d{10}$/.test(p.customer.mobile))throw Error('Valid 10-digit customer phone required.');
+ if(!/^\d{10}$/.test(p.customer.mobile))throw Error('Valid 10-digit mobile is required.');
  if(p.customer.pincode!==active.payload.customer.pincode&&window.GPPostal){
-  const loc=await GPPostal.lookup(p.customer.pincode);if(!loc)throw Error('PIN not found — check delivery address.');
+  const loc=await GPPostal.lookup(p.customer.pincode);if(!loc)throw Error('PIN code not found.');
   p.customer.state=loc.state;p.customer.city=loc.city;
   if(!loc.postoffices.includes(p.customer.postoffice))p.customer.postoffice=loc.postoffices[0]||'';
   p.order.delivery=loc.delivery;
  }
  p.order.paymentMode=$('payment').value;
- const items=(p.order.items||[]).map(i=>({...i}));
- $('detail').querySelectorAll('[data-item]').forEach(el=>{const i=items[Number(el.dataset.item)];if(!i)return;const k=el.dataset.key;i[k]=k==='quantity'||k==='unitPrice'?Number(el.value):el.value.trim()});
+ const items=collectItems();
  for(const i of items){
-  if(!i.name||!Number.isFinite(i.quantity)||i.quantity<1||!Number.isInteger(i.quantity)||!Number.isFinite(i.unitPrice)||i.unitPrice<0)throw Error('Product, valid quantity and unit price are required.');
-  i.lineTotal=Math.round(i.quantity*i.unitPrice*100)/100;
+  if(!String(i.name||i.product).trim()||!Number.isInteger(i.quantity)||i.quantity<1||i.unitPrice<0||!Number.isFinite(i.unitPrice)||i.unitWeight<0||!Number.isFinite(i.unitWeight))throw Error('Each product needs a name, positive quantity, valid unit price and weight.');
  }
- p.order.items=items;p.order.productTotal=items.reduce((n,i)=>n+i.lineTotal,0);
+ p.order.items=items;
+ p.order.totalQuantity=items.reduce((n,i)=>n+i.quantity,0);
+ p.order.productTotal=items.reduce((n,i)=>n+itemTotal(i),0);
  for(const el of $('detail').querySelectorAll('[data-finance]'))p.order[el.dataset.finance]=Number(el.value);
+ p.order.totalWeight=items.reduce((n,i)=>n+num(i.lineWeight),0);
+ p.order.packingWeight=num($('packingWeight').value);
+ p.order.packedWeight=p.order.totalWeight+p.order.packingWeight;
+ p.order.boxDimensions=['boxL','boxW','boxH'].map(id=>num($(id).value));
+ p.order.actualKg=p.order.packedWeight/1000;
+ p.order.volumetricKg=p.order.boxDimensions.every(v=>v>0)?p.order.boxDimensions.reduce((a,b)=>a*b,1)/5000:0;
+ p.order.chargeableKg=Math.max(p.order.actualKg,p.order.volumetricKg);
  p.order.grandTotal=Math.max(0,Math.round((p.order.productTotal+num(p.order.courierCharge)+num(p.order.vasCharge)+num(p.order.productGst)-num(p.order.discountApplied))*100)/100);
- p.order.restAmount=Math.max(0,Math.round((p.order.grandTotal-num(p.order.advanceAmount))*100)/100);
+ p.order.advanceAmount=num(p.order.advanceAmount);
+ p.order.restAmount=Math.max(0,Math.round((p.order.grandTotal-p.order.advanceAmount)*100)/100);
+ p.order.busDestination=$('busDestination').value.trim();
+ if(changed)p.order.shippingRequoteNeeded=true;
+ const shipping=shippingForm();
  if(accept){
-  if(!$('verified').checked)throw Error('Please confirm you actually received the payment / COD advance.');
-  if(num(p.order.advanceAmount)<=0)throw Error('Enter the amount actually received before accepting.');
-  if(!confirm('Confirm payment '+money(p.order.advanceAmount)+' received and accept '+active.order_id+'?'))return;
+  if(!$('verified').checked)throw Error('Confirm actual payment / COD advance in the checkbox before accepting.');
+  if(p.order.advanceAmount<=0)throw Error('Enter the actual payment amount received before accepting.');
+  if(!confirm('Confirm '+money(p.order.advanceAmount)+' received and accept '+active.order_id+'?'))return;
  }
- const mustReview=changed&&active.status==='successful'&&!accept;
- const nextStatus=accept?'successful':(mustReview?'pending':active.status);
- const verified=accept?true:mustReview?false:!!$('verified').checked;
- const approved=accept?!!$('invoiceApproved').checked:mustReview?false:!!$('invoiceApproved').checked;
- await api('/orders/'+active.id,'PATCH',{payload:p,status:nextStatus,paymentVerified:verified,invoiceApproved:approved,expectedRevision:active.revision});
- dirty=false;const id=active.id;await load(false,true);await open(id,false);
- if(!$('historyPanel').hidden)await showHistoryQuietly();
- msg(accept?'Order accepted after payment verification.':mustReview?'Changes saved; order returned to Pending for payment review.':'Order saved. Current tab is unchanged.','success');
+ const nextStatus=forceStatus||(accept?'successful':(changed&&active.status==='successful'?'pending':active.status));
+ if(forceStatus==='dispatched'&&active.status!=='successful')throw Error('Only Accepted orders can be dispatched.');
+ if(forceStatus==='dispatched'&&!active.payment_verified)throw Error('Confirm payment and accept the order before dispatching.');
+ if(forceStatus==='dispatched'&&(!shipping.courier||!shipping.dispatchDate))throw Error('Choose courier/bus and dispatch date.');
+ if(forceStatus==='dispatched'&&changed)throw Error('Save changed products/prices first; re-accept after payment review, then dispatch.');
+ const verified=accept?true:nextStatus==='pending'&&changed?false:!!$('verified').checked;
+ const approved=nextStatus==='pending'&&changed?false:!!$('invoiceApproved').checked;
+ await api('/orders/'+active.id,'PATCH',{payload:p,status:nextStatus,paymentVerified:verified,invoiceApproved:approved,expectedRevision:active.revision,...shipping});
+ const id=active.id;await refreshAfterChange(id,nextStatus==='dispatched'?'Order dispatched. Courier / bus details are visible in customer login.':accept?'Payment verified and order accepted.':'Saved. Current tab stays selected.');
+}
+async function dispatchOrder(){
+ if(!active||active.status!=='successful')throw Error('Only Accepted orders can be dispatched.');
+ if(!active.payment_verified)throw Error('Confirm actual payment / COD advance first.');
+ await save(false,'dispatched');
+}
+function paymentMessage(){
+ if(!active)return '';
+ const o=active.payload.order,c=active.payload.customer,paid=num(o.advanceAmount);
+ const goal=String(o.paymentMode).toLowerCase()==='cod'?(o.specialM88Offer?600:500):num(o.grandTotal);
+ const due=Math.max(0,Math.ceil(goal-paid));
+ const qr=qrUrl($('paymentQrMode')?.value);
+ return 'GAMES PLANET\nOrder ID: '+active.order_id+'\nHello '+(c.name||'Customer')+
+ '\nPayment mode: '+String(o.paymentMode||'').toUpperCase()+
+ '\nTotal order: '+money(o.grandTotal)+'\nPayment received: '+money(paid)+
+ '\nPayment requested now: '+money(due)+'\nPayment QR: '+qr+
+ '\nAfter payment please share the UPI transaction ID / screenshot. Payment will be confirmed manually by GAMES PLANET.';
+}
+function sendPaymentRequest(){
+ if(!active)return;
+ const phone=mobile(active.payload.customer.mobile);
+ if(!/^\d{10}$/.test(phone)){msg('Customer mobile is missing.','error');return}
+ const text=paymentMessage();window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(text),'_blank','noopener');
+}
+function sendDispatchMessage(){
+ if(!active)return;
+ const phone=mobile(active.payload.customer.mobile);if(!/^\d{10}$/.test(phone))return msg('Customer mobile is missing.','error');
+ const company=active.courier||'Courier',number=active.tracking_number||'Not yet available',track=active.tracking_url||'';
+ const text='GAMES PLANET\nOrder '+active.order_id+' has been '+status(active)+'.\nDispatch via: '+company+
+ '\nAWB / Bus reference: '+number+(track?'\nTrack parcel: '+track:'')+'\nThank you for your order.';
+ window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(text),'_blank','noopener');
 }
 $('refresh').onclick=()=>task(()=>load(false,true));
 $('filter').onchange=()=>{try{sessionStorage.setItem('gpz_owner_filter',$('filter').value)}catch{}render(true)};
