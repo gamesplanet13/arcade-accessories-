@@ -14,7 +14,7 @@ function compactOrder(row){
   return r;
 }
 
-export function canDownload(role,r){return role==='admin'||(r.payment_verified===1&&r.invoice_approved===1);}
+export function canDownload(role,r){return role==='admin'||(r.status!=='deleted'&&r.payment_verified===1&&r.invoice_approved===1);}
 async function rate(env,req,kind,max){const minute=Math.floor(Date.now()/60000),key=await sha((req.headers.get('X-GP-Client-IP')||req.headers.get('CF-Connecting-IP')||'local')+':'+kind+':'+minute);const row=await env.DB.prepare('INSERT INTO rate_limits(key,count,expires_at) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1 RETURNING count').bind(key,Date.now()+120000).first();if(row.count>max)fail(429,'Too many requests. Please try again later.');}
 async function auth(req,env){const owner=(req.headers.get('oai-authenticated-user-email')||'').toLowerCase();if(env.OWNER_EMAIL&&owner===env.OWNER_EMAIL.toLowerCase())return {account_id:'owner',role:'admin'};const t=(req.headers.get('Authorization')||'').replace(/^Bearer /,'');if(!t)fail(401,'Please login');const s=await env.DB.prepare('SELECT * FROM sessions WHERE token_hash=? AND expires_at>?').bind(await sha(t),Date.now()).first();if(!s)fail(401,'Session expired. Please login');return s;}
 async function session(env,id,role){const t=token();await env.DB.prepare('INSERT INTO sessions VALUES(?,?,?,?)').bind(await sha(t),id,role,Date.now()+8*3600000).run();return {token:t,role};}
@@ -160,7 +160,7 @@ if(path==='/auth/register'&&req.method==='POST'){await rate(env,req,'register',5
 const a=await auth(req,env);
 if(path==='/customer-counts'&&req.method==='GET'){
   if(a.role!=='admin')fail(403,'Owner only');
-  const rows=await env.DB.prepare("SELECT json_extract(payload,'$.customer.mobile') AS mobile,COUNT(*) AS n FROM orders GROUP BY json_extract(payload,'$.customer.mobile')").all();
+  const rows=await env.DB.prepare("SELECT json_extract(payload,'$.customer.mobile') AS mobile,COUNT(*) AS n FROM orders WHERE status<>'deleted' GROUP BY json_extract(payload,'$.customer.mobile')").all();
   const totals={};for(const row of rows.results){const phone=normalizeMobile(row.mobile);if(phone.length===10)totals[phone]=(totals[phone]||0)+Number(row.n||0)}
   return json({counts:Object.entries(totals).map(([mobile,count])=>({mobile,count}))});
 }
@@ -169,8 +169,16 @@ if(path==='/customer-history'&&req.method==='GET'){
   const mobile=normalizeMobile(u.searchParams.get('mobile'));
   if(mobile.length!==10)fail(400,'Valid mobile required');
   const offset=Math.min(1000000,Math.max(0,Number(u.searchParams.get('offset'))||0));
-  const rows=await env.DB.prepare("SELECT * FROM orders WHERE json_extract(payload,'$.customer.mobile') IN (?, ?, ?) ORDER BY created_at DESC LIMIT 100 OFFSET ?").bind(mobile,'91'+mobile,'0'+mobile,offset).all();
+  const rows=await env.DB.prepare("SELECT * FROM orders WHERE status<>'deleted' AND json_extract(payload,'$.customer.mobile') IN (?, ?, ?) ORDER BY created_at DESC LIMIT 100 OFFSET ?").bind(mobile,'91'+mobile,'0'+mobile,offset).all();
   return json({orders:rows.results.map(publicOrder),nextOffset:rows.results.length===100?offset+100:null});
+}
+if(path.match(/^\/orders\/[a-z0-9-]+\/history$/)&&req.method==='GET'){
+  if(a.role!=='admin')fail(403,'Owner only');
+  const id=path.split('/')[2];
+  const history=await env.DB.prepare('SELECT actor,changed_at,before_json,after_json FROM audit WHERE order_ref=? ORDER BY changed_at DESC LIMIT 60').bind(id).all();
+  return json({history:history.results.map(x=>({actor:x.actor,changedAt:x.changed_at,
+    beforeStatus:(()=>{try{return JSON.parse(x.before_json).status}catch{return''}})(),
+    afterStatus:(()=>{try{return JSON.parse(x.after_json).status}catch{return''}})()}))});
 }
 if(path==='/metrics'&&req.method==='GET'){if(a.role!=='admin')fail(403,'Owner only');const rows=await env.DB.prepare('SELECT status,COUNT(*) AS n FROM orders GROUP BY status').all();const q=await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE status='successful' AND payment_verified=1 AND printed_revision<revision AND lower(json_extract(payload,'$.order.paymentMode'))='prepaid'").first();return json({counts:rows.results,queued:q.n});}
 if(path==='/labels'&&req.method==='GET'){if(a.role!=='admin')fail(403,'Owner only');const rows=await env.DB.prepare("SELECT * FROM orders WHERE status='successful' AND payment_verified=1 AND printed_revision<revision AND lower(json_extract(payload,'$.order.paymentMode'))='prepaid' ORDER BY created_at,id LIMIT 200").all();return json({orders:rows.results.map(publicOrder)});}
@@ -180,7 +188,7 @@ if(path==='/orders/claim'&&req.method==='POST'){if(a.role!=='customer')fail(403,
 if(path==='/orders'&&req.method==='GET'){
   const q=clean(u.searchParams.get('q'),200).toLowerCase();
   const offset=Math.min(1000000,Math.max(0,Number(u.searchParams.get('offset'))||0));
-  const where=a.role==='admin'?'1=1':'account_id=?',params=a.role==='admin'?[]:[a.account_id];
+  const where=a.role==='admin'?'1=1':"account_id=? AND status<>'deleted'",params=a.role==='admin'?[]:[a.account_id];
   const like='%'+q.replace(/[\\%_]/g,'\\$&')+'%';
   const searchPart=q?" AND (search_text LIKE ? ESCAPE '\\' OR lower(order_id) LIKE ? ESCAPE '\\' OR lower(source) LIKE ? ESCAPE '\\')":'';
   const argumentsList=q?[...params,like,like,like,offset]:[...params,offset];
@@ -188,6 +196,25 @@ if(path==='/orders'&&req.method==='GET'){
   const compressed=a.role==='admin'&&u.searchParams.get('view')==='summary';
   return json({orders:rows.results.map(compressed?compactOrder:publicOrder),nextOffset:rows.results.length===100?offset+100:null});
 }
-const match=path.match(/^\/orders\/([a-z0-9-]+)(\/(?:invoice|summary))?$/);if(match){const row=await env.DB.prepare('SELECT * FROM orders WHERE id=?'+(a.role==='admin'?'':' AND account_id=?')).bind(...(a.role==='admin'?[match[1]]:[match[1],a.account_id])).first();if(!row)fail(404,'Order not found');if(match[2]&&req.method==='GET'){if(match[2]==='/summary'&&a.role!=='admin')fail(403,'Order summary is for owner only');if(match[2]==='/invoice'&&!canDownload(a.role,row))fail(403,'Invoice pending payment/download approval');return new Response(invoice(row,match[2]==='/summary'),{headers:{...headers,'Content-Type':'text/html; charset=utf-8','Content-Disposition':'inline; filename="invoice.html"','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"}});}if(req.method==='GET')return json({order:publicOrder(row)});if(req.method==='PATCH'){if(a.role!=='admin')fail(403,'Read-only customer account');const b=await body(req);if(b.expectedRevision!==undefined&&b.expectedRevision!==row.revision)fail(409,'This order changed in another tab. Reload it before saving.');const allowedStatus=['pending','successful','dispatched','cancelled'];if(b.status&&!allowedStatus.includes(b.status))fail(400,'Invalid status');const next={...row,status:b.status||row.status,payment_verified:b.paymentVerified===undefined?row.payment_verified:(b.paymentVerified?1:0),invoice_approved:b.invoiceApproved===undefined?row.invoice_approved:(b.invoiceApproved?1:0),dispatch_by:b.dispatchBy===undefined?row.dispatch_by:clean(b.dispatchBy,40),dispatch_date:b.dispatchDate===undefined?row.dispatch_date:clean(b.dispatchDate,40),courier:b.courier===undefined?row.courier:clean(b.courier,100),tracking_number:b.trackingNumber===undefined?row.tracking_number:clean(b.trackingNumber,120),tracking_url:b.trackingUrl===undefined?row.tracking_url:clean(b.trackingUrl,1000),payload:b.payload?JSON.stringify(b.payload):row.payload};if(b.payload&&(!b.payload.customer?.name||!b.payload.customer?.mobile||!Array.isArray(b.payload.order?.items)||!b.payload.order.items.length))fail(400,'Customer name, mobile and products are required.');if(next.status==='successful'&&!next.payment_verified)fail(400,'Verify actual received payment before accepting the order.');const revision=next.payload===row.payload?row.revision:row.revision+1;if(next.tracking_url&&!/^https:\/\//.test(next.tracking_url))fail(400,'Tracking URL must use HTTPS');const now=new Date().toISOString();const writes=await env.DB.batch([env.DB.prepare('UPDATE orders SET status=?,payment_verified=?,invoice_approved=?,dispatch_by=?,dispatch_date=?,courier=?,tracking_number=?,tracking_url=?,payload=?,search_text=?,updated_at=?,revision=? WHERE id=? AND revision=?').bind(next.status,next.payment_verified,next.invoice_approved,next.dispatch_by,next.dispatch_date,next.courier,next.tracking_number,next.tracking_url,next.payload,searchText(JSON.parse(next.payload)),now,revision,row.id,row.revision),env.DB.prepare('INSERT INTO audit SELECT ?,?,?,?,?,? WHERE changes()=1').bind(crypto.randomUUID(),row.id,a.account_id,now,JSON.stringify(publicOrder(row)),JSON.stringify(publicOrder({...next,revision})))]);if(writes[0].meta.changes!==1)fail(409,'Order changed while saving. Reload before editing.');return json({order:publicOrder({...next,revision})});}}
+const match=path.match(/^\/orders\/([a-z0-9-]+)(\/(?:invoice|summary))?$/);if(match){const row=await env.DB.prepare('SELECT * FROM orders WHERE id=?'+(a.role==='admin'?'':' AND account_id=?')).bind(...(a.role==='admin'?[match[1]]:[match[1],a.account_id])).first();if(!row||a.role!=='admin'&&row.status==='deleted')fail(404,'Order not found');if(match[2]&&req.method==='GET'){if(match[2]==='/summary'&&a.role!=='admin')fail(403,'Order summary is for owner only');if(match[2]==='/invoice'&&!canDownload(a.role,row))fail(403,'Invoice pending payment/download approval');return new Response(invoice(row,match[2]==='/summary'),{headers:{...headers,'Content-Type':'text/html; charset=utf-8','Content-Disposition':'inline; filename="invoice.html"','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"}});}if(req.method==='GET')return json({order:publicOrder(row)});if(req.method==='PATCH'){if(a.role!=='admin')fail(403,'Read-only customer account');const b=await body(req);if(b.expectedRevision!==undefined&&b.expectedRevision!==row.revision)fail(409,'This order changed in another tab. Reload it before saving.');const allowedStatus=['pending','successful','dispatched','delivered','cancelled','deleted'];if(b.status&&!allowedStatus.includes(b.status))fail(400,'Invalid status');const next={...row,status:b.status||row.status,payment_verified:b.paymentVerified===undefined?row.payment_verified:(b.paymentVerified?1:0),invoice_approved:b.invoiceApproved===undefined?row.invoice_approved:(b.invoiceApproved?1:0),dispatch_by:b.dispatchBy===undefined?row.dispatch_by:clean(b.dispatchBy,40),dispatch_date:b.dispatchDate===undefined?row.dispatch_date:clean(b.dispatchDate,40),courier:b.courier===undefined?row.courier:clean(b.courier,100),tracking_number:b.trackingNumber===undefined?row.tracking_number:clean(b.trackingNumber,120),tracking_url:b.trackingUrl===undefined?row.tracking_url:clean(b.trackingUrl,1000),payload:b.payload?JSON.stringify(b.payload):row.payload};if(b.payload&&(!b.payload.customer?.name||!b.payload.customer?.mobile||!Array.isArray(b.payload.order?.items)||!b.payload.order.items.length))fail(400,'Customer name, mobile and products are required.');if(['successful','dispatched','delivered'].includes(next.status)&&!next.payment_verified)
+  fail(400,'Verify received payment or COD advance before accepting or dispatching.');
+if(next.status==='dispatched'||next.status==='delivered'){
+  if(!next.courier)fail(400,'Choose a courier company or Bus before dispatching.');
+  if(!next.dispatch_date)fail(400,'Provide the dispatch date.');
+  if(next.dispatch_by!=='bus'&&next.dispatch_by!=='courier')fail(400,'Choose Courier or Bus dispatch method.');
+}
+if(b.status==='deleted'&&row.status!=='deleted'&&clean(b.deleteConfirmation,120)!==row.order_id)
+  fail(400,'Enter the exact Order ID to archive/delete this order.');
+if(next.status==='deleted')next.invoice_approved=0;
+if(b.payload&&b.payload.order?.items?.some(i=>!i.name&&!i.product||!Number.isInteger(Number(i.quantity))||Number(i.quantity)<1||Number(i.unitPrice)<0||!Number.isFinite(Number(i.unitPrice))))
+  fail(400,'Product name, positive integer quantity and valid unit price are required.');
+if(b.payload&&b.payload.order?.items?.length>200)fail(400,'Too many products.');if(next.status!==row.status){
+ const oldPayload=JSON.parse(next.payload),details=oldPayload.order||{};
+ details.statusChangedAt=new Date().toISOString();
+ if(next.status==='delivered')details.deliveredAt=details.statusChangedAt;
+ if(next.status==='dispatched')details.dispatchedAt=details.statusChangedAt;
+ oldPayload.order=details;next.payload=JSON.stringify(oldPayload);
+}
+const revision=next.payload===row.payload?row.revision:row.revision+1;if(next.tracking_url&&!/^https:\/\//.test(next.tracking_url))fail(400,'Tracking URL must use HTTPS');const now=new Date().toISOString();const writes=await env.DB.batch([env.DB.prepare('UPDATE orders SET status=?,payment_verified=?,invoice_approved=?,dispatch_by=?,dispatch_date=?,courier=?,tracking_number=?,tracking_url=?,payload=?,search_text=?,updated_at=?,revision=? WHERE id=? AND revision=?').bind(next.status,next.payment_verified,next.invoice_approved,next.dispatch_by,next.dispatch_date,next.courier,next.tracking_number,next.tracking_url,next.payload,searchText(JSON.parse(next.payload)),now,revision,row.id,row.revision),env.DB.prepare('INSERT INTO audit SELECT ?,?,?,?,?,? WHERE changes()=1').bind(crypto.randomUUID(),row.id,a.account_id,now,JSON.stringify(publicOrder(row)),JSON.stringify(publicOrder({...next,revision})))]);if(writes[0].meta.changes!==1)fail(409,'Order changed while saving. Reload before editing.');return json({order:publicOrder({...next,revision})});}}
 fail(404,'Not found');}catch(e){return json({error:e.status?e.message:'Server error. Please retry.'},e.status||500);}},async scheduled(_,env){await env.DB.batch([env.DB.prepare('DELETE FROM sessions WHERE expires_at<?').bind(Date.now()),env.DB.prepare('DELETE FROM rate_limits WHERE expires_at<?').bind(Date.now())]);}};
 
