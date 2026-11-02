@@ -1145,18 +1145,33 @@ function gpzIncomingCartItems(){
   return GPZ_PARAMS.get("shared")==="1"?(window.GPSharedStore?.items()||[]):[];
 }
 
+function gpzGamingShippingProfile(name,variant=''){
+ const t=(String(name||'')+' '+String(variant||'')).toUpperCase().replace(/[_–—-]+/g,' ').replace(/\s+/g,' ').trim();
+ const profile=(weight,dimensions)=>({weight,dimensions});
+ if(/\bGS5\s*PRO\b/.test(t))return profile(800,[30,20,10]);
+ if(/\bGD\s*30\s*(?:V\s*3)?\b/.test(t))return profile(550,[17,12,12]);
+ if(/\bGD\s*35\b/.test(t)||/\bM\s*22\b/.test(t)||/\bM\s*88\b/.test(t)||/\bGS5\s*MINI\b/.test(t)||/\bPANDORA\b/.test(t)||/\bM\s*(?:15|8)\b/.test(t))return profile(600,[24,17,7]);
+ if(/\bP\s*3\b/.test(t)&&/\bSPECIAL\b/.test(t))return profile(999,[17,12,14]);
+ if(/\bCPU\s*BOX\b.*\bGAME\s*BOX\b|\bARCADE\s*BOX\b.*\bGAME\s*BOX\b/.test(t))return null;
+ if(/\bG\s*11\s*PRO\b/.test(t)||/\bGAME\s*BOX\b|\bGAMEBOX\b/.test(t)){
+  if(/\bSPECIAL\b|\bGTA\b|\bSP\b|\bP\s*3\b/.test(t))return profile(999,[17,12,14]);
+  return profile(700,[17,12,14]);
+ }
+ return null;
+}
 function gpzNormalizeIncomingItem(i){
   const quantity=Math.max(1,Number(i?.quantity)||1);
   const unitPrice=Number(i?.unitPrice)||0;
-  const unitWeight=Number.isFinite(Number(i?.unitWeight))?Math.max(0,Number(i.unitWeight)):gpzInferWeight(i?.product||i?.name||"",i?.variant||"");
   const product=String(i?.product||"").trim();
   const variant=String(i?.variant||"").trim();
-  const name=String(i?.name||((variant&&variant!=="PS2")?`${product} — ${variant}`:product)||"PS2 Product");
+  const name=String(i?.name||((variant&&variant!=="PS2")? `${product} — ${variant}`:product)||"PS2 Product");
+  const shipping=(i?.cpuBuild||i?.arcadeBuild||i?.shippingIgnoreDimensions)?null:gpzGamingShippingProfile(product||name,variant);
+  const unitWeight=shipping?.weight??(Number.isFinite(Number(i?.unitWeight))?Math.max(0,Number(i.unitWeight)):gpzInferWeight(product||name,variant));
   return {
     ...i,name,product,variant,pack:String(i?.pack||""),quantity,unitPrice,
     lineTotal:Number(i?.lineTotal)||(unitPrice*quantity),
-    unitWeight,lineWeight:Number(i?.lineWeight)||(unitWeight*quantity),
-    dimensions:i?.dimensions||i?.unitDimensions||i?.size||""
+    unitWeight,lineWeight:unitWeight*quantity,
+    dimensions:shipping?.dimensions||i?.dimensions||i?.unitDimensions||i?.size||""
   };
 }
 
@@ -1203,7 +1218,7 @@ function gpzBaseItems(){
   const suppliedWeight=Number(GPZ_PARAMS.get("weight")||0);
   const unitPrice=quantity?base/quantity:base;
   const unitWeight=suppliedWeight?suppliedWeight/quantity:gpzInferWeight(product,variant);
-  return [{name:variant?`${product} — ${variant}`:product,product,variant,quantity,unitPrice,lineTotal:base,unitWeight,lineWeight:unitWeight*quantity,dimensions:GPZ_PARAMS.get("dimensions")||""}];
+  return [gpzNormalizeIncomingItem({name:variant?`${product} — ${variant}`:product,product,variant,quantity,unitPrice,lineTotal:base,unitWeight,lineWeight:unitWeight*quantity,dimensions:GPZ_PARAMS.get("dimensions")||""})];
 }
 function gpzAllItems(){
   const items=gpzBaseItems().filter(i=>i.serviceCode!=='PS2_INSPECTION'&&i.name!=='Inspection and verification charges of product');
@@ -1227,7 +1242,7 @@ function gpzAllItems(){
 function gpzBox(items,totalWeight){
   const manual=["actualBoxLength","actualBoxWidth","actualBoxHeight"].map(id=>Number(document.getElementById(id)?.value||0));
   if(manual.every(n=>n>0))return manual;
-  if(items.some(i=>i.cpuBuild||i.arcadeBuild)){const computed=GPCPUShipping.pack(items,manual).dimensions;if(computed)return computed;}
+  if(items.some(i=>i.cpuBuild||i.arcadeBuild||gpzGamingShippingProfile(i.product||i.name,i.variant))){const computed=GPCPUShipping.pack(items,manual).dimensions;if(computed)return computed;}
   const quantities=Object.fromEntries(items.map(item=>[item.name,Number(item.quantity||0)]));
   const hamidProfile=quantities["Push Button (Imported) - Green"]===10&&quantities["MD Switch Button"]===5&&quantities["Zippy Coin Drop Switch"]===2&&quantities["MD Handle (With Switch) - Black"]===2&&quantities["Coin Packet"]===1&&quantities["10 Core Wire (Per Meter)"]===1;
   if(hamidProfile)return [17,12,14];
@@ -1390,10 +1405,10 @@ function gpzRenderRateGuide(kg){
       <tr><td>Air: Trackon / Shree Maruti</td><td><b>₹150/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Trackon</td><td><b>₹200/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Shree Maruti</td><td><b>₹250/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Prepaid and COD</td><td><b>Same courier rate</b></td><td>VAS 2%</td></tr>
+      <tr><td>COD for any product</td><td><b>2 × prepaid courier rate</b></td><td>VAS per courier</td></tr>
     </tbody>
   </table></div>
-  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. चारों couriers में Delhivery rate समान है; Prepaid और COD rate same है। Actual और volumetric में जो अधिक हो वही chargeable है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
+  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. Prepaid courier rate applies normally; COD courier charge is double the same courier's prepaid rate.  Actual और volumetric में जो अधिक हो वही chargeable है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
 }
 function computeTotals(){
   const items=gpzAllItems();
@@ -1429,7 +1444,8 @@ function computeTotals(){
   if(!pickup&&!bus){gpzLoadBigshipQuote();gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);}
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
-  const courierBaseCharge=(emptyOrder||pickup)?0:(bus?GPZ_BUS_RICKSHAW:(m88Offer?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg))));
+  const standardPrepaidCourier=bigshipRate||liveRate||gpzCourierRate(courier,speed,'prepaid',chargeableKg);
+  const courierBaseCharge=(emptyOrder||pickup)?0:(bus?GPZ_BUS_RICKSHAW:(payment==='cod'?2*standardPrepaidCourier:(m88Offer?0:standardPrepaidCourier)));
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
