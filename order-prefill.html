@@ -294,8 +294,31 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
     <div class="hint" id="codNote">COD केवल ₹1,300 या अधिक product value पर उपलब्ध है। Advance: ₹500 या courier charge का 2×, जो भी अधिक हो।</div>
   </div>
 
-  <div class="card">
-    <span class="badge">Delivery & Courier</span>
+  <div class="card" id="gpzDeliveryCard">
+    <span class="badge">Delivery Method — Courier or Bus</span>
+    <div class="label">How should we send your parcel?</div>
+    <div class="choice-grid" role="radiogroup" aria-label="Delivery Mode">
+      <label class="choice"><input type="radio" name="transportMode" value="courier" checked onchange="gpzSetTransportMode('courier')"> 🚚 Courier</label>
+      <label class="choice" id="gpzBusChoice"><input type="radio" name="transportMode" value="bus" onchange="gpzSetTransportMode('bus')"> 🚌 Bus</label>
+    </div>
+    <div id="gpzBusDeliveryFields" hidden>
+      <div class="label">Bus Destination / बस कहाँ भेजनी है?</div>
+      <select id="gpzBusDestination" onchange="computeTotals()" aria-label="Bus destination" required>
+        <option value="">Select bus destination</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Rudrapur">Rudrapur</option>
+        <option value="Bareilly">Bareilly</option>
+        <option value="Moradabad">Moradabad</option>
+        <option value="Bilaspur, Uttar Pradesh">Bilaspur, U.P.</option>
+        <option value="Kashipur">Kashipur</option>
+        <option value="Swar">Swar</option>
+        <option value="Rampur Doraha">Rampur Doraha</option>
+        <option value="Milak">Milak</option>
+        <option value="Haldwani">Haldwani</option>
+      </select>
+      <div class="hint" id="gpzBusFareNote"><b>Shop to Bus Stand — Rickshaw Charge: ₹40</b> (added to your order). <b>Bus fare is NOT included</b>; customer pays bus operator directly. Bus service/dispatch time will be confirmed before sending. Bus orders require prepaid payment.</div>
+    </div>
+    <div id="gpzCourierDeliveryFields">
     <div class="label">Choose Delivery Speed</div>
     <div class="choice-grid">
       <label class="choice"><input type="radio" name="deliverySpeed" value="surface" checked onchange="syncCourierOptions()"> Surface</label>
@@ -305,6 +328,7 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
     <div class="label">Choose Preferred Courier</div>
     <select id="courier" onchange="computeTotals()"></select>
     <div class="hint" id="courierServiceNote">पहले valid pincode भरें। Final courier serviceability destination pincode पर depend करेगी।</div>
+    </div><!-- /gpzCourierDeliveryFields -->
     <div class="label">Actual Packing Box Size (cm)</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
       <input id="actualBoxLength" type="number" min="1" placeholder="Length" oninput="computeTotals()">
@@ -335,10 +359,10 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
       <span>Volumetric Weight</span><b id="sumVolumetric">0kg</b>
       <span>Chargeable Weight</span><b id="sumChargeable">1kg</b>
       <span>VAS (2%)</span><b id="sumVas">₹0</b>
-      <span>Courier Base Charge</span><b id="sumCourierBase">₹0</b>
+      <span id="sumCourierBaseLabel">Courier Base Charge</span><b id="sumCourierBase">₹0</b>
       <span>Extra Courier GST</span><b id="sumCourierGst">₹0</b>
-      <span>Courier Total</span><b id="sumCourier">₹0</b>
-      <span>Courier Rate Source</span><b id="sumRateSource">Configured rate</b>
+      <span id="sumCourierLabel">Courier Total</span><b id="sumCourier">₹0</b>
+      <span id="sumRateSourceLabel">Courier Rate Source</span><b id="sumRateSource">Configured rate</b>
       <span class="grand-row">Grand Total</span><b class="grand-row" id="sumGrand">₹0</b>
       <span>Pay Now / Advance</span><b id="sumPaid">₹0</b>
       <span id="restLabel">Rest on Delivery</span><b id="sumRest">₹0</b>
@@ -1276,7 +1300,43 @@ function recomputeAddons(){
   updateAreaTypeStatus();
   syncCourierOptions();
 }
+const GPZ_BUS_STOPS=Object.freeze(["Delhi","Rudrapur","Bareilly","Moradabad","Bilaspur, Uttar Pradesh","Kashipur","Swar","Rampur Doraha","Milak","Haldwani"]);
+const GPZ_BUS_RICKSHAW=40;
+function gpzIsBus(){return gpzSelected('transportMode','courier')==='bus';}
+function gpzBusStop(){const stop=(document.getElementById('gpzBusDestination')?.value||'').trim();return GPZ_BUS_STOPS.includes(stop)?stop:'';}
+function gpzSyncTransportUI(){
+  const isPickup=gpzCurrentOrder?.fulfillment==='pickup';
+  const bus=gpzIsBus()&&!isPickup;
+  const courierPanel=document.getElementById('gpzCourierDeliveryFields');
+  const busPanel=document.getElementById('gpzBusDeliveryFields');
+  if(courierPanel)courierPanel.hidden=bus;
+  if(busPanel)busPanel.hidden=!bus;
+  const cod=document.querySelector('input[name="paymentMode"][value="cod"]');
+  if(bus&&cod?.checked){
+    document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
+    mode='prepaid';
+  }
+  document.getElementById('gpzBusChoice').style.display=isPickup?'none':'';
+  const btn=document.getElementById('gpzBusDestination');
+  if(btn)btn.required=bus;
+}
+function gpzSetTransportMode(next){
+  if(!['courier','bus'].includes(next))return;
+  document.querySelector('input[name="transportMode"][value="'+next+'"]').checked=true;
+  if(next==='bus'){
+    document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
+    mode='prepaid';
+  }
+  gpzSyncTransportUI();
+  syncCourierOptions();
+}
 function syncCourierOptions(){
+  gpzSyncTransportUI();
+  if(gpzIsBus()){
+    document.getElementById('courierServiceNote').textContent='Bus chosen: customer pays bus operator separately. Shop-to-bus rickshaw ₹40 is included in the total.';
+    computeTotals();
+    return;
+  }
   const payment=gpzMode();
   const rural=gpzIsRuralDestination();
   const productValue=getSubtotal();
@@ -1341,6 +1401,9 @@ function computeTotals(){
   const productTotal=items.reduce((s,i)=>s+i.lineTotal,0);
   const totalWeight=items.reduce((s,i)=>s+i.lineWeight,0);
   const pickup=gpzPickup(items);
+  const bus=!pickup&&gpzIsBus();
+  const busDestination=bus?gpzBusStop():'';
+  gpzSyncTransportUI();
   const packingWeight=GPCPUShipping.pack(items).packingWeight;
   const packedWeight=totalWeight+packingWeight;
   const boxDimensions=gpzBox(items,totalWeight);
@@ -1348,10 +1411,10 @@ function computeTotals(){
   const volumetricKg=(boxDimensions[0]*boxDimensions[1]*boxDimensions[2])/5000;
   const courier=document.getElementById("courier").value||"Trackon.in";
   // Volumetric weight is charged only by these courier partners.
-  const usesVolumetric=!pickup&&(items.some(i=>i.cpuBuild||i.arcadeBuild)||GPZ_VAS_COURIERS.includes(courier));
-  const chargeableKg=pickup?0:Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
+  const usesVolumetric=!pickup&&!bus&&(items.some(i=>i.cpuBuild||i.arcadeBuild)||GPZ_VAS_COURIERS.includes(courier));
+  const chargeableKg=(pickup||bus)?0:Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
   let payment=gpzMode();
-  if(pickup){document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;payment="prepaid";mode="prepaid";}
+  if(pickup||bus){document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;payment="prepaid";mode="prepaid";}
   if(payment==="cod"&&productTotal<GPZ_COD_MIN){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     payment="prepaid"; mode="prepaid";
@@ -1363,10 +1426,10 @@ function computeTotals(){
   const discountedProducts=Math.max(0,productTotal-appliedDiscount);
   const speed=gpzSpeed();
   const liveKey=gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg);
-  if(!pickup){gpzLoadBigshipQuote();gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);}
+  if(!pickup&&!bus){gpzLoadBigshipQuote();gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);}
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
-  const courierBaseCharge=(emptyOrder||pickup||m88Offer)?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg));
+  const courierBaseCharge=(emptyOrder||pickup)?0:(bus?GPZ_BUS_RICKSHAW:(m88Offer?0:(bigshipRate||liveRate||gpzCourierRate(courier,speed,payment,chargeableKg))));
   const courierGst=0;
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
@@ -1377,15 +1440,15 @@ function computeTotals(){
   const amountBeforeGst=Math.max(0,productTotal+courierCharge-appliedDiscount);
   const productGst=invoiceIncluded?(m88Offer?Math.round(amountBeforeGst*18/118):Math.ceil(amountBeforeGst*.18)):0;
   const totalBeforeVas=amountBeforeGst+(m88Offer?0:productGst);
-  const vasApplies=!emptyOrder&&!m88Offer&&!pickup&&GPZ_VAS_COURIERS.includes(courier);
+  const vasApplies=!emptyOrder&&!m88Offer&&!pickup&&!bus&&GPZ_VAS_COURIERS.includes(courier);
   const vasCharge=vasApplies?Math.ceil(totalBeforeVas*.02):0;
   const grandTotal=totalBeforeVas+vasCharge;
   const advanceAmount=payment==="cod"?(m88Offer?Math.min(grandTotal,600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0)):Math.min(grandTotal,Math.max(500,Math.ceil(courierCharge*2)))):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
-    boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":"courier",deliverySpeed:pickup?"Shop Pickup":speed,courier:pickup?"Shop Pickup":courier,
-    courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),gstInvoiceIncluded:invoiceIncluded,productGst,
-    discountApplied:appliedDiscount,couponApplied:gpzVerifiedCoupon,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",specialM88Offer:m88Offer,courierIncluded:m88Offer,
+    boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":(bus?"bus":"courier"),deliveryMode:pickup?"pickup":(bus?"bus":"courier"),busDestination:busDestination,busFarePaidToOperator:bus,busRickshawCharge:bus&&!emptyOrder?GPZ_BUS_RICKSHAW:0,deliverySpeed:pickup?"Shop Pickup":(bus?"Bus dispatch":speed),courier:pickup?"Shop Pickup":(bus?"Bus — "+(busDestination||"Select destination"):courier),
+    courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bus?"Bus fare paid separately by customer • ₹40 rickshaw":bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),gstInvoiceIncluded:invoiceIncluded,productGst,
+    discountApplied:appliedDiscount,couponApplied:gpzVerifiedCoupon,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",specialM88Offer:m88Offer,courierIncluded:m88Offer&&!bus,
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
     // User-facing Base Price is deliberately GST-exclusive and follows:
     // all products + add-ons + courier + VAS. Discount/GST are shown separately.
@@ -1396,10 +1459,10 @@ function computeTotals(){
   document.getElementById("addonsTotal").value=sumAddons();
   document.getElementById("subtotal").value=productTotal;
   document.getElementById("gstDetails").style.display=invoiceIncluded?"block":"none";
-  const codAvailable=!pickup&&productTotal>=GPZ_COD_MIN;
+  const codAvailable=!pickup&&!bus&&productTotal>=GPZ_COD_MIN;
   document.getElementById("codChoice").style.display=codAvailable?"":"none";
   document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
-  document.getElementById("codNote").textContent=m88Offer
+  document.getElementById("codNote").textContent=bus?"Bus dispatch: full prepaid payment required; bus fare paid directly to bus operator.":m88Offer
     ? "M88 coupon COD offer: ₹600 advance per unit, remaining on delivery. No courier or COD fee."
     : codAvailable?"COD available. Courier charges will be added separately.":"COD is available when products + add-ons total is ₹1,300 or more.";
   const showCoupon=couponItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
@@ -1423,10 +1486,13 @@ function computeTotals(){
   }).join("");
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:appliedDiscount?"-"+gpzMoney(appliedDiscount):gpzMoney(0),sumProductGst:(m88Offer&&invoiceIncluded?'Included: ':'')+gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
     sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:usesVolumetric?volumetricKg.toFixed(2)+"kg":"Not applicable for "+courier,
-    sumChargeable:chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
+    sumChargeable:bus?"Bus — charged by operator":chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
     sumCourier:gpzMoney(courierCharge)+(m88Offer?' (included in offer)':''),sumRateSource:m88Offer?'Included in M88 coupon offer':gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
     sumPaid:gpzMoney(advanceAmount),sumRest:gpzMoney(restAmount)};
   Object.entries(values).forEach(([id,value])=>document.getElementById(id).textContent=value);
+  document.getElementById('sumCourierBaseLabel').textContent=bus?'Shop → Bus Rickshaw Charge':'Courier Base Charge';
+  document.getElementById('sumCourierLabel').textContent=bus?'Shop → Bus Transport Total':'Courier Total';
+  document.getElementById('sumRateSourceLabel').textContent=bus?'Bus Fare':'Courier Rate Source';
   const bigshipStatus=document.getElementById("bigshipRateStatus");
   if(bigshipStatus)bigshipStatus.textContent=bigshipRate?`✅ Bigship rate ${gpzMoney(bigshipRate)} लागू है (अगले ₹10 में round).`:`Bigship calculator order का PIN, box, weight, payment mode और invoice amount अपने आप लेगा।`;
   document.getElementById("restLabel").style.display=payment==="cod"?"":"none";
@@ -1439,7 +1505,8 @@ function computeTotals(){
   const paymentUpi=gpzUpiLink(advanceAmount,paymentNote,invoiceIncluded);
   payNow.href=paymentUpi;
   payNow.dataset.upi=paymentUpi;
-  gpzRenderRateGuide(chargeableKg);
+  document.getElementById('courierRateGuide').hidden=bus;
+  if(!bus)gpzRenderRateGuide(chargeableKg);
 }
 function gpzUpiLink(amount,note,invoiceIncluded=gpzInvoice()){
   const isGst=Boolean(invoiceIncluded);
@@ -1520,13 +1587,15 @@ function buildWhatsAppTemplate(){
     `Product: ${simpleProducts}`,
     `Variant: ${simpleVariants}`,
     `Base Price: ${gpzMoney(o.basePriceDisplay||0)}`,
-    `Courier Company: ${o.courier}`,
+    `Courier Company: ${o.fulfillment==="bus"?"Not applicable — Bus":o.courier}`,
+    `Delivery Method: ${o.fulfillment==="bus"?"Bus":o.fulfillment==="pickup"?"Shop Pickup":"Courier"}`,
+    ...(o.fulfillment==="bus"?[`Bus Destination: ${o.busDestination}`,`Shop to Bus Rickshaw Charge: ${gpzMoney(o.busRickshawCharge)} (included in order)`,"Bus Fare: Customer pays bus operator directly (not included in order)"]:[]),
     gstTop,
     `Amount Paid: ${gpzMoney(o.advanceAmount)}`,
     ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[]),"",
-    ...(o.fulfillment==="pickup"?["Delivery: Shop Pickup — Courier ₹0"]:[`📏 Distance: ${document.getElementById("distance").value||""}`]),
-    ...(o.fulfillment==="pickup"?[]:[`⏳ ${isCod?"COD":"Prepaid"} Order ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`]),
-    ...(o.fulfillment==="pickup"?[]:[`📅 Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`]),"",
+    ...(o.fulfillment==="pickup"?["Delivery: Shop Pickup — Courier ₹0"]:o.fulfillment==="bus"?[`Delivery: By Bus to ${o.busDestination} — customer pays bus fare directly`]:[`📏 Distance: ${document.getElementById("distance").value||""}`]),
+    ...(o.fulfillment!=="courier"?[]:[`⏳ ${isCod?"COD":"Prepaid"} Order ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`]),
+    ...(o.fulfillment!=="courier"?[]:[`📅 Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`]),"",
     "━━━━━━━━━━━━━━━━━━━━",
     "🧾 COMPLETE ORDER BREAKDOWN",
     "━━━━━━━━━━━━━━━━━━━━","",
@@ -1545,8 +1614,8 @@ function buildWhatsAppTemplate(){
     `Total Products: ${o.totalQuantity}`,
     `Products + Add-ons: ${gpzMoney(o.productTotal)}`,
     `Coupon Discount: -${gpzMoney(o.discountApplied)}`,
-    `Courier Charges: ${o.courierIncluded?'Included in offer — ₹0':"+"+gpzMoney(o.courierCharge)}`,
-    `Products + Courier After Discount: ${gpzMoney(o.discountedProducts+o.courierCharge)}`,
+    `${o.fulfillment==="bus"?"Shop-to-Bus Rickshaw Charge":"Courier Charges"}: ${o.courierIncluded?'Included in offer — ₹0':"+"+gpzMoney(o.courierCharge)}`,
+    `Products + Delivery After Discount: ${gpzMoney(o.discountedProducts+o.courierCharge)}`,
     `GST Invoice (18%): ${o.gstInvoiceIncluded?(o.specialM88Offer?'Included '+gpzMoney(o.productGst):"+"+gpzMoney(o.productGst)):gpzMoney(0)+" (Excluded)"}`,
     ...gstCustomerLines,
     `Total Before VAS: ${gpzMoney(o.totalBeforeVas)}`,
@@ -1560,6 +1629,11 @@ function buildWhatsAppTemplate(){
   ].join("\n");
 }
 function submitOrder(){
+  if(gpzIsBus()&&!gpzBusStop()){
+    alert('Please choose one of the 10 available bus destinations before submitting your order.');
+    document.getElementById('gpzBusDestination')?.focus();
+    return;
+  }
   if(!gpzCurrentOrder?.items?.length){alert('Cart is empty. Add a product before submitting an order.');return;}
   // Only these four customer fields are compulsory. Everything else is optional.
   const required=gpzCurrentOrder?.fulfillment==="pickup"?["name","mobile"]:["name","mobile","address","pincode"];
@@ -1581,6 +1655,10 @@ function submitOrder(){
     restOnDelivery:gpzCurrentOrder.restAmount,
     total:gpzCurrentOrder.grandTotal,
     courier:gpzCurrentOrder.courier,
+    deliveryMode:gpzCurrentOrder.deliveryMode,
+    busDestination:gpzCurrentOrder.busDestination,
+    busRickshawCharge:gpzCurrentOrder.busRickshawCharge,
+    busFarePaidToOperator:gpzCurrentOrder.busFarePaidToOperator,
     items:gpzCurrentOrder.items,
     message
   };
