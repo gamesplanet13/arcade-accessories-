@@ -1501,7 +1501,11 @@ function computeTotals(){
   document.getElementById("modeBadge").className="badge right "+(payment==="cod"?"mode-cod":"mode-pre");
   const paymentNote=payment==="cod"?"COD Payment":(invoiceIncluded?"GST Invoice Payment":"Prepaid Order");
   const payNow=document.getElementById("payNow");
-  payNow.style.pointerEvents=emptyOrder?'none':'';payNow.style.opacity=emptyOrder?'0.45':'';
+  const busStopMissing=bus&&!busDestination;
+  payNow.style.pointerEvents=(emptyOrder||busStopMissing)?'none':'';
+  payNow.style.opacity=(emptyOrder||busStopMissing)?'0.45':'';
+  if(busStopMissing)document.getElementById('gpzBusFareNote').textContent='Select a bus destination first. Rickshaw ₹40 is added to this order; bus fare is paid separately to the bus operator.';
+  else document.getElementById('gpzBusFareNote').innerHTML='<b>Shop to Bus Stand — Rickshaw Charge: ₹40</b> (included in order). <b>Bus fare paid directly to bus operator</b>; not included in order. Bus booking/dispatch is subject to confirmation.';
   const paymentUpi=gpzUpiLink(advanceAmount,paymentNote,invoiceIncluded);
   payNow.href=paymentUpi;
   payNow.dataset.upi=paymentUpi;
@@ -1516,6 +1520,12 @@ function gpzUpiLink(amount,note,invoiceIncluded=gpzInvoice()){
 }
 function launchUpiPayment(event){
   computeTotals();
+  if(gpzIsBus()&&!gpzBusStop()){
+    if(event)event.preventDefault();
+    alert('Select a valid bus destination before paying.');
+    document.getElementById('gpzBusDestination')?.focus();
+    return false;
+  }
   const o=gpzCurrentOrder;
   if(!o||!Number(o.advanceAmount)){
     if(event) event.preventDefault();
