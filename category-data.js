@@ -70,10 +70,26 @@ window.GPShop={pages,group,recentProducts,prepare(products){
 const GAME_LIST='https://gamesplanet13.github.io/gameselector/PS4_GAME_SELECTOR.html',PS2='https://gamesplanet13.github.io/ps2/';
 const hardware=p=>p.category==='Game Consoles'&&/PS4|PLAYSTATION 4/i.test(p.name)&&!/Games Pack|Service/i.test(p.name);
 const pack=p=>/PS4 (?:500GB|1TB) Games Pack/i.test(p.name);
+function gpzGamingShippingProfile(name,variant=''){
+ const t=(String(name||'')+' '+String(variant||'')).toUpperCase().replace(/[_–—-]+/g,' ').replace(/\s+/g,' ').trim();
+ const profile=(weight,dimensions)=>({weight,dimensions});
+ if(/\bGS5\s*PRO\b/.test(t))return profile(800,[30,20,10]);
+ if(/\bGD\s*30\s*(?:V\s*3)?\b/.test(t))return profile(550,[17,12,12]);
+ if(/\bGD\s*35\b/.test(t)||/\bM\s*22\b/.test(t)||/\bM\s*88\b/.test(t)||/\bGS5\s*MINI\b/.test(t)||/\bPANDORA\b/.test(t)||/\bM\s*(?:15|8)\b/.test(t))return profile(600,[24,17,7]);
+ if(/\bP\s*3\b/.test(t)&&/\bSPECIAL\b/.test(t))return profile(999,[17,12,14]);
+ if(/\bCPU\s*BOX\b.*\bGAME\s*BOX\b|\bARCADE\s*BOX\b.*\bGAME\s*BOX\b/.test(t))return null;
+ if(/\bG\s*11\s*PRO\b/.test(t)||/\bGAME\s*BOX\b|\bGAMEBOX\b/.test(t)){
+  if(/\bSPECIAL\b|\bGTA\b|\bSP\b|\bP\s*3\b/.test(t))return profile(999,[17,12,14]);
+  return profile(700,[17,12,14]);
+ }
+ return null;
+}
 const prepare=GPShop.prepare;
 GPShop.prepare=function(products){
  prepare(products);
  products.forEach(p=>{
+  const shipping=gpzGamingShippingProfile(p.name,(p.variants||[]).join(' '));
+  if(shipping){p.weight=shipping.weight;p.dimensions=shipping.dimensions;p.shippingWeightVerified=true;}
   p.shopPages=(p.shopPages||[p.shopPage]).filter(x=>x!=='consoles');
   if(pack(p)){
    const storage=/500GB/.test(p.name)?'500GB':'1TB',count=storage==='500GB'?'5–7':'13–15';
