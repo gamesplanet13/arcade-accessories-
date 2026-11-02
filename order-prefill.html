@@ -1279,7 +1279,7 @@ function gpzCourierRate(courier,speed,payment,kg){
   if(GPZ_FIVE_STATES.includes(state))return Math.ceil((Math.max(.5,kg)*250)/10)*10;
   return Math.max(1,Math.ceil(kg/.5))*200;
 }
-function gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg){return [courier,payment,document.getElementById("pincode")?.value||"",actualKg.toFixed(3),volumetricKg.toFixed(3)].join("|")}
+function gpzLiveQuoteKey(courier,payment,actualKg,volumetricKg){return [courier,"prepaid",document.getElementById("pincode")?.value||"",actualKg.toFixed(3),volumetricKg.toFixed(3)].join("|")}
 function gpzLoadBigshipQuote(){
   try{gpzBigshipQuote=JSON.parse(localStorage.getItem("gpz_bigship_rate_v1")||"null")}catch(e){gpzBigshipQuote=null}
   return gpzBigshipQuote;
@@ -1290,7 +1290,7 @@ function clearBigshipRate(){
 function openBigshipCalculator(){
   computeTotals();
   const o=gpzCurrentOrder;if(!o)return;
-  const q=new URLSearchParams({source:"244901",destination:(document.getElementById("pincode")?.value||"").replace(/\D/g,""),payment:o.paymentMode,invoice:String(Math.ceil(o.productTotal)),weight:String(Math.ceil(o.actualKg*1000)),length:String(o.boxDimensions[0]),width:String(o.boxDimensions[1]),height:String(o.boxDimensions[2]),courier:o.courier});
+  const q=new URLSearchParams({source:"244901",destination:(document.getElementById("pincode")?.value||"").replace(/\D/g,""),payment:"prepaid",invoice:String(Math.ceil(o.productTotal)),weight:String(Math.ceil(o.actualKg*1000)),length:String(o.boxDimensions[0]),width:String(o.boxDimensions[1]),height:String(o.boxDimensions[2]),courier:o.courier});
   window.open("bigship-rate-calculator.html?"+q.toString(),"gpzBigshipCalculator","width=760,height=900,noopener=no");
 }
 window.addEventListener("storage",event=>{if(event.key==="gpz_bigship_rate_v1"){gpzLoadBigshipQuote();computeTotals()}});
@@ -1496,8 +1496,8 @@ function computeTotals(){
   document.getElementById("codChoice").style.display=codAvailable?"":"none";
   document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
   document.getElementById("codNote").textContent=bus?"Bus dispatch: full prepaid payment required; bus fare paid directly to bus operator.":m88Offer
-    ? "M88 coupon COD offer: ₹600 advance per unit, remaining on delivery. No courier or COD fee."
-    : codAvailable?"COD available. Courier charges will be added separately.":"COD is available when products + add-ons total is ₹1,300 or more.";
+    ? "M88 COD: ₹600 advance per unit. COD courier charge is 2× the standard prepaid courier rate, added separately."
+    : codAvailable?"COD available. Courier charges are 2× prepaid shipping for the same courier.":"COD is available when products + add-ons total is ₹1,300 or more."
   const showCoupon=couponItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
   document.body.classList.toggle('gpz-coupon-checkout',showCoupon);
   document.getElementById("couponCard").hidden=!showCoupon;
