@@ -1305,7 +1305,7 @@ const GPZ_BUS_RICKSHAW=40;
 function gpzIsBus(){return gpzSelected('transportMode','courier')==='bus';}
 function gpzBusStop(){const stop=(document.getElementById('gpzBusDestination')?.value||'').trim();return GPZ_BUS_STOPS.includes(stop)?stop:'';}
 function gpzSyncTransportUI(){
-  const isPickup=gpzCurrentOrder?.fulfillment==='pickup';
+  const isPickup=gpzPickup(gpzAllItems());
   const bus=gpzIsBus()&&!isPickup;
   const courierPanel=document.getElementById('gpzCourierDeliveryFields');
   const busPanel=document.getElementById('gpzBusDeliveryFields');
