@@ -71,6 +71,8 @@ if(path==='/orders'&&req.method==='POST'){
   if(!/^[a-f0-9]{64}$/.test(b.submissionKey)||!/^[a-f0-9]{64}$/.test(b.claimToken))fail(400,'Invalid submission');
   if(!b.customer?.name||!/^[0-9]{10}$/.test(normalizeMobile(b.customer?.mobile))||!b.order?.items?.length)fail(400,'Incomplete order');
   const hash=await sha(b.claimToken),now=new Date().toISOString();
+  const signedIn=req.headers.get('Authorization')?await auth(req,env):null;
+  const customerAccount=signedIn?.role==='customer'?signedIn.account_id:null;
   const incoming={customer:b.customer,order:b.order,message:clean(b.message,80000)};
   const existing=await env.DB.prepare('SELECT * FROM orders WHERE submission_key=?').bind(b.submissionKey).first();
   if(existing){
@@ -85,8 +87,14 @@ if(path==='/orders'&&req.method==='POST'){
   }
   const orderId=clean(b.orderId,150);if(!orderId)fail(400,'Order ID is required');
   if(await env.DB.prepare('SELECT id FROM orders WHERE order_id=?').bind(orderId).first())fail(409,'This Order ID is already saved. Open the existing order instead.');
-  if(b.previousOrderId&&b.previousClaimToken){
-    const previous=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND claim_hash=?').bind(clean(b.previousOrderId,90),await sha(String(b.previousClaimToken))).first();
+  if((b.previousOrderId&&b.previousClaimToken)||customerAccount){
+    let previous=null;
+    if(b.previousOrderId&&b.previousClaimToken)
+      previous=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND claim_hash=?').bind(clean(b.previousOrderId,90),await sha(String(b.previousClaimToken))).first();
+    if(!previous&&customerAccount){
+      const candidates=await env.DB.prepare("SELECT * FROM orders WHERE account_id=? AND status IN ('pending','successful') ORDER BY created_at DESC LIMIT 25").bind(customerAccount).all();
+      previous=candidates.results.find(row=>canCustomerChange(row)&&normalizeMobile(JSON.parse(row.payload).customer?.mobile)===normalizeMobile(b.customer.mobile))||null;
+    }
     if(previous&&canCustomerChange(previous)){
       const old=JSON.parse(previous.payload);
       if(normalizeMobile(old.customer?.mobile)===normalizeMobile(b.customer.mobile)){
@@ -100,8 +108,8 @@ if(path==='/orders'&&req.method==='POST'){
     }
   }
   const id=crypto.randomUUID();
-  await env.DB.prepare('INSERT INTO orders(id,submission_key,claim_hash,source,order_id,created_at,updated_at,payload,search_text) VALUES(?,?,?,?,?,?,?,?,?)')
-    .bind(id,b.submissionKey,hash,clean(b.source,100),orderId,now,now,JSON.stringify(incoming),searchText(incoming)).run();
+  await env.DB.prepare('INSERT INTO orders(id,submission_key,claim_hash,account_id,source,order_id,created_at,updated_at,payload,search_text) VALUES(?,?,?,?,?,?,?,?,?,?)')
+    .bind(id,b.submissionKey,hash,customerAccount,clean(b.source,100),orderId,now,now,JSON.stringify(incoming),searchText(incoming)).run();
   return json({id,orderId,saved:true},201);
 }
 
