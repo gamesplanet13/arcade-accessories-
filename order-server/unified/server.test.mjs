@@ -56,6 +56,55 @@ assert.equal(summary.status,200);
 const summaryHtml=await summary.text();
 assert(summaryHtml.includes('ORDER SUMMARY'));
 assert(summaryHtml.includes('Extra arcade button'));
-assert(summaryHtml.includes('Amount paid / declared'));
+assert(summaryHtml.includes('Amount recorded / advance'));
+
+
+// Owner lifecycle: pending -> accepted -> courier dispatched -> delivered -> pending -> accepted -> deleted -> restored.
+const acceptedRevision=(await call('/orders/'+cid,'GET',null,true)).data.order.revision;
+r=await call('/orders/'+cid,'PATCH',{status:'successful',paymentVerified:true,expectedRevision:acceptedRevision},true);
+assert.equal(r.status,200);
+const acceptedRow=r.data.order;
+assert.equal(acceptedRow.status,'successful');
+r=await call('/orders/'+cid,'PATCH',{status:'dispatched',dispatchBy:'courier',courier:'Delhivery',
+  dispatchDate:'2026-11-03',trackingNumber:'1234567890',trackingUrl:'https://www.delhivery.com/track/package/1234567890',
+  expectedRevision:acceptedRow.revision},true);
+assert.equal(r.status,200);
+assert.equal(r.data.order.status,'dispatched');
+assert.equal(r.data.order.courier,'Delhivery');
+assert.equal(r.data.order.tracking_number,'1234567890');
+const dispatchedRevision=r.data.order.revision;
+r=await call('/orders/'+cid,'PATCH',{status:'delivered',expectedRevision:dispatchedRevision},true);
+assert.equal(r.status,200);
+assert.equal(r.data.order.status,'delivered');
+assert(r.data.order.payload.order.deliveredAt);
+r=await call('/orders/'+cid,'PATCH',{status:'pending',paymentVerified:false,invoiceApproved:false,expectedRevision:r.data.order.revision},true);
+assert.equal(r.status,200);
+assert.equal(r.data.order.payment_verified,false);
+assert.equal(r.data.order.status,'pending');
+r=await call('/orders/'+cid,'PATCH',{status:'successful',paymentVerified:true,expectedRevision:r.data.order.revision},true);
+assert.equal(r.status,200);
+const beforeArchive=r.data.order;
+assert.equal((await call('/orders/'+cid,'PATCH',{status:'deleted',expectedRevision:beforeArchive.revision},true)).status,400);
+r=await call('/orders/'+cid,'PATCH',{status:'deleted',deleteConfirmation:beforeArchive.order_id,expectedRevision:beforeArchive.revision},true);
+assert.equal(r.status,200);
+assert.equal(r.data.order.status,'deleted');
+const ownerDeleted=await call('/orders/'+cid,'GET',null,true);
+assert.equal(ownerDeleted.status,200);
+const hiddenCounts=await call('/customer-counts','GET',null,true);
+assert(hiddenCounts.data.counts.some(x=>x.mobile==='9000000000'&&x.count>=1));
+const audit=await call('/orders/'+cid+'/history','GET',null,true);
+assert.equal(audit.status,200);
+assert(audit.data.history.length>=6);
+r=await call('/orders/'+cid,'PATCH',{status:'pending',paymentVerified:false,invoiceApproved:false,expectedRevision:r.data.order.revision},true);
+assert.equal(r.status,200);
+assert.equal(r.data.order.status,'pending');
+// Bus orders should preserve transport mode without mandatory AWB.
+const bus=payload('gg','cod'),busId=(await call('/orders','POST',bus)).data.id;
+r=await call('/orders/'+busId,'PATCH',{status:'successful',paymentVerified:true},true);
+assert.equal(r.status,200);
+r=await call('/orders/'+busId,'PATCH',{status:'dispatched',dispatchBy:'bus',courier:'Bus',dispatchDate:'2026-11-03',trackingNumber:'BUS-R-13'},true);
+assert.equal(r.status,200);
+assert.equal(r.data.order.dispatch_by,'bus');
+assert.equal((await call('/orders/'+busId+'/history','GET')).status,401);
 
 console.log('PASS server persistence, pending/accept/reject, COD exclusion, idempotency, unique order ID, live edits, revision conflict, stale print acknowledgement, printed archive and reprint after edit.');
