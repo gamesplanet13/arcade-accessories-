@@ -4,16 +4,93 @@ $('portalTitle').textContent=admin?'Admin Dashboard':'My Orders';$('register').h
 async function api(path,method='GET',data){const root=(GP_ORDER_SERVICE.apiUrl||'').replace(/\/$/,'');if(!root)throw Error('Order server is not activated yet.');const r=await fetch(root+path,{method,headers:{'Content-Type':'application/json',...(session?{Authorization:'Bearer '+session.token}:{})},body:data?JSON.stringify(data):undefined});if(!r.ok){const x=await r.json();if(r.status===401){session=null;sessionStorage.removeItem(key);view()}throw Error(x.error||'Request failed')}return r;}
 function task(fn){return async()=>{try{$('error').textContent='';await fn()}catch(e){$('error').textContent=e.message}}}
 function view(){$('loginButton').hidden=false;$('registerButton').hidden=false;$('username').parentElement.hidden=false;$('password').parentElement.hidden=false;$('claimButton').hidden=true;$('login').hidden=!!session;$('tools').hidden=!session;$('export').hidden=!session||!admin;if(!session)$('detail').hidden=true;else if(!admin){$('register').hidden=false;$('login').hidden=false;$('loginButton').hidden=true;$('registerButton').hidden=true;$('username').parentElement.hidden=true;$('password').parentElement.hidden=true;$('claimButton').hidden=false;}}
-async function list(reset=true){if(reset){offset=0;records=[];$('orders').innerHTML=''}const r=await api('/orders?q='+encodeURIComponent($('search').value)+'&offset='+offset),x=await r.json();records.push(...x.orders);offset=x.nextOffset;$('more').hidden=offset===null;for(const o of x.orders){const b=document.createElement('button');b.style.cssText='display:block;width:100%;text-align:left;margin:8px 0;background:#f7f9fc';b.textContent=o.order_id+' • '+o.payload.customer.name+' • '+o.source+' • '+o.status+' • '+money(o.payload.order.grandTotal);b.onclick=task(()=>details(o.id));$('orders').append(b)}if(!records.length)$('orders').textContent='No matching orders';}
+const statusLabel=x=>({pending:'Pending — Payment review',successful:'Accepted',dispatched:'Dispatched',delivered:'Delivered',cancelled:'Rejected',deleted:'Archived'}[x]||x);
+const moneySafe=n=>n===null||n===undefined||n===''?'—':money(n);
+const safeImage=(value,source)=>{
+ const raw=String(value||'').trim();if(!raw)return '';
+ try{const root='https://gamesplanet13.github.io/'+encodeURIComponent(String(source||'arcade-accessories-').replace(/[^a-z0-9_-]/gi,''))+'/';
+ const u=new URL(raw,root);return ['http:','https:'].includes(u.protocol)?u.href:''}catch{return ''}
+};
+const imageTag=(item,source)=>{
+ const img= safeImage(item.image||item.imageUrl||item.thumbnail||item.photo||(Array.isArray(item.images)?item.images[0]:''),source);
+ return img?'<img class="customer-product-photo" loading="lazy" src="'+esc(img)+'" alt="Product photo">':'<span class="customer-image-missing">No photo</span>';
+};
+const readableDate=x=>{const d=new Date(x);return Number.isNaN(d.valueOf())?String(x||'—'):d.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})};
+async function list(reset=true){
+ if(reset){offset=0;records=[];$('orders').replaceChildren()}
+ const r=await api('/orders?q='+encodeURIComponent($('search').value)+'&offset='+offset),x=await r.json();
+ records.push(...x.orders);offset=x.nextOffset;$('more').hidden=offset===null;
+ for(const o of x.orders){
+  const c=o.payload.customer||{},order=o.payload.order||{},b=document.createElement('button');
+  b.className='customer-order-entry';
+  b.innerHTML='<div class="customer-order-head"><b>'+esc(o.order_id)+'</b><span class="customer-status '+esc(o.status)+'">'+esc(statusLabel(o.status))+'</span></div>'+
+   '<small>'+esc(readableDate(o.created_at))+' · '+esc(String(order.paymentMode||'').toUpperCase())+'</small>'+
+   '<div>'+esc((order.items||[]).map(i=>(i.name||i.product)+' × '+(i.quantity||1)).join(' · '))+'</div>'+
+   '<strong>'+moneySafe(order.grandTotal)+'</strong>';
+  b.onclick=task(()=>details(o.id));$('orders').append(b);
+ }
+ if(!records.length)$('orders').textContent='No matching orders';
+}
 function field(id,label,value,type='text'){return '<label>'+label+'<input id="'+id+'" type="'+type+'" value="'+esc(value)+'"></label>'}
-async function details(id){const r=await api('/orders/'+id),x=await r.json(),o=x.order;selected=o;const p=o.payload,c=p.customer,order=p.order;const status=o.status==='pending'?'Pending — payment verification':o.status==='successful'?'Successful Order':o.status;let html='<h2>'+esc(o.order_id)+'</h2><span class="status">'+esc(status)+'</span><p>'+esc(o.created_at)+' • '+esc(o.source)+'</p><h3>Customer</h3><pre>'+esc(JSON.stringify(c,null,2))+'</pre><h3>Order / Cart</h3>'+(order.items||[]).map(i=>'<div class="row">'+(i.image?'<img src="'+esc(new URL(i.image,'https://gamesplanet13.github.io/'+o.source+'/').href)+'" alt="">':'')+'<b>'+esc(i.name)+'</b><br>Qty: '+Number(i.quantity)+' × '+money(i.unitPrice)+' = '+money(i.lineTotal)+(i.components?.length?'<small style="display:block">'+i.components.map(c=>esc(c.name)+' × '+c.quantity).join('<br>')+'</small>':'')+'</div>').join('')+'<h3>Payment & delivery</h3><pre>'+esc(JSON.stringify({total:order.grandTotal,amountSubmitted:order.advanceAmount,restOnDelivery:order.restAmount,paymentVerified:o.payment_verified,invoiceApproved:o.invoice_approved,dispatchBy:o.dispatch_by||'Pending',dispatchDate:o.dispatch_date||'Pending',courier:o.courier,trackingNumber:o.tracking_number||'Pending'},null,2))+'</pre>'+(o.tracking_url?'<a href="'+esc(o.tracking_url)+'" target="_blank" rel="noopener">Track parcel →</a>':'');
-if(admin||o.payment_verified&&o.invoice_approved)html+='<p><button id="invoice">Download Invoice / Print PDF</button><button id="invoicePDF">Download PDF</button><button id="invoiceJPEG">Download JPEG</button><button id="invoiceHTML">Download Invoice HTML</button></p>';else html+='<p>Invoice download is locked until GAMES PLANET verifies payment and approves it.</p>';
-if(admin)html+='<h3>Admin controls</h3><label><input id="verified" type="checkbox" style="width:auto" '+(o.payment_verified?'checked':'')+'> Payment received / verified</label><br><label><input id="approved" type="checkbox" style="width:auto" '+(o.invoice_approved?'checked':'')+'> Allow customer invoice download</label><br><label>Status<select id="status">'+['pending','successful','dispatched','cancelled'].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></label><div class="grid">'+field('dispatchBy','Dispatch by',o.dispatch_by,'date')+field('dispatchDate','Dispatch date',o.dispatch_date,'date')+field('courier','Courier',o.courier)+field('tracking','Tracking / AWB',o.tracking_number)+field('trackingUrl','Tracking URL',o.tracking_url,'url')+'</div><details><summary>Edit complete customer/order data</summary><textarea id="payload">'+esc(JSON.stringify(o.payload,null,2))+'</textarea></details><button id="save">Save changes</button>';
-$('detail').innerHTML=html;$('detail').hidden=false;$('detail').scrollIntoView({behavior:'smooth'});
-if($('invoice'))$('invoice').onclick=task(async()=>{const win=window.open('about:blank','_blank');if(win)win.opener=null;try{const r=await api('/orders/'+o.id+'/invoice'),text=await r.text(),blob=new Blob([text],{type:'text/html'}),url=URL.createObjectURL(blob);if(win)win.location.href=url;else download(blob,o.order_id+'.html');setTimeout(()=>URL.revokeObjectURL(url),60000)}catch(e){win?.close();throw e}});
-for(const [id,kind]of [['invoicePDF','pdf'],['invoiceJPEG','jpg']])if($(id))$(id).onclick=task(async()=>{const b=$(id);b.disabled=true;try{const response=await api('/orders/'+o.id+'/invoice');const blob=await GPApprovedInvoiceExport(await response.text(),kind);download(blob,o.order_id+'.'+kind)}finally{b.disabled=false}});
-if($('invoiceHTML'))$('invoiceHTML').onclick=task(async()=>download(await (await api('/orders/'+o.id+'/invoice')).blob(),o.order_id+'.html'));
-if(admin){$('verified').onchange=()=>{if($('verified').checked&&$('status').value==='pending')$('status').value='successful'};$('save').onclick=task(async()=>{await api('/orders/'+o.id,'PATCH',{paymentVerified:$('verified').checked,invoiceApproved:$('approved').checked,status:$('status').value,dispatchBy:$('dispatchBy').value,dispatchDate:$('dispatchDate').value,courier:$('courier').value,trackingNumber:$('tracking').value,trackingUrl:$('trackingUrl').value,payload:JSON.parse($('payload').value)});await list();await details(o.id)});}}
+async function details(id){
+ const r=await api('/orders/'+id),x=await r.json(),o=x.order;selected=o;
+ const p=o.payload,c=p.customer||{},order=p.order||{},delivery=order.delivery||{};
+ const lineItems=(order.items||[]).map(i=>
+  '<tr><td>'+imageTag(i,o.source)+'</td><td><b>'+esc(i.name||i.product||'Product')+'</b>'+
+  '<div class="secondary">'+esc(i.variant||'')+'</div>'+
+  '<div class="secondary">Unit weight: '+esc(i.unitWeight??'—')+'g · Dimensions: '+esc(Array.isArray(i.dimensions)?i.dimensions.join(' × '):(i.dimensions||'—'))+'</div></td>'+
+  '<td>'+Number(i.quantity||1)+'</td><td>'+moneySafe(i.unitPrice)+'</td><td><b>'+moneySafe(i.lineTotal??(Number(i.quantity||1)*Number(i.unitPrice||0)))+'</b></td></tr>').join('');
+ const panel=(key,value)=>'<div><span>'+key+'</span><b>'+value+'</b></div>';
+ const isDispatch=['dispatched','delivered'].includes(o.status);
+ const tracking=o.tracking_url&&/^https:\/\//i.test(o.tracking_url)?'<a href="'+esc(o.tracking_url)+'" target="_blank" rel="noopener noreferrer">Track parcel</a>':'';
+ const ship=isDispatch?'<section class="customer-detail-box"><h3>Dispatch & tracking</h3><div class="customer-data">'+
+   panel('Delivery method',esc(o.dispatch_by==='bus'?'Bus transport':'Courier'))+
+   panel('Courier / transport',esc(o.courier||'Not available'))+
+   panel(o.dispatch_by==='bus'?'Bus reference':'AWB / Tracking number',esc(o.tracking_number||'Not provided yet'))+
+   panel('Dispatched on',esc(o.dispatch_date||'—'))+
+   (order.busDestination?panel('Bus destination',esc(order.busDestination)):'')+
+   (o.status==='delivered'?panel('Delivered on',esc(readableDate(order.deliveredAt))):'')+
+   '</div>'+tracking+'</section>':'';
+ const due=String(order.paymentMode||'').toLowerCase()==='cod'?
+  Math.max(0,(order.specialM88Offer?600:500)-Number(order.advanceAmount||0)):
+  Math.max(0,Number(order.grandTotal||0)-Number(order.advanceAmount||0));
+ const qr= 'https://gamesplanet13.github.io/arcade-accessories-/'+(order.gstInvoiceIncluded?'GSTcurrentQR.png':'NonGSTcurrentQR.jpg');
+ const paymentHelp=!o.payment_verified?
+  '<section class="customer-detail-box"><h3>Payment not yet verified</h3><p>Payment required for confirmation: '+money(due)+'. Send payment proof to GAMES PLANET for verification.</p>'+
+  '<a href="'+qr+'" target="_blank" rel="noopener"><img class="customer-qr" src="'+qr+'" alt="Games Planet payment QR"></a>'+
+  '<p><a href="'+qr+'" target="_blank" rel="noopener">Open payment QR</a></p></section>':'';
+ let html='<div class="customer-order-head"><h2>'+esc(o.order_id)+'</h2><span class="customer-status '+esc(o.status)+'">'+esc(statusLabel(o.status))+'</span></div>'+
+ '<p class="secondary"><b>Ordered:</b> '+esc(readableDate(o.created_at))+' · <b>Last updated:</b> '+esc(readableDate(o.updated_at))+'</p>'+
+ '<section class="customer-detail-box"><h3>Customer & delivery address</h3><p><b>'+esc(c.name||'')+'</b> · '+esc(c.mobile||'')+
+ (c.altMobile?' · Alternate: '+esc(c.altMobile):'')+'</p><p>'+esc([c.house,c.address,c.landmark,c.postoffice,c.city,c.state,c.pincode].filter(Boolean).join(', '))+'</p></section>'+
+ '<section class="customer-detail-box"><h3>Products purchased</h3><div style="overflow-x:auto"><table class="customer-order-table"><thead><tr><th>Photo</th><th>Product / Variant</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+lineItems+'</tbody></table></div></section>'+
+ '<section class="customer-detail-box"><h3>Order totals</h3><div class="customer-data">'+
+ panel('Total products',moneySafe(order.productTotal??(order.items||[]).reduce((n,i)=>n+Number(i.lineTotal||0),0)))+
+ panel('Total quantity',String((order.items||[]).reduce((n,i)=>n+Number(i.quantity||0),0)))+
+ panel('Packed weight',esc(order.packedWeight??'—')+'g')+
+ panel('Box dimensions',esc(Array.isArray(order.boxDimensions)?order.boxDimensions.join(' × ')+' cm':'—'))+
+ panel('Courier charge',moneySafe(order.courierCharge))+
+ panel('VAS',moneySafe(order.vasCharge))+
+ panel('Discount',moneySafe(order.discountApplied))+
+ (order.gstInvoiceIncluded?panel('GST',moneySafe(order.productGst)):'')+
+ panel('**Grand total**',moneySafe(order.grandTotal))+
+ panel('Payment mode',esc(String(order.paymentMode||'—').toUpperCase()))+
+ panel('Amount recorded',moneySafe(order.advanceAmount))+
+ panel('Payment verified',o.payment_verified?'Yes':'Awaiting verification')+
+ panel('Balance on delivery',moneySafe(order.restAmount))+'</div></section>'+ship+paymentHelp;
+ if(o.payment_verified&&o.invoice_approved)html+='<section class="customer-detail-box"><h3>Invoice / documents</h3><div class="customer-action-row"><button id="invoice">Open invoice / Print</button><button id="invoicePDF">Download PDF</button><button id="invoiceJPEG">Download JPEG</button><button id="invoiceHTML">Download HTML</button></div></section>';
+ else html+='<p class="secondary">Invoice download becomes available after payment confirmation and approval.</p>';
+ $('detail').innerHTML=html;$('detail').hidden=false;$('detail').scrollIntoView({behavior:'smooth'});
+ if($('invoice'))$('invoice').onclick=task(async()=>{
+  const win=window.open('about:blank','_blank');if(win)win.opener=null;
+  try{const r=await api('/orders/'+o.id+'/invoice'),html=await r.text(),url=URL.createObjectURL(new Blob([html],{type:'text/html'}));if(win)win.location.href=url;else download(new Blob([html],{type:'text/html'}),o.order_id+'.html');setTimeout(()=>URL.revokeObjectURL(url),60000)}
+  catch(e){win?.close();throw e}
+ });
+ for(const [button,format] of [['invoicePDF','pdf'],['invoiceJPEG','jpg']])if($(button))$(button).onclick=task(async()=>{
+  const btn=$(button);btn.disabled=true;try{const response=await api('/orders/'+o.id+'/invoice');const blob=await GPApprovedInvoiceExport(await response.text(),format);download(blob,o.order_id+'.'+format)}finally{btn.disabled=false}
+ });
+ if($('invoiceHTML'))$('invoiceHTML').onclick=task(async()=>download(await(await api('/orders/'+o.id+'/invoice')).blob(),o.order_id+'.html'));
+}
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 $('loginButton').onclick=task(async()=>{const r=await api('/auth/login','POST',{username:$('username').value,password:$('password').value,role});session=await r.json();sessionStorage.setItem(key,JSON.stringify(session));$('password').value='';view();await list()});
 $('registerButton').onclick=task(async()=>{const r=await api('/auth/register','POST',{username:$('username').value,password:$('password').value,orderId:$('claimOrder').value,claimToken:$('claimToken').value});session=await r.json();sessionStorage.setItem(key,JSON.stringify(session));$('password').value='';view();await list()});
