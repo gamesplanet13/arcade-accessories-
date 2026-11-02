@@ -28,6 +28,22 @@ function combineProducts(previous,incoming){
   }
   return {items,added};
 }
+function canCustomerChange(row){
+  const age=Date.now()-Date.parse(row.created_at);
+  return age>=0&&age<=72*3600000&&['pending','successful'].includes(row.status)&&
+    !row.dispatch_date&&!row.tracking_number&&!(row.printed_revision>=row.revision&&row.printed_revision>0);
+}
+function repriceOrder(original,items){
+  const productTotal=items.reduce((n,i)=>n+moneyValue(i.lineTotal),0);
+  const courierCharge=moneyValue(original.courierCharge),discountApplied=moneyValue(original.discountApplied);
+  const productGst=original.gstInvoiceIncluded?Math.ceil((productTotal+courierCharge)*.18):0;
+  const subtotal=Math.max(0,productTotal+courierCharge-discountApplied)+productGst;
+  const vasCharge=original.vasApplies?Math.ceil(subtotal*.02):moneyValue(original.vasCharge);
+  const grandTotal=Math.max(0,Math.round((subtotal+vasCharge)*100)/100);
+  return {...original,items,productTotal,totalQuantity:items.reduce((n,i)=>n+moneyValue(i.quantity),0),productGst,
+    vasCharge,grandTotal,restAmount:Math.max(0,Math.round((grandTotal-moneyValue(original.advanceAmount))*100)/100),
+    shippingRequoteNeeded:true,mergeReviewNeeded:true,lastAdditionAt:new Date().toISOString()};
+}
 function combineOrder(existing,incoming){
   const merged=combineProducts(existing.items,incoming.items);if(!merged.added)return null;
   const productTotal=merged.items.reduce((n,i)=>n+moneyValue(i.lineTotal),0);
@@ -61,7 +77,7 @@ if(path==='/orders'&&req.method==='POST'){
     if(existing.claim_hash!==hash)fail(409,'Submission conflict');
     const updatedPayload=JSON.stringify(incoming);
     if(updatedPayload!==existing.payload){
-      if(existing.status==='dispatched'||existing.status==='cancelled'||existing.tracking_number||existing.dispatch_date)fail(409,'Order is already processed. Contact Games Planet.');
+      if(existing.status==='dispatched'||existing.status==='cancelled'||existing.tracking_number||existing.dispatch_date||(existing.printed_revision>=existing.revision&&existing.printed_revision>0))fail(409,'Order is already processed. Contact Games Planet.');
       const result=await env.DB.prepare("UPDATE orders SET payload=?,search_text=?,status='pending',payment_verified=0,invoice_approved=0,revision=revision+1,updated_at=? WHERE id=? AND revision=?").bind(updatedPayload,searchText(incoming),now,existing.id,existing.revision).run();
       if(result.meta.changes!==1)fail(409,'Order updated in another session. Retry.');
     }
@@ -71,13 +87,13 @@ if(path==='/orders'&&req.method==='POST'){
   if(await env.DB.prepare('SELECT id FROM orders WHERE order_id=?').bind(orderId).first())fail(409,'This Order ID is already saved. Open the existing order instead.');
   if(b.previousOrderId&&b.previousClaimToken){
     const previous=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND claim_hash=?').bind(clean(b.previousOrderId,90),await sha(String(b.previousClaimToken))).first();
-    if(previous&&previous.status!=='cancelled'&&previous.status!=='dispatched'&&!previous.tracking_number&&!previous.dispatch_date&&Date.now()-Date.parse(previous.created_at)<=72*3600000&&Date.now()-Date.parse(previous.created_at)>=0){
+    if(previous&&canCustomerChange(previous)){
       const old=JSON.parse(previous.payload);
       if(normalizeMobile(old.customer?.mobile)===normalizeMobile(b.customer.mobile)){
         const merged=combineOrder(old.order,incoming.order);
         if(!merged)return json({id:previous.id,orderId:previous.order_id,saved:true,merged:true,duplicate:true});
         const payload={...old,order:merged,message:(old.message||'')+'\n\nAdditional products requested ('+now+'):\n'+clean(b.message,25000)};
-        const saved=await env.DB.prepare("UPDATE orders SET payload=?,search_text=?,status='pending',payment_verified=0,invoice_approved=0,revision=revision+1,updated_at=? WHERE id=? AND revision=? AND status IN ('pending','successful') AND tracking_number='' AND dispatch_date=''").bind(JSON.stringify(payload),searchText(payload),now,previous.id,previous.revision).run();
+        const saved=await env.DB.prepare("UPDATE orders SET payload=?,search_text=?,status='pending',payment_verified=0,invoice_approved=0,revision=revision+1,updated_at=? WHERE id=? AND revision=? AND status IN ('pending','successful') AND tracking_number='' AND dispatch_date='' AND (printed_revision=0 OR printed_revision<revision)").bind(JSON.stringify(payload),searchText(payload),now,previous.id,previous.revision).run();
         if(saved.meta.changes!==1)fail(409,'Original order changed. Refresh your order and retry.');
         return json({id:previous.id,orderId:previous.order_id,saved:true,merged:true,reopened:true,requiresPaymentVerification:true});
       }
@@ -87,6 +103,38 @@ if(path==='/orders'&&req.method==='POST'){
   await env.DB.prepare('INSERT INTO orders(id,submission_key,claim_hash,source,order_id,created_at,updated_at,payload,search_text) VALUES(?,?,?,?,?,?,?,?,?)')
     .bind(id,b.submissionKey,hash,clean(b.source,100),orderId,now,now,JSON.stringify(incoming),searchText(incoming)).run();
   return json({id,orderId,saved:true},201);
+}
+
+if(path==='/orders/receipt'&&req.method==='POST'){
+  await rate(env,req,'receipt',15);
+  const b=await body(req),id=clean(b.orderId,90),claim=String(b.claimToken||'');
+  if(!/^[a-z0-9-]{10,90}$/.test(id)||!/^[a-f0-9]{64}$/.test(claim))fail(400,'Invalid private order receipt');
+  const row=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND claim_hash=?').bind(id,await sha(claim)).first();
+  if(!row)fail(404,'Private order receipt was not found');
+  return json({order:publicOrder(row),canEdit:canCustomerChange(row)});
+}
+if(path==='/orders/receipt-edit'&&req.method==='POST'){
+  await rate(env,req,'receipt-edit',10);
+  const b=await body(req),id=clean(b.orderId,90),claim=String(b.claimToken||'');
+  if(!/^[a-z0-9-]{10,90}$/.test(id)||!/^[a-f0-9]{64}$/.test(claim)||!Number.isInteger(b.expectedRevision)||!Array.isArray(b.quantities))fail(400,'Invalid receipt edit request');
+  const row=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND claim_hash=?').bind(id,await sha(claim)).first();
+  if(!row)fail(404,'Private order receipt was not found');
+  if(!canCustomerChange(row))fail(409,'Order is already dispatched, rejected, printed or older than 72 hours. Contact Games Planet.');
+  if(row.revision!==b.expectedRevision)fail(409,'This order changed. Refresh before editing.');
+  const original=JSON.parse(row.payload);
+  if(b.quantities.length!==original.order.items.length)fail(400,'The item list changed. Reload before saving.');
+  const items=original.order.items.map((item,i)=>{
+    const quantity=Number(b.quantities[i]);
+    if(!Number.isInteger(quantity)||quantity<0||quantity>1000)fail(400,'Invalid product quantity');
+    return {...item,quantity,lineTotal:Math.round(quantity*moneyValue(item.unitPrice)*100)/100};
+  }).filter(i=>i.quantity>0);
+  if(!items.length)fail(400,'At least one product is required. Contact Games Planet to cancel the order.');
+  const updated={...original,order:repriceOrder(original.order,items)};
+  const now=new Date().toISOString(),stored=JSON.stringify(updated);
+  const result=await env.DB.prepare("UPDATE orders SET payload=?,search_text=?,status='pending',payment_verified=0,invoice_approved=0,revision=revision+1,updated_at=? WHERE id=? AND revision=? AND status IN ('pending','successful') AND tracking_number='' AND dispatch_date='' AND (printed_revision=0 OR printed_revision<revision)")
+    .bind(stored,searchText(updated),now,row.id,row.revision).run();
+  if(result.meta.changes!==1)fail(409,'Order changed during editing. Reload before saving.');
+  return json({id:row.id,orderId:row.order_id,saved:true,needsPaymentVerification:true,order:publicOrder({...row,payload:stored,revision:row.revision+1,status:'pending',payment_verified:0,invoice_approved:0})});
 }
 if(path==='/auth/login'&&req.method==='POST'){await rate(env,req,'login',5);const b=await body(req),name=clean(b.username,80).toLowerCase();if(b.role==='admin'){if(!env.ADMIN_USERNAME||!env.ADMIN_SALT||!env.ADMIN_PASSWORD_HASH)fail(503,'Admin login not configured');if(name!==env.ADMIN_USERNAME.toLowerCase()||await passwordHash(String(b.password||''),env.ADMIN_SALT)!==env.ADMIN_PASSWORD_HASH)fail(401,'Invalid login');return json(await session(env,'owner','admin'));}const a=await env.DB.prepare('SELECT * FROM accounts WHERE username=?').bind(name).first();if(!a||await passwordHash(String(b.password||''),a.salt)!==a.password_hash)fail(401,'Invalid login');return json(await session(env,a.id,'customer'));}
 if(path==='/auth/register'&&req.method==='POST'){await rate(env,req,'register',5);const b=await body(req),username=clean(b.username,80).toLowerCase();if(!/^[a-z0-9_.@-]{3,80}$/.test(username)||String(b.password||'').length<10||String(b.password).length>128)fail(400,'ID: 3–80 characters. Password: at least 10 characters.');const order=await env.DB.prepare('SELECT id FROM orders WHERE id=? AND claim_hash=? AND account_id IS NULL').bind(b.orderId,await sha(String(b.claimToken||''))).first();if(!order)fail(403,'Your private order receipt code is required');if(await env.DB.prepare('SELECT id FROM accounts WHERE username=?').bind(username).first())fail(409,'ID already used');const id=crypto.randomUUID(),salt=token(),hash=await passwordHash(b.password,salt);await env.DB.batch([env.DB.prepare('INSERT INTO accounts VALUES(?,?,?,?,?)').bind(id,username,salt,hash,new Date().toISOString()),env.DB.prepare('UPDATE orders SET account_id=? WHERE id=? AND account_id IS NULL').bind(id,order.id)]);return json(await session(env,id,'customer'),201);}
