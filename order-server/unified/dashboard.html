@@ -72,7 +72,12 @@ function card(r){
  '<div class="item-preview">'+(o.items||[]).map(i=>itemPhoto(i,r.source)+esc(itemName(i))+' × '+num(i.quantity)+' = '+money(itemTotal(i))+'<div style="clear:both"></div>').join('')+'</div>'+
  '<div class="amount">'+money(o.grandTotal)+'</div><small>Payment: '+(r.payment_verified?'Verified':'Not verified')+' · '+(r.printed_revision>=r.revision?'Label printed':'Not printed')+'</small>'+
  '<div class="actions" style="margin-top:12px"><button data-open="'+esc(r.id)+'">'+(editable?'Open / edit':'View order')+'</button><button data-print="'+esc(r.id)+'">Print order summary</button>'+
- (r.status==='pending'?'<button class="accept" data-accept="'+esc(r.id)+'">Accept — payment confirmed</button>':'')+(r.status==='successful'?'<button data-open="'+esc(r.id)+'">Dispatch details</button>':'')+'</div></article>';
+ (r.status==='pending'?'<button class="accept" data-accept="'+esc(r.id)+'">Accept — verify payment</button>':'')+
+ (r.status==='successful'?'<button data-pending="'+esc(r.id)+'">↩ Pending</button><button data-open="'+esc(r.id)+'">Dispatch details</button>':'')+
+ (r.status==='dispatched'?'<button class="accept" data-delivered="'+esc(r.id)+'">✓ Delivered</button><button data-pending="'+esc(r.id)+'">↩ Pending</button>':'')+
+ (r.status==='delivered'?'<button data-pending="'+esc(r.id)+'">↩ Pending</button><button data-accept="'+esc(r.id)+'">↩ Accepted</button>':'')+
+ (r.status==='cancelled'?'<button data-pending="'+esc(r.id)+'">↩ Pending</button>':'')+
+ (r.status==='deleted'?'<button data-pending="'+esc(r.id)+'">Restore</button>':'')+'</div></article>';
 }
 function render(force=false){
  const filter=$('filter').value;
@@ -83,13 +88,15 @@ function render(force=false){
 }
 function bindActions(el){
  el.addEventListener('click',e=>{
- const button=e.target.closest('button[data-open],button[data-print],button[data-accept],button[data-reject],button[data-history]');
+ const button=e.target.closest('button[data-open],button[data-print],button[data-accept],button[data-reject],button[data-history],button[data-pending],button[data-delivered]');
  if(!button)return;
  if(button.dataset.print){window.open('/api/orders/'+encodeURIComponent(button.dataset.print)+'/summary','_blank','noopener');return}
  if(button.dataset.history){task(()=>showHistory(button.dataset.history,button.dataset.cname));return}
  if(button.dataset.open){task(()=>open(button.dataset.open));return}
  if(button.dataset.accept){task(()=>decision(button.dataset.accept,'successful'));return}
  if(button.dataset.reject){task(()=>decision(button.dataset.reject,'cancelled'));return}
+ if(button.dataset.pending){task(()=>decision(button.dataset.pending,'pending'));return}
+ if(button.dataset.delivered){task(()=>decision(button.dataset.delivered,'delivered'));return}
  });
 }
 bindActions($('orders'));bindActions($('historyPanel'));bindActions($('detail'));
