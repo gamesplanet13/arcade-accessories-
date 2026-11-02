@@ -71,7 +71,61 @@ function combineOrder(existing,incoming){
     mergeReviewNeeded:true,lastAdditionAt:new Date().toISOString(),paymentMode:existing.paymentMode||incoming.paymentMode};
 }
 
-function invoice(r,summary=false){const p=JSON.parse(r.payload),o=p.order||{},c=p.customer||{},gst=!!o.gstInvoiceIncluded,amount=n=>'₹'+Number(n||0).toLocaleString('en-IN');return '<!doctype html><html><head><meta charset="utf-8"><title>'+escape(r.order_id)+(summary?' Order Summary':' Invoice')+'</title><style>body{font:14px system-ui;max-width:900px;margin:30px auto;color:#17212e}table{width:100%;border-collapse:collapse}td,th{border:1px solid #cad5df;padding:8px;text-align:left}small{display:block}h1{font-size:24px}@media print{button{display:none}body{margin:0}}</style></head><body><button onclick="print()">Print / Save as PDF</button><h1>GAMES PLANET — '+(summary?'ORDER SUMMARY':gst?'TAX INVOICE':'BILL — GST not charged')+'</h1><p>Order ID: '+escape(r.order_id)+'<br>Date: '+escape(r.created_at)+'<br>'+ (gst?'Seller GSTIN: 09DIDPS5066Q1ZB<br>':'')+'Name: '+escape(c.name)+'<br>Mobile: '+escape(c.mobile)+'<br>Address: '+escape([c.house,c.address,c.landmark,c.city,c.state,c.pincode].filter(Boolean).join(', '))+(gst&&c.gstin?'<br>Customer GSTIN: '+escape(c.gstin):'')+'</p><table><tr><th>Product</th><th>Qty</th><th>Rate</th><th>Total</th></tr>'+(o.items||[]).map(i=>'<tr><td>'+escape([i.name||i.product,i.variant].filter(Boolean).join(' — '))+(i.components?.length?'<small>'+i.components.map(x=>escape(x.name)+' × '+Number(x.quantity)).join('<br>')+'</small>':'')+'</td><td>'+Number(i.quantity)+'</td><td>'+amount(i.unitPrice)+'</td><td>'+amount(i.lineTotal)+'</td></tr>').join('')+'</table><p>Products: '+amount(o.productTotal)+'<br>Discount: '+amount(o.discountApplied)+'<br>Courier: '+amount(o.courierCharge)+'<br>VAS: '+amount(o.vasCharge)+(gst?'<br>GST (18%): '+amount(o.productGst):'')+'<br><b>Final total: '+amount(o.grandTotal)+'</b><br>Payment mode: '+escape(String(o.paymentMode||'unknown').toUpperCase())+'<br>Amount paid / declared: '+amount(o.advanceAmount)+'<br>Balance to collect: '+amount(o.restAmount)+'<br>Order status: '+escape(r.status)+'<br>Total units: '+(o.items||[]).reduce((n,i)=>n+Number(i.quantity||0),0)+'<br>Payment verification: '+(r.payment_verified?'Verified':'Pending')+'</p></body></html>';}
+function printableImage(item,source){
+ const raw=String(item.image||item.imageUrl||item.thumbnail||item.photo||(Array.isArray(item.images)?item.images[0]:'')||'').trim();
+ if(!raw)return '';
+ try{const repo=String(source||'arcade-accessories-').replace(/[^a-z0-9_-]/gi,'');
+   const url=new URL(raw,'https://gamesplanet13.github.io/'+repo+'/');
+   return ['http:','https:'].includes(url.protocol)?url.href:''}catch{return ''}
+}
+function invoice(r,summary=false){
+ const p=JSON.parse(r.payload),o=p.order||{},c=p.customer||{},gst=!!o.gstInvoiceIncluded;
+ const amount=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+ const items=Array.isArray(o.items)?o.items:[];
+ const itemRows=items.map((i,index)=>{
+  const img=printableImage(i,r.source);
+  const photo=img?'<img src="'+escape(img)+'" alt="Product photo" loading="lazy" style="height:55px;width:55px;object-fit:contain">':'—';
+  const dimensions=Array.isArray(i.dimensions)?i.dimensions.join(' × '):String(i.dimensions||'');
+  const rate=Number(i.unitPrice)||0,qty=Number(i.quantity)||0;
+  const total=Number.isFinite(Number(i.lineTotal))?Number(i.lineTotal):qty*rate;
+  return '<tr><td>'+(index+1)+'</td><td>'+photo+'</td><td><b>'+escape([i.name||i.product,i.variant].filter(Boolean).join(' — '))+'</b>'+
+  '<small>Unit weight: '+escape(i.unitWeight??'—')+'g'+(dimensions?' · Dimensions: '+escape(dimensions):'')+'</small>'+
+  '</td><td>'+qty+'</td><td>'+amount(rate)+'</td><td>'+amount(total)+'</td></tr>';
+ }).join('');
+ const detail=(title,value)=>'<tr><td colspan="4">'+title+'</td><td colspan="2">'+value+'</td></tr>';
+ const subtotal=Number.isFinite(Number(o.productTotal))?Number(o.productTotal):items.reduce((n,i)=>n+Number(i.lineTotal||0),0);
+ const mode=String(o.paymentMode||'unknown').toUpperCase();
+ const shipped=['dispatched','delivered'].includes(r.status);
+ const carrier=shipped?'<p><b>Dispatch:</b> '+escape(r.dispatch_by==='bus'?'Bus transport':'Courier')+' — '+escape(r.courier||'')+
+   ' · <b>Dispatch date:</b> '+escape(r.dispatch_date||'—')+'<br><b>AWB / Bus reference:</b> '+escape(r.tracking_number||'Not recorded')+
+   (r.tracking_url&&/^https:\/\//.test(r.tracking_url)?'<br><b>Tracking URL:</b> '+escape(r.tracking_url):'')+'</p>':'';
+ return '<!doctype html><html><head><meta charset="utf-8"><title>'+escape(r.order_id)+(summary?' Order Summary':' Invoice')+'</title>'+
+ '<style>body{font:13px/1.5 system-ui,Arial;max-width:960px;margin:22px auto;color:#193044;padding:0 14px}h1{font-size:23px;margin:8px 0}h2{font-size:17px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #d5e0e8;padding:10px 7px;text-align:left;vertical-align:top}th{background:#ecf4f8}small{display:block;color:#596d7a;margin-top:4px}td:nth-child(4),td:nth-child(5),td:nth-child(6){white-space:nowrap}button{padding:9px 13px;margin-bottom:12px} .total{font-weight:800;background:#e7f4fa}@media print{button{display:none}body{margin:0;max-width:none}tr{break-inside:avoid}}</style></head><body>'+
+ '<button onclick="print()">Print / Save as PDF</button><h1>GAMES PLANET — '+(summary?'ORDER SUMMARY':gst?'TAX INVOICE':'BILL — GST not charged')+'</h1>'+
+ '<p><b>Order:</b> '+escape(r.order_id)+' · <b>Ordered at:</b> '+escape(r.created_at)+
+ ' · <b>Updated:</b> '+escape(r.updated_at)+'<br><b>Status:</b> '+escape(r.status)+
+ ' · <b>Payment mode:</b> '+escape(mode)+(gst?'<br><b>Seller GSTIN:</b> 09DIDPS5066Q1ZB':'')+'</p>'+
+ '<p><b>Customer:</b> '+escape(c.name)+' · <b>Mobile:</b> '+escape(c.mobile)+
+ (c.altMobile?' · '+escape(c.altMobile):'')+'<br><b>Address:</b> '+
+ escape([c.house,c.address,c.landmark,c.postoffice,c.city,c.state,c.pincode].filter(Boolean).join(', '))+
+ (gst&&c.gstin?'<br><b>Customer GSTIN:</b> '+escape(c.gstin):'')+'</p>'+carrier+
+ '<h2>Products / Items Purchased</h2><table><thead><tr><th>#</th><th>Photo</th><th>Product / Variant</th><th>Qty</th><th>Unit Rate</th><th>Line Total</th></tr></thead><tbody>'+itemRows+'</tbody><tfoot>'+
+ detail('Total pieces',items.reduce((n,i)=>n+Number(i.quantity||0),0))+
+ detail('Products subtotal',amount(subtotal))+
+ detail('Discount',amount(o.discountApplied))+
+ detail('Courier',amount(o.courierCharge))+
+ detail('VAS',amount(o.vasCharge))+
+ (gst?detail('GST',amount(o.productGst)):'')+
+ '<tr class="total"><td colspan="4">FINAL ORDER TOTAL</td><td colspan="2">'+amount(o.grandTotal)+'</td></tr>'+
+ detail('Amount recorded / advance',amount(o.advanceAmount))+
+ detail('Payment verification',r.payment_verified?'Confirmed':'Not yet verified')+
+ detail('Balance to collect',amount(o.restAmount))+
+ '</tfoot></table><p><b>Products weight:</b> '+escape(o.totalWeight??'—')+'g · <b>Packaging:</b> '+escape(o.packingWeight??'—')+
+ 'g · <b>Packed weight:</b> '+escape(o.packedWeight??'—')+'g · <b>Box:</b> '+
+ escape(Array.isArray(o.boxDimensions)?o.boxDimensions.join(' × ')+' cm':'—')+
+ ' · <b>Chargeable:</b> '+escape(o.chargeableKg??'—')+'kg</p>'+
+ '<small>Amounts represent saved order details. Payment is confirmed only when explicitly marked verified.</small></body></html>';
+}
 export default {async fetch(req,env){const origin=req.headers.get('Origin'),ownOrigin=new URL(req.url).origin,allowed=origin===ownOrigin?ownOrigin:'https://gamesplanet13.github.io';const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Headers':'Content-Type,Authorization','Access-Control-Allow-Methods':'GET,POST,PATCH,OPTIONS','Vary':'Origin'};const json=(o,status=200)=>new Response(JSON.stringify(o),{status,headers});try{if(origin&&origin!==allowed)fail(403,'Origin denied');if(req.method==='OPTIONS')return new Response(null,{status:204,headers});const u=new URL(req.url),path=u.pathname;if(path==='/health'){if(!env.DB)return json({ok:false},503);await env.DB.prepare('SELECT COUNT(*) AS n FROM orders').first();return json({ok:true,service:'games-planet-orders',database:true});}if(!env.DB)fail(503,'Database not configured');
 if(path==='/orders'&&req.method==='POST'){
   await rate(env,req,'submit',10);
@@ -196,7 +250,7 @@ if(path==='/orders'&&req.method==='GET'){
   const compressed=a.role==='admin'&&u.searchParams.get('view')==='summary';
   return json({orders:rows.results.map(compressed?compactOrder:publicOrder),nextOffset:rows.results.length===100?offset+100:null});
 }
-const match=path.match(/^\/orders\/([a-z0-9-]+)(\/(?:invoice|summary))?$/);if(match){const row=await env.DB.prepare('SELECT * FROM orders WHERE id=?'+(a.role==='admin'?'':' AND account_id=?')).bind(...(a.role==='admin'?[match[1]]:[match[1],a.account_id])).first();if(!row||a.role!=='admin'&&row.status==='deleted')fail(404,'Order not found');if(match[2]&&req.method==='GET'){if(match[2]==='/summary'&&a.role!=='admin')fail(403,'Order summary is for owner only');if(match[2]==='/invoice'&&!canDownload(a.role,row))fail(403,'Invoice pending payment/download approval');return new Response(invoice(row,match[2]==='/summary'),{headers:{...headers,'Content-Type':'text/html; charset=utf-8','Content-Disposition':'inline; filename="invoice.html"','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"}});}if(req.method==='GET')return json({order:publicOrder(row)});if(req.method==='PATCH'){if(a.role!=='admin')fail(403,'Read-only customer account');const b=await body(req);if(b.expectedRevision!==undefined&&b.expectedRevision!==row.revision)fail(409,'This order changed in another tab. Reload it before saving.');const allowedStatus=['pending','successful','dispatched','delivered','cancelled','deleted'];if(b.status&&!allowedStatus.includes(b.status))fail(400,'Invalid status');const next={...row,status:b.status||row.status,payment_verified:b.paymentVerified===undefined?row.payment_verified:(b.paymentVerified?1:0),invoice_approved:b.invoiceApproved===undefined?row.invoice_approved:(b.invoiceApproved?1:0),dispatch_by:b.dispatchBy===undefined?row.dispatch_by:clean(b.dispatchBy,40),dispatch_date:b.dispatchDate===undefined?row.dispatch_date:clean(b.dispatchDate,40),courier:b.courier===undefined?row.courier:clean(b.courier,100),tracking_number:b.trackingNumber===undefined?row.tracking_number:clean(b.trackingNumber,120),tracking_url:b.trackingUrl===undefined?row.tracking_url:clean(b.trackingUrl,1000),payload:b.payload?JSON.stringify(b.payload):row.payload};if(b.payload&&(!b.payload.customer?.name||!b.payload.customer?.mobile||!Array.isArray(b.payload.order?.items)||!b.payload.order.items.length))fail(400,'Customer name, mobile and products are required.');if(['successful','dispatched','delivered'].includes(next.status)&&!next.payment_verified)
+const match=path.match(/^\/orders\/([a-z0-9-]+)(\/(?:invoice|summary))?$/);if(match){const row=await env.DB.prepare('SELECT * FROM orders WHERE id=?'+(a.role==='admin'?'':' AND account_id=?')).bind(...(a.role==='admin'?[match[1]]:[match[1],a.account_id])).first();if(!row||a.role!=='admin'&&row.status==='deleted')fail(404,'Order not found');if(match[2]&&req.method==='GET'){if(match[2]==='/summary'&&a.role!=='admin')fail(403,'Order summary is for owner only');if(match[2]==='/invoice'&&!canDownload(a.role,row))fail(403,'Invoice pending payment/download approval');return new Response(invoice(row,match[2]==='/summary'),{headers:{...headers,'Content-Type':'text/html; charset=utf-8','Content-Disposition':'inline; filename="invoice.html"','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src https: data:; base-uri 'none'; frame-ancestors 'none'"}});}if(req.method==='GET')return json({order:publicOrder(row)});if(req.method==='PATCH'){if(a.role!=='admin')fail(403,'Read-only customer account');const b=await body(req);if(b.expectedRevision!==undefined&&b.expectedRevision!==row.revision)fail(409,'This order changed in another tab. Reload it before saving.');const allowedStatus=['pending','successful','dispatched','delivered','cancelled','deleted'];if(b.status&&!allowedStatus.includes(b.status))fail(400,'Invalid status');const next={...row,status:b.status||row.status,payment_verified:b.paymentVerified===undefined?row.payment_verified:(b.paymentVerified?1:0),invoice_approved:b.invoiceApproved===undefined?row.invoice_approved:(b.invoiceApproved?1:0),dispatch_by:b.dispatchBy===undefined?row.dispatch_by:clean(b.dispatchBy,40),dispatch_date:b.dispatchDate===undefined?row.dispatch_date:clean(b.dispatchDate,40),courier:b.courier===undefined?row.courier:clean(b.courier,100),tracking_number:b.trackingNumber===undefined?row.tracking_number:clean(b.trackingNumber,120),tracking_url:b.trackingUrl===undefined?row.tracking_url:clean(b.trackingUrl,1000),payload:b.payload?JSON.stringify(b.payload):row.payload};if(b.payload&&(!b.payload.customer?.name||!b.payload.customer?.mobile||!Array.isArray(b.payload.order?.items)||!b.payload.order.items.length))fail(400,'Customer name, mobile and products are required.');if(['successful','dispatched','delivered'].includes(next.status)&&!next.payment_verified)
   fail(400,'Verify received payment or COD advance before accepting or dispatching.');
 if(next.status==='dispatched'||next.status==='delivered'){
   if(!next.courier)fail(400,'Choose a courier company or Bus before dispatching.');
