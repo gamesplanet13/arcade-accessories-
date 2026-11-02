@@ -86,12 +86,15 @@ if(path==='/orders'&&req.method==='POST'){
   if(existing){
     if(existing.claim_hash!==hash)fail(409,'Submission conflict');
     const updatedPayload=JSON.stringify(incoming);
-    if(updatedPayload!==existing.payload){
+    const previousPayload=JSON.parse(existing.payload);
+    // A repeated submit with only a different WhatsApp message must not reopen an accepted order.
+    const meaningfulChange=JSON.stringify({customer:previousPayload.customer,order:previousPayload.order})!==JSON.stringify({customer:incoming.customer,order:incoming.order});
+    if(meaningfulChange){
       if(existing.status==='dispatched'||existing.status==='cancelled'||existing.tracking_number||existing.dispatch_date||(existing.printed_revision>=existing.revision&&existing.printed_revision>0))fail(409,'Order is already processed. Contact Games Planet.');
       const result=await env.DB.prepare("UPDATE orders SET payload=?,search_text=?,status='pending',payment_verified=0,invoice_approved=0,revision=revision+1,updated_at=? WHERE id=? AND revision=?").bind(updatedPayload,searchText(incoming),now,existing.id,existing.revision).run();
       if(result.meta.changes!==1)fail(409,'Order updated in another session. Retry.');
     }
-    return json({id:existing.id,orderId:existing.order_id,saved:true,updated:updatedPayload!==existing.payload});
+    return json({id:existing.id,orderId:existing.order_id,saved:true,updated:meaningfulChange});
   }
   const orderId=clean(b.orderId,150);if(!orderId)fail(400,'Order ID is required');
   if(await env.DB.prepare('SELECT id FROM orders WHERE order_id=?').bind(orderId).first())fail(409,'This Order ID is already saved. Open the existing order instead.');
