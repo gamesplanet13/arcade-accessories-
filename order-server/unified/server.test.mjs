@@ -9,4 +9,40 @@ r=await call('/orders/'+id,'PATCH',{status:'successful',paymentVerified:true,exp
 r=await call('/labels/complete','POST',{labels:[{id,revision:1}]},true);assert.equal(r.data.completed.length,0);assert.equal((await call('/labels','GET',null,true)).data.orders.length,1);r=await call('/labels/complete','POST',{labels:[{id,revision:2}]},true);assert.deepEqual(r.data.completed,[id]);assert.equal((await call('/labels','GET',null,true)).data.orders.length,0);assert.equal((await call('/orders/'+id,'GET',null,true)).status,200);
 await call('/orders/'+id,'PATCH',{payload:{customer:{...edited.customer,address:'Changed after print'},order:edited.order,message:'Changed'},expectedRevision:2},true);assert.equal((await call('/labels','GET',null,true)).data.orders.length,1);await call('/orders/'+id,'PATCH',{status:'cancelled',expectedRevision:3},true);assert.equal((await call('/labels','GET',null,true)).data.orders.length,0);
 const cod=payload('dd','cod');const cid=(await call('/orders','POST',cod)).data.id;await call('/orders/'+cid,'PATCH',{status:'successful',paymentVerified:true},true);assert.equal((await call('/labels','GET',null,true)).data.orders.length,0);assert.equal((await call('/orders/'+cid,'PATCH',{payload:{customer:cod.customer,order:cod.order},expectedRevision:999},true)).status,409);assert(sql.prepare('SELECT COUNT(*) AS n FROM audit').get().n>=4);
+
+// Same customer's second checkout is attached to an accepted but unprocessed COD order.
+const add=payload('ee','cod');
+add.previousOrderId=cid;add.previousClaimToken='b'.repeat(64);
+add.order.items=[{name:'Extra arcade button',quantity:3,unitPrice:25,lineTotal:75}];
+add.order.productTotal=75;add.order.grandTotal=75;
+r=await call('/orders','POST',add);
+assert.equal(r.status,200);
+assert.equal(r.data.id,cid);
+assert.equal(r.data.merged,true);
+assert.equal(r.data.reopened,true);
+let combined=(await call('/orders/'+cid,'GET',null,true)).data.order;
+assert.equal(combined.status,'pending');
+assert.equal(combined.payment_verified,false);
+assert.equal(combined.payload.order.items.length,2);
+assert.equal(combined.payload.order.productTotal,175);
+assert.equal(combined.payload.order.grandTotal,175);
+assert.equal(combined.payload.order.restAmount,57);
+// Repeat checkout must not add quantity or create another database order.
+const again=payload('ff','cod');again.previousOrderId=cid;again.previousClaimToken='b'.repeat(64);
+again.order.items=[{name:'Extra arcade button',quantity:3,unitPrice:25,lineTotal:75}];
+r=await call('/orders','POST',again);
+assert.equal(r.data.duplicate,true);
+assert.equal((await call('/orders/'+cid,'GET',null,true)).data.order.payload.order.items.length,2);
+const history=await call('/customer-history?mobile=9000000000','GET',null,true);
+assert(history.data.orders.some(x=>x.id===cid));
+const countResponse=await call('/customer-counts','GET',null,true);
+assert(countResponse.data.counts.some(x=>x.mobile==='9000000000'&&x.count>=2));
+assert.equal((await call('/customer-history?mobile=9000000000')).status,401);
+const summary=await service.fetch(new Request('https://orders.example.test/orders/'+cid+'/summary',{headers:{'oai-authenticated-user-email':env.OWNER_EMAIL}}),env);
+assert.equal(summary.status,200);
+const summaryHtml=await summary.text();
+assert(summaryHtml.includes('ORDER SUMMARY'));
+assert(summaryHtml.includes('Extra arcade button'));
+assert(summaryHtml.includes('Amount paid / declared'));
+
 console.log('PASS server persistence, pending/accept/reject, COD exclusion, idempotency, unique order ID, live edits, revision conflict, stale print acknowledgement, printed archive and reprint after edit.');
