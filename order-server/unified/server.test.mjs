@@ -33,6 +33,19 @@ again.order.items=[{name:'Extra arcade button',quantity:3,unitPrice:25,lineTotal
 r=await call('/orders','POST',again);
 assert.equal(r.data.duplicate,true);
 assert.equal((await call('/orders/'+cid,'GET',null,true)).data.order.payload.order.items.length,2);
+
+// A receipt permits quantity adjustments without exposing editable prices or payment verification.
+r=await call('/orders/receipt','POST',{orderId:cid,claimToken:'b'.repeat(64)});
+assert.equal(r.status,200);
+assert.equal(r.data.canEdit,true);
+const oldRevision=r.data.order.revision;
+r=await call('/orders/receipt-edit','POST',{orderId:cid,claimToken:'b'.repeat(64),expectedRevision:oldRevision,quantities:[1,5]});
+assert.equal(r.status,200);
+assert.equal(r.data.order.status,'pending');
+assert.equal(r.data.order.payment_verified,false);
+assert.equal(r.data.order.payload.order.productTotal,225);
+assert.equal((await call('/orders/receipt-edit','POST',{orderId:cid,claimToken:'b'.repeat(64),expectedRevision:oldRevision,quantities:[1,4]})).status,409);
+assert.equal((await call('/orders/receipt','POST',{orderId:cid,claimToken:'1'.repeat(64)})).status,404);
 const history=await call('/customer-history?mobile=9000000000','GET',null,true);
 assert(history.data.orders.some(x=>x.id===cid));
 const countResponse=await call('/customer-counts','GET',null,true);
