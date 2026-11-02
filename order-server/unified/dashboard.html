@@ -352,13 +352,17 @@ async function save(accept=false,forceStatus=''){
  p.order.totalQuantity=items.reduce((n,i)=>n+i.quantity,0);
  p.order.productTotal=items.reduce((n,i)=>n+itemTotal(i),0);
  for(const el of $('detail').querySelectorAll('[data-finance]'))p.order[el.dataset.finance]=Number(el.value);
- p.order.totalWeight=items.reduce((n,i)=>n+num(i.lineWeight),0);
- p.order.packingWeight=num($('packingWeight').value);
- p.order.packedWeight=p.order.totalWeight+p.order.packingWeight;
- p.order.boxDimensions=['boxL','boxW','boxH'].map(id=>num($(id).value));
- p.order.actualKg=p.order.packedWeight/1000;
- p.order.volumetricKg=p.order.boxDimensions.every(v=>v>0)?p.order.boxDimensions.reduce((a,b)=>a*b,1)/5000:0;
- p.order.chargeableKg=Math.max(p.order.actualKg,p.order.volumetricKg);
+ if(reviewDirty){
+  const measured=items.reduce((n,i)=>n+num(i.lineWeight),0);
+  p.order.totalWeight=measured>0?measured:num(active.payload.order.totalWeight);
+  p.order.packingWeight=num($('packingWeight').value);
+  p.order.packedWeight=p.order.totalWeight+p.order.packingWeight;
+  const box=['boxL','boxW','boxH'].map(id=>num($(id).value));
+  if(box.every(v=>v>0))p.order.boxDimensions=box;
+  p.order.actualKg=p.order.packedWeight/1000;
+  p.order.volumetricKg=Array.isArray(p.order.boxDimensions)&&p.order.boxDimensions.every(v=>v>0)?p.order.boxDimensions.reduce((a,b)=>a*b,1)/5000:0;
+  p.order.chargeableKg=Math.max(p.order.actualKg,p.order.volumetricKg);
+ }
  p.order.grandTotal=Math.max(0,Math.round((p.order.productTotal+num(p.order.courierCharge)+num(p.order.vasCharge)+num(p.order.productGst)-num(p.order.discountApplied))*100)/100);
  p.order.advanceAmount=num(p.order.advanceAmount);
  p.order.restAmount=Math.max(0,Math.round((p.order.grandTotal-p.order.advanceAmount)*100)/100);
