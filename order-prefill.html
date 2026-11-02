@@ -327,7 +327,7 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
     </div>
     <div class="label">Choose Preferred Courier</div>
     <select id="courier" onchange="computeTotals()"></select>
-    <div class="hint" id="courierServiceNote">पहले valid pincode भरें। Final courier serviceability destination pincode पर depend करेगी।</div>
+    <div class="hint" id="courierServiceNote">पहले valid pincode भरें। Final courier serviceability destination pincode पर depend करेगी।</div><div class="hint" id="codCityRateNotice" style="display:none;margin-top:8px"><b>COD Courier:</b> Charges depend on city, pincode, packed weight and COD amount. Charges are rounded up to the next ₹100, with applicable VAS extra. If the final carrier charge changes, any additional difference will be added to the COD balance payable on delivery. Screenshot-based rates are estimates until booking is confirmed.</div>
     </div><!-- /gpzCourierDeliveryFields -->
     <div class="label">Actual Packing Box Size (cm)</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
@@ -1099,6 +1099,7 @@ document.getElementById("postoffice").addEventListener("change",()=>{ updatePrim
 </script>
 
 <script src="delhivery-config.js"></script>
+<script src="cod-shipping-rates.js?v=20261102-forward-cod"></script>
 <script id="gpz-fmcb-final-calculator">
 /* Correct FMCB/USB/Combo + PS2 Accessories checkout calculator */
 const GPZ_PARAMS=new URLSearchParams(location.search);
@@ -1400,15 +1401,15 @@ function gpzRenderRateGuide(kg){
     <thead><tr><th>Mode</th><th>Courier charge</th><th>VAS</th></tr></thead>
     <tbody>
       <tr><td>Surface: Trackon / Shree Maruti / DTDC</td><td><b>₹99/kg</b></td><td>No VAS</td></tr>
-      <tr><td>Delhivery / BlueDart / Ecom / XpressBees</td><td><b>Delhivery live rate; courier next ₹10 round</b></td><td>VAS 2%</td></tr>
+      <tr><td>Delhivery Forward COD</td><td><b>City / weight / COD amount based; next ₹100 (minimum ₹200)</b></td><td>VAS 2% extra</td></tr><tr><td>Other COD courier partners</td><td><b>Current provisional COD quote; next ₹100</b></td><td>VAS as applicable</td></tr>
       <tr><td>Surface: Speed Post</td><td><b>₹100/500g</b></td><td>No VAS</td></tr>
       <tr><td>Air: Trackon / Shree Maruti</td><td><b>₹150/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Trackon</td><td><b>₹200/kg</b></td><td>No VAS</td></tr>
       <tr><td>Prime: Shree Maruti</td><td><b>₹250/kg</b></td><td>No VAS</td></tr>
-      <tr><td>COD for any product</td><td><b>2 × prepaid courier rate</b></td><td>VAS per courier</td></tr>
+      <tr><td>COD prices</td><td><b>Forward COD charge, NOT RTO; unknown cities need final provider confirmation</b></td><td>VAS extra</td></tr>
     </tbody>
   </table></div>
-  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. Prepaid courier rate applies normally; COD courier charge is double the same courier's prepaid rate.  Actual और volumetric में जो अधिक हो वही chargeable है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
+  <div class="hint">5 states: Delhi, Rajasthan, Uttarakhand, Uttar Pradesh, Punjab. Prepaid courier rates remain unchanged. COD rate depends on the city, chargeable weight and COD collection amount.  Actual और volumetric में जो अधिक हो वही chargeable है। Current chargeable weight: ${Number(kg).toFixed(2)}kg.</div>`;
 }
 function computeTotals(){
   const items=gpzAllItems();
@@ -1445,8 +1446,24 @@ function computeTotals(){
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
   const standardPrepaidCourier=bigshipRate||liveRate||gpzCourierRate(courier,speed,'prepaid',chargeableKg);
-  const courierBaseCharge=(emptyOrder||pickup)?0:(bus?GPZ_BUS_RICKSHAW:(payment==='cod'?2*standardPrepaidCourier:(m88Offer?0:standardPrepaidCourier)));
-  const courierGst=0;
+  // These are Forward COD figures. Never substitute the separate RTO/return quotes.
+  // Delhivery ONE screenshots: selected cities / weight tiers, total includes courier GST and COD fee.
+  const codCollectionEstimate=Math.max(0,discountedProducts-500);
+  const forwardCodCityQuote=payment==='cod'&&courier==='Delhivery.com'
+    ? window.GPZForwardCOD?.quote({city:document.getElementById('city')?.value,
+      state:document.getElementById('state')?.value,chargeableKg,codAmount:codCollectionEstimate,
+      speed:speed}) : null;
+  const forwardCodRaw=(payment==='cod'&&courier==='Delhivery.com')
+    ? (bigshipRate||forwardCodCityQuote?.raw||(2*gpzCourierRate(courier,speed,'prepaid',chargeableKg)))
+    : (bigshipRate||2*standardPrepaidCourier);
+  const courierBaseCharge=(emptyOrder||pickup)?0:(bus?GPZ_BUS_RICKSHAW:
+    (payment==='cod'?(window.GPZForwardCOD?.round100(forwardCodRaw) ?? Math.max(200,Math.ceil(forwardCodRaw/100)*100))
+     :(m88Offer?0:standardPrepaidCourier)));
+  const courierGst=0; // Delhivery screenshot quotes already include 18% GST.
+  const courierEstimate=!bigshipRate&&payment==='cod';
+  const codRateSource=bigshipRate?'Bigship forward COD quote, rounded to next ₹100'
+    :forwardCodCityQuote?'Delhivery forward COD city sample-based estimate — final PIN rate subject to confirmation'
+    :'Provisional COD estimate for this city / pincode — final courier quote required';
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
   gpzUpdatePaymentQr(invoiceIncluded);
@@ -1463,7 +1480,7 @@ function computeTotals(){
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":(bus?"bus":"courier"),deliveryMode:pickup?"pickup":(bus?"bus":"courier"),busDestination:busDestination,busFarePaidToOperator:bus,busRickshawCharge:bus&&!emptyOrder?GPZ_BUS_RICKSHAW:0,deliverySpeed:pickup?"Shop Pickup":(bus?"Bus dispatch":speed),courier:pickup?"Shop Pickup":(bus?"Bus — "+(busDestination||"Select destination"):courier),
-    courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bus?"Bus fare paid separately by customer • ₹40 rickshaw":bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),gstInvoiceIncluded:invoiceIncluded,productGst,
+    courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bus?"Bus fare paid separately by customer • ₹40 rickshaw":payment==="cod"?codRateSource:bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),courierEstimate,forwardCodCity:forwardCodCityQuote?.city||"",gstInvoiceIncluded:invoiceIncluded,productGst,
     discountApplied:appliedDiscount,couponApplied:gpzVerifiedCoupon,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",specialM88Offer:m88Offer,courierIncluded:m88Offer&&!bus,
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
     // User-facing Base Price is deliberately GST-exclusive and follows:
@@ -1510,7 +1527,9 @@ function computeTotals(){
   document.getElementById('sumCourierLabel').textContent=bus?'Shop → Bus Transport Total':'Courier Total';
   document.getElementById('sumRateSourceLabel').textContent=bus?'Bus Fare':'Courier Rate Source';
   const bigshipStatus=document.getElementById("bigshipRateStatus");
-  if(bigshipStatus)bigshipStatus.textContent=bigshipRate?`✅ Bigship rate ${gpzMoney(bigshipRate)} लागू है (अगले ₹10 में round).`:`Bigship calculator order का PIN, box, weight, payment mode और invoice amount अपने आप लेगा।`;
+  if(bigshipStatus)bigshipStatus.textContent=bigshipRate?`✅ Bigship rate ${gpzMoney(bigshipRate)} लागू है (${payment==="cod"?"COD next ₹100 round":"prepaid next ₹10 round"}).`:`Bigship calculator order का PIN, box, weight, payment mode और invoice amount अपने आप लेगा।`;
+  const codNotice=document.getElementById("codCityRateNotice");
+  if(codNotice)codNotice.style.display=payment==="cod"&&!pickup&&!bus?"block":"none";
   document.getElementById("restLabel").style.display=payment==="cod"?"":"none";
   document.getElementById("sumRest").style.display=payment==="cod"?"":"none";
   document.getElementById("modeBadge").textContent=payment==="cod"?"Mode: COD":"Mode: Prepaid";
@@ -1618,7 +1637,8 @@ function buildWhatsAppTemplate(){
     ...(o.fulfillment==="bus"?[`Bus Destination: ${o.busDestination}`,`Shop to Bus Rickshaw Charge: ${gpzMoney(o.busRickshawCharge)} (included in order)`,"Bus Fare: Customer pays bus operator directly (not included in order)"]:[]),
     gstTop,
     `Amount Paid: ${gpzMoney(o.advanceAmount)}`,
-    ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[]),"",
+    ...(isCod?[`Rest on Delivery: ${gpzMoney(o.restAmount)}`]:[]),
+    ...(isCod&&o.fulfillment==="courier"?["Courier charges depend on destination city and pincode. Final carrier difference, if any, will be added to COD balance payable at delivery."]:[]),"",
     ...(o.fulfillment==="pickup"?["Delivery: Shop Pickup — Courier ₹0"]:o.fulfillment==="bus"?[`Delivery: By Bus to ${o.busDestination} — customer pays bus fare directly`]:[`📏 Distance: ${document.getElementById("distance").value||""}`]),
     ...(o.fulfillment!=="courier"?[]:[`⏳ ${isCod?"COD":"Prepaid"} Order ETA: ${isCod?(document.getElementById("etaTextCod")?.value||""):(document.getElementById("etaText").value||"")}`]),
     ...(o.fulfillment!=="courier"?[]:[`📅 Estimated Delivery: ${isCod?(document.getElementById("dateRangeCOD")?.value||""):(document.getElementById("dateRange").value||"")}`]),"",
