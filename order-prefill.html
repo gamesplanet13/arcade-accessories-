@@ -1475,14 +1475,14 @@ function computeTotals(){
   const forwardCodRaw=(payment==='cod'&&courier==='Delhivery.com')
     ? (bigshipRate||forwardCodCityQuote?.raw||(2*gpzCourierRate(courier,speed,'prepaid',chargeableKg)))
     : (bigshipRate||2*standardPrepaidCourier);
+  // Business shipping rule: Forward COD courier fee is exactly 2× the
+  // prepaid courier fee for the same parcel, courier and service.
+  // Bus (₹40 rickshaw) and shop pickup remain separate delivery modes.
   const courierBaseCharge=(emptyOrder||pickup)?0:(bus?GPZ_BUS_RICKSHAW:
-    (payment==='cod'?(window.GPZForwardCOD?.round100(forwardCodRaw) ?? Math.max(200,Math.ceil(forwardCodRaw/100)*100))
-     :(m88Offer?0:standardPrepaidCourier)));
+    (payment==='cod'?2*standardPrepaidCourier:(m88Offer?0:standardPrepaidCourier)));
   const courierGst=0; // Delhivery screenshot quotes already include 18% GST.
   const courierEstimate=!bigshipRate&&payment==='cod';
-  const codRateSource=bigshipRate?'Bigship forward COD quote, rounded to next ₹100'
-    :forwardCodCityQuote?'Delhivery forward COD city sample-based estimate — final PIN rate subject to confirmation'
-    :'Provisional COD estimate for this city / pincode — final courier quote required';
+  const codRateSource='COD courier charge = 2× prepaid courier charge for same shipment';
   const courierCharge=courierBaseCharge+courierGst;
   const invoiceIncluded=gpzInvoice();
   gpzUpdatePaymentQr(invoiceIncluded);
