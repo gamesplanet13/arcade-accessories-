@@ -1448,11 +1448,30 @@ function computeTotals(){
   const standardPrepaidCourier=bigshipRate||liveRate||gpzCourierRate(courier,speed,'prepaid',chargeableKg);
   // These are Forward COD figures. Never substitute the separate RTO/return quotes.
   // Delhivery ONE screenshots: selected cities / weight tiers, total includes courier GST and COD fee.
-  const codCollectionEstimate=Math.max(0,discountedProducts-500);
-  const forwardCodCityQuote=payment==='cod'&&courier==='Delhivery.com'
-    ? window.GPZForwardCOD?.quote({city:document.getElementById('city')?.value,
-      state:document.getElementById('state')?.value,chargeableKg,codAmount:codCollectionEstimate,
-      speed:speed}) : null;
+  const codAdvanceEstimate=m88Offer?600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0):500;
+  const forwardCodInput={city:document.getElementById('city')?.value,
+    state:document.getElementById('state')?.value,chargeableKg,speed};
+  let forwardCodCityQuote=payment==='cod'&&courier==='Delhivery.com'
+    ? window.GPZForwardCOD?.quote({...forwardCodInput,codAmount:Math.max(0,discountedProducts-codAdvanceEstimate)})
+    : null;
+  // Delhivery charges 2% collection fee on the amount actually collected at delivery.
+  // Compute a provisional courier/amount balance together; a changed ₹100 slab can
+  // change the payable COD balance, so re-evaluate until its slab settles.
+  if(forwardCodCityQuote&&!bigshipRate){
+    let rounded=window.GPZForwardCOD.round100(forwardCodCityQuote.raw);
+    for(let i=0;i<4;i++){
+      const preVas=discountedProducts+rounded;
+      const gst=gpzInvoice()&&!m88Offer?Math.ceil(preVas*.18):0;
+      const vas=!m88Offer?Math.ceil((preVas+gst)*.02):0;
+      const finalCODAmount=Math.max(0,preVas+gst+vas-codAdvanceEstimate);
+      const updated=window.GPZForwardCOD.quote({...forwardCodInput,codAmount:finalCODAmount});
+      if(!updated)break;
+      forwardCodCityQuote=updated;
+      const newRounded=window.GPZForwardCOD.round100(updated.raw);
+      if(newRounded===rounded)break;
+      rounded=newRounded;
+    }
+  }
   const forwardCodRaw=(payment==='cod'&&courier==='Delhivery.com')
     ? (bigshipRate||forwardCodCityQuote?.raw||(2*gpzCourierRate(courier,speed,'prepaid',chargeableKg)))
     : (bigshipRate||2*standardPrepaidCourier);
@@ -1476,7 +1495,7 @@ function computeTotals(){
   const vasApplies=!emptyOrder&&!m88Offer&&!pickup&&!bus&&GPZ_VAS_COURIERS.includes(courier);
   const vasCharge=vasApplies?Math.ceil(totalBeforeVas*.02):0;
   const grandTotal=totalBeforeVas+vasCharge;
-  const advanceAmount=payment==="cod"?(m88Offer?Math.min(grandTotal,600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0)):Math.min(grandTotal,Math.max(500,Math.ceil(courierCharge*2)))):grandTotal;
+  const advanceAmount=payment==="cod"?(m88Offer?Math.min(grandTotal,600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0)):Math.min(grandTotal,500)):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
   gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":(bus?"bus":"courier"),deliveryMode:pickup?"pickup":(bus?"bus":"courier"),busDestination:busDestination,busFarePaidToOperator:bus,busRickshawCharge:bus&&!emptyOrder?GPZ_BUS_RICKSHAW:0,deliverySpeed:pickup?"Shop Pickup":(bus?"Bus dispatch":speed),courier:pickup?"Shop Pickup":(bus?"Bus — "+(busDestination||"Select destination"):courier),
