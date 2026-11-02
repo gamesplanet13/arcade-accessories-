@@ -88,8 +88,11 @@ const prepare=GPShop.prepare;
 GPShop.prepare=function(products){
  prepare(products);
  products.forEach(p=>{
-  const shipping=gpzGamingShippingProfile(p.name,(p.variants||[]).join(' '));
-  if(shipping){p.weight=shipping.weight;p.dimensions=shipping.dimensions;p.shippingWeightVerified=true;}
+  const shipping=gpzGamingShippingProfile(p.name);
+  if(shipping){p.weight=shipping.weight;p.dimensions=shipping.dimensions;p.shippingWeightVerified=true;
+    p.variantWeights={...(p.variantWeights||{})};
+    for(const variant of (p.variants||[])){const profile=gpzGamingShippingProfile(p.name,variant);if(profile)p.variantWeights[variant]=profile.weight;}
+  }
   p.shopPages=(p.shopPages||[p.shopPage]).filter(x=>x!=='consoles');
   if(pack(p)){
    const storage=/500GB/.test(p.name)?'500GB':'1TB',count=storage==='500GB'?'5–7':'13–15';
