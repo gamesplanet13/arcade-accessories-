@@ -12,7 +12,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const money=n=>(n===null||n===undefined||n==='')?'—':'₹'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:2});
 const num=n=>Number.isFinite(Number(n))?Number(n):0;
 const mobile=v=>String(v||'').replace(/\D/g,'').replace(/^91(?=\d{10}$)/,'').replace(/^0(?=\d{10}$)/,'');
-let records=[],offset=0,active=null,dirty=false,busy=false,counts={},cachedAt=0,metricsAt=0,lastView='',historyOrders=[],historyMobile='',historyName='';
+let records=[],offset=0,active=null,dirty=false,busy=false,counts={},cachedAt=0,metricsAt=0,lastView='',historyOrders=[],historyMobile='',historyName='',historyOffset=null;
 try{$('filter').value=sessionStorage.getItem('gpz_owner_filter')||'all'}catch{}
 function msg(s,type=''){$('message').className=type;$('message').textContent=s;}
 async function api(path,method='GET',data){const r=await fetch('/api'+path,{method,headers:{'Content-Type':'application/json'},body:data?JSON.stringify(data):undefined});const x=await r.json();if(!r.ok)throw Error(x.error||'Request failed');return x;}
@@ -88,13 +88,21 @@ async function load(more=false,force=false){
 async function showHistory(phone,name){
  if(!/^\d{10}$/.test(phone))throw Error('Valid customer mobile is missing');
  const x=await api('/customer-history?mobile='+encodeURIComponent(phone));
- historyOrders=x.orders;historyMobile=phone;historyName=name;
+ historyOrders=x.orders;historyMobile=phone;historyName=name;historyOffset=x.nextOffset;
  $('historyPanel').hidden=false;
- $('historyPanel').innerHTML='<div class="actions"><h2>'+esc(name)+' — all orders ('+historyOrders.length+')</h2><button id="closeHistory" type="button">Close history</button></div>'+
- '<p class="note">Only this customer mobile’s orders. Review and manage each separately.</p>'+
- '<div class="orders">'+historyOrders.map(card).join('')+'</div>';
- $('closeHistory').onclick=()=>{$('historyPanel').hidden=true;historyOrders=[]};
+ $('historyPanel').innerHTML='<div class="actions"><h2>'+esc(name)+' — orders ('+(counts[phone]||historyOrders.length)+')</h2><button id="closeHistory" type="button">Close history</button></div>'+
+ '<p class="note">Private customer history. Review each order separately; older orders remain accessible below.</p>'+
+ '<div class="orders">'+historyOrders.map(card).join('')+'</div><button id="historyMore" type="button" '+(historyOffset===null?'hidden':'')+'>Load older orders</button>';
+ $('closeHistory').onclick=()=>{$('historyPanel').hidden=true;historyOrders=[];historyOffset=null};
+ $('historyMore').onclick=()=>task(()=>loadHistoryMore());
  $('historyPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function loadHistoryMore(){
+ if(historyOffset===null||!historyMobile)return;
+ const x=await api('/customer-history?mobile='+encodeURIComponent(historyMobile)+'&offset='+historyOffset);
+ historyOrders.push(...x.orders);historyOffset=x.nextOffset;
+ $('historyPanel').querySelector('.orders').innerHTML=historyOrders.map(card).join('');
+ $('historyMore').hidden=historyOffset===null;
 }
 function lookup(id){return records.find(r=>r.id===id)||historyOrders.find(r=>r.id===id)|| (active?.id===id?active:null)}
 async function decision(id,next){
@@ -115,9 +123,10 @@ async function decision(id,next){
 async function showHistoryQuietly(){
  if(!historyMobile)return;
  const x=await api('/customer-history?mobile='+encodeURIComponent(historyMobile));
- historyOrders=x.orders;
+ historyOrders=x.orders;historyOffset=x.nextOffset;
  $('historyPanel').querySelector('.orders').innerHTML=historyOrders.map(card).join('');
- const h=$('historyPanel').querySelector('h2');if(h)h.textContent=historyName+' — all orders ('+historyOrders.length+')';
+ const h=$('historyPanel').querySelector('h2');if(h)h.textContent=historyName+' — orders ('+(counts[historyMobile]||historyOrders.length)+')';
+ const btn=$('historyMore');if(btn)btn.hidden=historyOffset===null;
 }
 function field(key,label,value){return '<label>'+esc(label)+'<input data-customer="'+esc(key)+'" value="'+esc(value)+'"></label>'}
 function moneyField(key,label,value){return '<label>'+esc(label)+'<input type="number" min="0" step=".01" data-finance="'+key+'" value="'+num(value)+'"></label>'}
