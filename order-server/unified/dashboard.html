@@ -64,7 +64,7 @@ function bindActions(el){
  el.addEventListener('click',e=>{
  const button=e.target.closest('button[data-open],button[data-print],button[data-accept],button[data-reject],button[data-history]');
  if(!button)return;
- if(button.dataset.print){window.open('/api/orders/'+encodeURIComponent(button.dataset.print)+'/invoice','_blank','noopener');return}
+ if(button.dataset.print){window.open('/api/orders/'+encodeURIComponent(button.dataset.print)+'/summary','_blank','noopener');return}
  if(button.dataset.history){task(()=>showHistory(button.dataset.history,button.dataset.cname));return}
  if(button.dataset.open){task(()=>open(button.dataset.open));return}
  if(button.dataset.accept){task(()=>decision(button.dataset.accept,'successful'));return}
