@@ -1237,7 +1237,13 @@ img,canvas{
 #products .product:not(.has-variants) .qty span{font-size:14px!important}
 #products .product:not(.has-variants) .product-features,#products .product:not(.has-variants) .product-extra-actions,#products .product:not(.has-variants) .stock-note{grid-column:1/-1!important;margin:3px 0!important}
 #products .product .product-specs{display:none!important}
-</style><style id="compact-features-v5">#products .product:not(.has-variants) .product-title{grid-row:1!important}#products .product:not(.has-variants) .image-row,#products .product:not(.has-variants) .info{grid-row:2!important}#products .product:not(.has-variants) .product-features{grid-row:3!important;font-size:10px!important;padding:5px 7px!important;line-height:1.35!important;border-radius:7px!important}#products .product:not(.has-variants) .product-features>div{padding:1px 0!important;margin:0!important}#products .product:not(.has-variants) .product-extra-actions{grid-row:4!important}#products .product:not(.has-variants) .stock-note{grid-row:5!important;font-size:10px!important;padding:5px 7px!important;margin:3px 0!important}</style></head>
+</style><style id="compact-features-v5">#products .product:not(.has-variants) .product-title{grid-row:1!important}#products .product:not(.has-variants) .image-row,#products .product:not(.has-variants) .info{grid-row:2!important}#products .product:not(.has-variants) .product-features{grid-row:3!important;font-size:10px!important;padding:5px 7px!important;line-height:1.35!important;border-radius:7px!important}#products .product:not(.has-variants) .product-features>div{padding:1px 0!important;margin:0!important}#products .product:not(.has-variants) .product-extra-actions{grid-row:4!important}#products .product:not(.has-variants) .stock-note{grid-row:5!important;font-size:10px!important;padding:5px 7px!important;margin:3px 0!important}</style><style id="gp-typed-quantity-css">
+#products .product .qty,#products .product:not(.has-variants) .qty,#products .product .variant-row .qty{width:124px!important;min-width:124px!important;max-width:124px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;gap:3px!important}
+#products .product .qty input.gp-typed-quantity{appearance:textfield;-moz-appearance:textfield;box-sizing:border-box!important;width:50px!important;min-width:42px!important;max-width:50px!important;height:32px!important;flex:1 1 auto!important;margin:0!important;padding:2px!important;text-align:center;font-size:14px!important;font-weight:800!important;border:1px solid #9ca3af!important;border-radius:8px!important;background:#fff!important;color:#111827!important;line-height:1!important}
+#products .product .qty input.gp-typed-quantity::-webkit-inner-spin-button,#products .product .qty input.gp-typed-quantity::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#products .product .gp-qty-discount-hint{display:block;margin-top:4px;padding:3px 5px;color:#0f766e;font-size:10px;line-height:1.35;white-space:normal;letter-spacing:0}
+#products .product .gp-qty-discount-hint.is-applied{color:#15803d;font-weight:800}
+</style></head>
 
 <body class="classic-view"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
 
@@ -1971,9 +1977,68 @@ products.push(...[{"name": "CPU Box — 6 Configurations", "price": 7580, "categ
 
 products.push(...[{"name": "4.8mm Handle Switch Connector Pin", "category": "Arcade Box Accessories", "price": 5, "weight": 0, "dimensions": [], "sizeLabel": "4.8 mm", "features": ["Available • ₹5 per pin", "Fits switches on MD and Rasila handles", "Photo shows two sides of one pin"], "images": ["images/switch-pin-4-8mm.png"]}, {"name": "10 Core Wire — ₹35 per Meter", "category": "Arcade Box Accessories", "price": 35, "weight": 0, "dimensions": [], "features": ["Available • Sold per meter", "Selected quantity means total meter length"], "images": ["images/jpeg/10-core-wire.jpg"]}]);
 products.push({name:'Best HDMI Cable',category:'Cables',price:350,weight:0,dimensions:[],images:['images/jpeg/hdmicable.jpeg'],compatibility:'PS2 HDMI converter, PS3, PS4, PS5, PC and Laptop'});
+/* Automatic bulk/quantity pricing. Product names must match the catalogue. */
+const QUANTITY_PRICE_RULES={
+ "Push Button":{min:50,price:35},
+ "Push Button (Imported)":{min:50,price:44},
+ "Black Switch Button":{min:50,price:20},
+ "MD Switch Button":{min:50,price:60},
+ "Coin Drop Switch Button":{min:50,price:60},
+ "Zippy Coin Drop Switch":{min:50,price:99},
+ "Rasila Handle (Without Switch)":{min:20,price:210},
+ "Rasila Handle with 4 Black Switches":{min:20,price:290},
+ "MD Handle (With Switch)":{min:20,price:550},
+ "Acrylic Coin Machine":{min:20,price:200},
+ "Acrylic Coin Machine with Switch":{min:20,price:260},
+ "10 Core Wire (Per Meter)":{min:20,price:50},
+ "Remote Lead":{min:20,price:95},
+ "Remote Plate (White Colour)":{min:20,price:300},
+ "Remote Plate (Red Colour)":{min:20,price:199},
+ "Generic 2.4G Wireless Double Gamepad - White (With USB Receiver)":{min:10,price:869},
+ "Generic 2.4G Wireless Double Gamepad - Black (With USB Receiver)":{min:10,price:799},
+ "Generic 2.4G Wireless Single Gamepad - Black (Without Receiver)":{min:10,price:300},
+ "Generic 2.4G Wireless Single Gamepad - White (Without Receiver)":{min:10,price:350},
+ "PS2 Wired Controller (Replica)":{min:10,price:350},
+ "PS2 Wireless Controller":{min:10,price:480},
+ "Matrix Modbo 5.0 Modchip":{min:10,price:530}
+};
+
 GPShop.prepare(products);
 const state = (()=>{try{return GPShop.migrate(JSON.parse(localStorage.getItem("gp_cart")||"{}"),products)}catch(_){return {}}})();
 const container=document.getElementById("products");
+function safeTypedQuantity(v){
+ const n=Number(String(v).trim());
+ return Number.isFinite(n)?Math.max(0,Math.min(99999,Math.floor(n))):0;
+}
+function quantityDiscountHint(p,i){
+ const rule=QUANTITY_PRICE_RULES[p.name];
+ if(!rule)return '';
+ const qty=selectedProductQuantity(p,i),applied=qty>=rule.min;
+ return `<small class="gp-qty-discount-hint ${applied?'is-applied':''}" data-quantity-rule-index="${i}">${applied?'✓ Quantity discount applied':'Quantity discount starts at '+rule.min+' pcs'} · ${applied?'from '+rule.min+' pcs · ':''}₹${rule.price}/pc</small>`;
+}
+function refreshQuantityDiscountHints(){
+ document.querySelectorAll('[data-quantity-rule-index]').forEach(el=>{
+  const i=Number(el.dataset.quantityRuleIndex),p=products[i],rule=p&&QUANTITY_PRICE_RULES[p.name];
+  if(!rule)return;
+  const qty=selectedProductQuantity(p,i),applied=qty>=rule.min;
+  el.classList.toggle('is-applied',applied);
+  el.textContent=applied?'✓ Quantity discount applied · '+qty+' pcs (starts '+rule.min+') · ₹'+rule.price+'/pc':'Quantity discount starts at '+rule.min+' pcs · ₹'+rule.price+'/pc';
+ });
+}
+function setTypedQuantity(i,v){
+ state[i]=safeTypedQuantity(v);
+ localStorage.setItem("gp_cart",JSON.stringify(state));
+ const el=document.getElementById('q'+i);if(el)el.value=state[i];
+ render();
+}
+function setTypedVariantQuantity(i,v,value){
+ const key='v_'+i+'_'+v;
+ state[key]=safeTypedQuantity(value);
+ localStorage.setItem("gp_cart",JSON.stringify(state));
+ const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));if(el)el.value=state[key];
+ render();
+}
+
 
 function productActionLinks(p){
  const actions=[];
@@ -2046,12 +2111,13 @@ categoryOrder.forEach((cat,categoryIndex)=>{
     <div class="price">${p.priceLabel || ("₹"+p.price)}</div>
     <small>${p.weight} g / piece${p.compatibility?'<br><b>Compatibility:</b> '+p.compatibility:''}</small>
    </div>
-   ${p.variants?`<div class="variant-list">${p.variants.map(v=>{const variantImg=p.variantImages?.[v]||p.images?.[0]||"",variantPrice=p.variantPrices?.[v]??p.price;return `<div class="variant-row"><span class="variant-label">${variantImg?`<img class="variant-thumb" src="${variantImg}" loading="lazy" decoding="async" alt="${p.name} ${v}" onclick="openImg('${variantImg}')">`:`<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999"></span>`}<span>${v} — ₹${variantPrice}</span></span><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><span id="vq${i}_${v.replace(/\s+/g,'_')}">${state['v_'+i+'_'+v]||0}</span><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`}).join('')}</div>`:`<div class="qty">
+   ${p.variants?`<div class="variant-list">${p.variants.map(v=>{const variantImg=p.variantImages?.[v]||p.images?.[0]||"",variantPrice=p.variantPrices?.[v]??p.price;return `<div class="variant-row"><span class="variant-label">${variantImg?`<img class="variant-thumb" src="${variantImg}" loading="lazy" decoding="async" alt="${p.name} ${v}" onclick="openImg('${variantImg}')">`:`<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999"></span>`}<span>${v} — ₹${variantPrice}</span></span><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><input class="gp-typed-quantity" type="number" inputmode="numeric" min="0" max="99999" step="1" aria-label="Quantity of ${p.name} ${v}" id="vq${i}_${v.replace(/\s+/g,'_')}" value="${state['v_'+i+'_'+v]||0}" onchange="setTypedVariantQuantity(${i},'${v}',this.value)" onkeydown="if(event.key==='Enter')this.blur()"><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`}).join('')}</div>`:`<div class="qty">
     <button onclick="updateQty(${i},-1)">−</button>
-    <span id="q${i}">${state[i]}</span>
+    <input class="gp-typed-quantity" type="number" inputmode="numeric" min="0" max="99999" step="1" aria-label="Quantity for ${p.name}" id="q${i}" value="${state[i]}" onchange="setTypedQuantity(${i},this.value)" onkeydown="if(event.key==='Enter')this.blur()">
     <button onclick="updateQty(${i},1)">+</button>
    </div>`}
   </div>
+  ${quantityDiscountHint(p,i)}
  </div>`);
 });
 });
@@ -2152,7 +2218,7 @@ window.addEventListener("popstate",function(){
 function updateQty(i,v){
  state[i]=Math.max(0,(state[i]||0)+v);
  localStorage.setItem("gp_cart", JSON.stringify(state));
- document.getElementById("q"+i).innerText=state[i];
+ document.getElementById("q"+i).value=state[i];
  render();
 }
 
@@ -2162,7 +2228,7 @@ function updateVariantQty(i,v,val){
  state[k]=Math.max(0,(state[k]||0)+val);
  localStorage.setItem("gp_cart", JSON.stringify(state));
  const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));
- if(el) el.innerText=state[k];
+ if(el) el.value=state[k];
  render();
 }
 
@@ -2240,31 +2306,6 @@ function courierBaseRate(courier){
  return 100;
 }
 
-/* Automatic bulk/quantity pricing. Product names must match the catalogue. */
-const QUANTITY_PRICE_RULES={
- "Push Button":{min:50,price:35},
- "Push Button (Imported)":{min:50,price:44},
- "Black Switch Button":{min:50,price:20},
- "MD Switch Button":{min:50,price:60},
- "Coin Drop Switch Button":{min:50,price:60},
- "Zippy Coin Drop Switch":{min:50,price:99},
- "Rasila Handle (Without Switch)":{min:20,price:210},
- "Rasila Handle with 4 Black Switches":{min:20,price:290},
- "MD Handle (With Switch)":{min:20,price:550},
- "Acrylic Coin Machine":{min:20,price:200},
- "Acrylic Coin Machine with Switch":{min:20,price:260},
- "10 Core Wire (Per Meter)":{min:20,price:50},
- "Remote Lead":{min:20,price:95},
- "Remote Plate (White Colour)":{min:20,price:300},
- "Remote Plate (Red Colour)":{min:20,price:199},
- "Generic 2.4G Wireless Double Gamepad - White (With USB Receiver)":{min:10,price:869},
- "Generic 2.4G Wireless Double Gamepad - Black (With USB Receiver)":{min:10,price:799},
- "Generic 2.4G Wireless Single Gamepad - Black (Without Receiver)":{min:10,price:300},
- "Generic 2.4G Wireless Single Gamepad - White (Without Receiver)":{min:10,price:350},
- "PS2 Wired Controller (Replica)":{min:10,price:350},
- "PS2 Wireless Controller":{min:10,price:480},
- "Matrix Modbo 5.0 Modchip":{min:10,price:530}
-};
 function selectedProductQuantity(p,i){
  let quantity=Number(state[i]||0);
  if(p.variants) p.variants.forEach(v=>quantity+=Number(state['v_'+i+'_'+v]||0));
@@ -2287,6 +2328,7 @@ function getCourierCalculation(chargeableKg){
 }
 
 function render(){
+ refreshQuantityDiscountHints();
  let html="", total=0, totalWeight=0;
 
  products.forEach((p,i)=>{
