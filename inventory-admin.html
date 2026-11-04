@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Games Planet | Product Price & Stock Manager</title>
+<style>
+:root{color-scheme:light;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#eef3f9;color:#172b46}header{background:#102b45;color:white;padding:18px max(16px,calc((100vw - 1180px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px}header h1{font-size:20px;margin:0}header a{color:#d4efff;font-size:13px}
+main{max-width:1180px;margin:auto;padding:18px}section{background:white;padding:16px;border:1px solid #d7e2ee;border-radius:14px;margin-bottom:14px;box-shadow:0 6px 20px #16354d0b}h2{font-size:17px;margin:0 0 12px}p{font-size:13px;color:#62738a;margin:5px 0 12px;line-height:1.55}
+label{font-size:12px;font-weight:750;display:block;margin-bottom:5px}input,button,select{font:inherit}input{width:100%;height:40px;border:1px solid #c9d6e5;border-radius:8px;background:white;padding:8px 10px;color:#132b45}input:focus-visible,button:focus-visible{outline:3px solid #66b7ec;outline-offset:1px}
+button{background:#145b91;color:white;border:0;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;min-height:40px}
+button.secondary{background:#eaf1f8;color:#1b446a}button.good{background:#168151}button.warn{background:#9b4330}button:disabled{opacity:.5;cursor:not-allowed}
+.toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px) auto auto;gap:10px;align-items:end}.cred{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:end}
+#status{font-weight:600;color:#31607d;min-height:22px}.item{border:1px solid #dae5ef;border-radius:11px;margin:10px 0;padding:13px;background:#fbfdff}
+.itemhead{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px}.name{font-weight:800;font-size:14px}.subtle{font-size:11px;color:#78889a;margin-top:3px}.fields{display:grid;grid-template-columns:150px 150px 150px minmax(170px,1fr);gap:9px}.variant{background:white;border-top:1px dashed #cedbe7;padding:9px 0 0;margin-top:10px}
+.controls{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;margin-top:8px}.controls input{max-width:105px}.controls input[type=date]{max-width:156px}.controls button{font-size:12px;padding:7px 10px;min-height:36px}
+.badge{padding:5px 9px;background:#e8f3ff;border-radius:999px;color:#235a83;font-size:12px}
+#productList:empty:before{content:"Choose Load Products to begin";display:block;color:#70829b;padding:22px;text-align:center}
+footer{color:#738398;text-align:center;font-size:12px;padding:18px}
+@media(max-width:690px){header{padding:14px}header h1{font-size:16px}main{padding:9px}section{padding:12px}.toolbar,.cred{grid-template-columns:1fr 1fr}.toolbar>div:first-child,.cred>div:first-child{grid-column:1/-1}.fields{grid-template-columns:1fr 1fr}.fields>div:last-child{grid-column:1/-1}.controls input{max-width:90px}.controls input[type=date]{max-width:125px}}
+</style></head><body>
+<header><h1>GAMES PLANET · Price & Stock Manager</h1><a href="index.html">Storefront</a></header>
+<main>
+<section><h2>Central product control</h2>
+<p>Products start at 999 available units until edited. Change the price, manually adjust stock, record received stock with its date, or record a confirmed sale. Publish changes to the central GitHub file to make them visible to the linked shops.</p>
+<div class="cred"><div><label for="token">GitHub fine-grained token (Contents: Read and write for arcade-accessories-)</label><input id="token" type="password" autocomplete="off" placeholder="Only needed to publish changes"></div><button id="load" class="secondary">Load Products</button><button id="save" class="good" disabled>Publish Changes</button></div>
+<p>Your token stays only in this open tab; it is not saved in the product catalog or browser storage. Only the repository owner should publish edits.</p>
+<div id="status" role="status"></div></section>
+<section><div class="toolbar"><div><label for="search">Find product or variant</label><input id="search" placeholder="Type PS4, push button, controller..."></div><div><label for="sort">Sort</label><select id="sort" style="width:100%;height:40px"><option value="az">Product A–Z</option><option value="stock">Lowest stock</option><option value="updated">Recently changed</option></select></div><button id="add" class="secondary">Add Product</button><button id="more" class="secondary">Show More</button></div>
+<p id="count"></p><div id="productList"></div></section>
+</main><footer>GAMES PLANET · Records are public product information. Check completed orders before recording stock deductions.</footer>
+<script>
+(function(){
+'use strict';
+const OWNER='gamesplanet13',REPO='arcade-accessories-',PATH='data/master-products.json';
+const api='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+PATH;
+const publicUrl='https://gamesplanet13.github.io/'+REPO+'/'+PATH;
+const $=id=>document.getElementById(id);
+let data=null,sha=null,visible=32,dirty=false,busy=false;
+const key=n=>String(n||'').trim().toLowerCase().replace(/[‐‑–—−]/g,'-').replace(/\s+/g,' ');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'});
+const status=(msg,error=false)=>{$('status').textContent=msg;$('status').style.color=error?'#b42318':'#256078'};
+const access=()=>($('token').value||'').trim();
+const authHeaders=()=>({'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...(access()?{'Authorization':'Bearer '+access()}:{})});
+const safeNum=(n,min=0)=>Math.max(min,Math.floor(Number(n)||0));
+const getItems=()=>Object.entries(data?.records||{}).filter(([k,p])=>!$('search').value||((p.name||'')+' '+Object.keys(p.variants||{}).join(' ')).toLowerCase().includes($('search').value.toLowerCase())).sort((a,b)=>$('sort').value==='stock'?(a[1].stock??999)-(b[1].stock??999):$('sort').value==='updated'?String(b[1].updatedAt||'').localeCompare(String(a[1].updatedAt||'')):a[1].name.localeCompare(b[1].name));
+const mark=(product)=>{product.updatedAt=new Date().toISOString();dirty=true;$('save').disabled=false;status('Unsaved edits — click Publish Changes when finished.')};
+const log=(p,type,amount,date,variant='')=>{p.stockLog=p.stockLog||[];p.stockLog.unshift({type,quantity:amount,date,variant,at:new Date().toISOString()});p.stockLog=p.stockLog.slice(0,120)};
+function draw(){
+ if(!data)return;const items=getItems();$('count').textContent=items.length+' matching products · '+Object.keys(data.records).length+' total products';$('productList').innerHTML='';
+ for(const [sku,p] of items.slice(0,visible)){
+  const el=document.createElement('article');el.className='item';el.dataset.sku=sku;
+  let variants=Object.entries(p.variants||{});
+  let row='<div class="itemhead"><div><div class="name">'+esc(p.name)+'</div><div class="subtle">Last stock received: '+esc(p.lastStockInDate||'Not recorded')+' · Qty: '+safeNum(p.lastStockInQty)+'</div></div><span class="badge">Stock: '+safeNum(p.stock??999)+'</span></div>';
+  row+='<div class="fields"><div><label>Price ₹</label><input data-field="price" type="number" step="0.01" min="0" value="'+esc(p.price??0)+'"></div><div><label>Available Qty</label><input data-field="stock" type="number" min="0" step="1" value="'+esc(p.stock??999)+'"></div><div><label>Received Date</label><input data-field="date" type="date" value="'+esc(p.lastStockInDate||today())+'"></div><div><label>Stock adjustment Qty</label><div class="controls"><input data-field="qty" type="number" min="1" step="1" value="1"><button data-action="receive" class="good">Stock In</button><button data-action="reduce" class="secondary">Reduce</button><button data-action="sale" class="warn">Sale −</button></div></div></div>';
+  for(const [v,info] of variants){
+   row+='<div class="variant" data-variant="'+esc(v)+'"><div class="name">↳ '+esc(v)+'</div><div class="fields"><div><label>Variant Price ₹</label><input data-vfield="price" type="number" min="0" step="0.01" value="'+esc(info.price??p.price??0)+'"></div><div><label>Available Qty</label><input data-vfield="stock" type="number" min="0" value="'+esc(info.stock??999)+'"></div><div><label>Received Date</label><input data-vfield="date" type="date" value="'+esc(info.lastStockInDate||today())+'"></div><div><label>Stock adjustment Qty</label><div class="controls"><input data-vfield="qty" type="number" min="1" value="1"><button data-vaction="receive" class="good">Stock In</button><button data-vaction="reduce" class="secondary">Reduce</button><button data-vaction="sale" class="warn">Sale −</button></div></div></div></div>';
+  }
+  el.innerHTML=row;$('productList').append(el);
+ }
+ $('more').disabled=items.length<=visible;
+}
+function mutateQty(p,target,variant,kind,qty,date){
+ const before=safeNum(target.stock??999),n=safeNum(qty,1);
+ target.stock=kind==='receive'?before+n:Math.max(0,before-n);
+ if(kind==='receive'){target.lastStockInDate=date||today();target.lastStockInQty=n}
+ log(p,kind,kind==='receive'?n:-Math.min(n,before),date||today(),variant);
+ mark(p);
+}
+$('productList').addEventListener('input',e=>{
+ const input=e.target,card=input.closest('[data-sku]');if(!card||!data)return;
+ const p=data.records[card.dataset.sku],vrow=input.closest('[data-variant]');
+ const target=vrow?p.variants[vrow.dataset.variant]:p;
+ const field=input.dataset.field||input.dataset.vfield;
+ if(!['price','stock'].includes(field))return;
+ target[field]=field==='stock'?safeNum(input.value):Math.max(0,Number(input.value)||0);mark(p);
+ const badge=card.querySelector('.badge');if(badge&&!vrow)badge.textContent='Stock: '+safeNum(p.stock);
+});
+$('productList').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-action],button[data-vaction]');if(!b)return;
+ const card=b.closest('[data-sku]'),vrow=b.closest('[data-variant]'),p=data.records[card.dataset.sku];
+ const target=vrow?p.variants[vrow.dataset.variant]:p,field=vrow?'data-vfield':'data-field',selector='['+field+'="';
+ const qty=vrow.querySelector(selector+'qty"]')?.value||card.querySelector(selector+'qty"]')?.value;
+ const date=vrow?.querySelector(selector+'date"]')?.value||card.querySelector(selector+'date"]')?.value||today();
+ const kind=b.dataset.action||b.dataset.vaction;mutateQty(p,target,vrow?.dataset.variant||'',kind,qty,date);draw();
+});
+$('search').oninput=()=>{visible=32;draw()};$('sort').onchange=draw;$('more').onclick=()=>{visible+=40;draw()};
+$('add').onclick=()=>{
+ if(!data)return status('Load products first',true);
+ const name=prompt('New product name');if(!name?.trim())return;const k=key(name);
+ if(data.records[k])return status('This product already exists',true);
+ const price=Number(prompt('Base price in rupees','0')||0);
+ data.records[k]={name:name.trim(),price:Math.max(0,price),stock:999,variants:{},lastStockInDate:null,lastStockInQty:0,stockLog:[],updatedAt:new Date().toISOString(),source:'inventory-admin'};
+ dirty=true;$('save').disabled=false;visible=32;$('search').value=name;draw();status('Product added locally. Click Publish Changes.');
+};
+$('load').onclick=async()=>{
+ if(busy)return;busy=true;status('Loading current product list...');
+ try{
+  const headers=authHeaders(),res=await fetch(access()?api:publicUrl+'?v='+Date.now(),{headers:access()?headers:{},cache:'no-store'});
+  if(!res.ok)throw Error('Cannot load catalog: HTTP '+res.status);
+  if(access()){
+   const doc=await res.json();sha=doc.sha;
+   const text=decodeURIComponent(escape(atob((doc.content||'').replace(/\s+/g,''))));data=JSON.parse(text);
+  }else{data=await res.json();sha=null}
+  visible=32;dirty=false;$('save').disabled=false;draw();status(Object.keys(data.records).length+' products loaded. Set a GitHub token before publishing changes.');
+ }catch(e){status(e.message,true)}finally{busy=false}
+};
+$('save').onclick=async()=>{
+ if(!data||busy)return;
+ if(!access())return status('Enter a GitHub token with Contents write permission.',true);
+ busy=true;$('save').disabled=true;status('Publishing prices and stock...');
+ try{
+  if(!sha){const r=await fetch(api,{headers:authHeaders(),cache:'no-store'});if(!r.ok)throw Error('GitHub token cannot read repository: '+r.status);sha=(await r.json()).sha}
+  data.updatedAt=new Date().toISOString();
+  const bytes=new TextEncoder().encode(JSON.stringify(data));let binary='';
+  for(let i=0;i<bytes.length;i+=8000)binary+=String.fromCharCode.apply(null,bytes.subarray(i,i+8000));
+  const res=await fetch(api,{method:'PUT',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({message:'Update Games Planet master price and stock',sha,content:btoa(binary)})});
+  const answer=await res.json();if(!res.ok)throw Error((answer.message||'Publish error')+' (HTTP '+res.status+')');
+  sha=answer.content?.sha||null;dirty=false;status('Published to GitHub. Linked websites will use the new price and stock after refreshing.');
+ }catch(e){status(e.message+' — If another editor updated the file, reload to resolve changes.',true)}finally{busy=false;$('save').disabled=false}
+};
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='Unsaved price/stock changes'}});
+$('load').click();
+})();
+</script></body></html>
