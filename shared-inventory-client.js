@@ -46,7 +46,7 @@ function updateBadges(){
 }
 function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;updateBadges()});}
 const style=document.createElement('style');
-style.textContent='.gp-available{display:inline-flex;align-items:center;margin:5px 0;padding:4px 8px;background:#defbe6;color:#135638;border-radius:8px;font-size:12px;font-weight:750;line-height:1.5}.gp-available.gp-no-stock{background:#ffe5e4;color:#a32827}.gp-variant-stock{display:block;font-size:11px;color:#187346;margin-top:3px}.product-card .gp-available{margin:4px 12px 10px}';
+style.textContent='.gp-available{display:block!important;width:max-content!important;max-width:100%!important;white-space:nowrap!important;overflow:hidden;text-overflow:clip;min-height:0!important;min-width:0!important;line-height:1.15!important;font-size:9px!important;letter-spacing:0!important;font-weight:400!important;color:#8a919a!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;margin:2px 0 3px!important}.gp-available.gp-no-stock{color:#a32827!important}.gp-variant-stock{display:inline!important;white-space:nowrap!important;font-size:9px!important;font-weight:400!important;color:#8a919a!important;margin:0 0 0 5px!important;padding:0!important}.product-card .gp-available{margin:2px 0 3px!important}.product-purchase .gp-available{margin:3px 0!important}';
 document.head.append(style);
 async function start(){
  try{
