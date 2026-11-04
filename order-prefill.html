@@ -83,7 +83,29 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
 .gpz-promo-slots p{margin:5px 0;font-size:13px}.gpz-free-courier{color:#166534;font-weight:800}
 .gpz-coupon-help{line-height:1.6;font-size:13px}
 @media(max-width:560px){.gpz-promo-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.gpz-promo-slots>section{padding:9px}.gpz-promo-slots strong{font-size:20px}.gpz-promo-slots p{font-size:11px}}
-</style><script src="cpu-shipping.js?v=2"></script><script src="shared-store.js?v=20261030-unified-v4"></script></head>
+</style><script src="cpu-shipping.js?v=2"></script><script src="shared-store.js?v=20261030-unified-v4"></script>
+<style id="gp-delivery-enquiry-styles">
+.gp-delivery-enquiry-launch{width:100%;display:flex;justify-content:space-between;align-items:center;gap:14px;text-align:left;border:1px solid #a6d6e4;background:linear-gradient(120deg,#ebfaff,#f4fdf8);color:#064c68;border-radius:13px;padding:15px;font-size:15px;line-height:1.4;cursor:pointer}
+.gp-delivery-enquiry-launch b,.gp-delivery-enquiry-launch small{display:block}.gp-delivery-enquiry-launch small{font-size:12px;color:#456979;font-weight:500;margin-top:4px}
+.gp-delivery-enquiry-launch .gp-enquiry-arrow{font-weight:900;font-size:24px}
+#gpDeliveryEnquiryDialog{border:0;border-radius:18px;width:min(96vw,565px);max-height:88dvh;padding:0;color:#102a42;box-shadow:0 28px 80px #00182970}
+#gpDeliveryEnquiryDialog::backdrop{background:rgba(4,20,42,.7)}
+.gp-enquiry-head{background:linear-gradient(120deg,#06476b,#0e796c);color:#fff;padding:18px 20px}
+.gp-enquiry-head h2{font-size:21px;margin:0 0 4px}.gp-enquiry-head p{font-size:13px;margin:0;opacity:.9}
+.gp-enquiry-content{padding:17px 20px 20px;max-height:calc(88dvh - 92px);overflow-y:auto}
+.gp-enquiry-rows{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px 16px;border:1px solid #dae6ef;border-radius:12px;padding:14px;margin:12px 0;font-size:14px}
+.gp-enquiry-rows b{text-align:right;font-variant-numeric:tabular-nums}.gp-enquiry-rows .gp-enquiry-total{font-size:17px;font-weight:900;color:#065a48;border-top:1px solid #c6d6de;padding-top:12px}
+.gp-enquiry-items{border-left:3px solid #c5dfe9;padding:5px 12px;margin:12px 0;font-size:13px;line-height:1.6;color:#456071}
+.gp-enquiry-info{background:#edf7fc;border-radius:10px;padding:12px;font-size:13px;line-height:1.6;color:#31526a;margin:12px 0}
+.gp-enquiry-warning{background:#fff7e8;border:1px solid #f8e3be;color:#794d0d;border-radius:10px;padding:12px;font-size:13px;line-height:1.6;margin:12px 0}
+.gp-enquiry-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+.gp-enquiry-actions button{flex:1 1 130px}.gp-enquiry-actions .gp-enquiry-send{background:#149b5d;color:#fff}
+.gp-enquiry-select{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.gp-enquiry-select button{border:1px solid #b8cfdc;background:#fff;color:#184b69}
+.gp-enquiry-select button[aria-pressed=true]{border-color:#068974;background:#e4f9f3;color:#065b47}
+@media(max-width:520px){#gpDeliveryEnquiryDialog{width:calc(100vw - 18px);max-height:92dvh}.gp-enquiry-head{padding:15px}.gp-enquiry-content{padding:13px;max-height:calc(92dvh - 80px)}.gp-enquiry-rows{gap:8px 9px;font-size:13px}.gp-enquiry-rows .gp-enquiry-total{font-size:15px}}
+</style>
+</head>
 <body>
 <div class="wrap">
   <h1>Games Planet — Quick Order</h1>
@@ -363,6 +385,28 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
       <span id="restLabel">Rest on Delivery</span><b id="sumRest">₹0</b>
     </div>
   </div>
+
+
+<section class="card" id="gpDeliveryEnquiryCard" aria-label="Delivery cost enquiry">
+  <button type="button" id="gpDeliveryEnquiryButton" class="gp-delivery-enquiry-launch" onclick="gpzOpenDeliveryEnquiry()">
+    <span><b>🚚 Courier / 🚌 Bus — पूरा खर्च देखें</b><small>Enquiry · Delivery charge, product total, VAS, payment & bus stand cost</small></span>
+    <span class="gp-enquiry-arrow" aria-hidden="true">›</span>
+  </button>
+</section>
+<dialog id="gpDeliveryEnquiryDialog" aria-labelledby="gpDeliveryEnquiryTitle">
+  <div class="gp-enquiry-head"><h2 id="gpDeliveryEnquiryTitle">Delivery Cost Enquiry</h2><p>GAMES PLANET · Full cost details before ordering</p></div>
+  <div class="gp-enquiry-content">
+    <div class="gp-enquiry-select" role="group" aria-label="Compare delivery modes">
+      <button type="button" data-enquiry-mode="courier" onclick="gpzEnquirySelectMode('courier')">🚚 Courier Cost</button>
+      <button type="button" data-enquiry-mode="bus" onclick="gpzEnquirySelectMode('bus')">🚌 Bus Stand Cost</button>
+    </div>
+    <div id="gpDeliveryEnquiryDetails" aria-live="polite"></div>
+    <div class="gp-enquiry-actions">
+      <button type="button" class="gp-enquiry-send" onclick="gpzSendDeliveryCostEnquiry()">Send Enquiry on WhatsApp</button>
+      <button type="button" class="ghost" onclick="document.getElementById('gpDeliveryEnquiryDialog').close()">Close</button>
+    </div>
+  </div>
+</dialog>
 
   <!-- Order (only Order ID visible) -->
   <div class="card">
@@ -1546,6 +1590,85 @@ function computeTotals(){
   document.getElementById('courierRateGuide').hidden=bus;
   if(!bus)gpzRenderRateGuide(chargeableKg);
 }
+
+/* Itemized customer enquiry follows the SAME figures as live checkout totals.
+   Bus-operator fares must never be invented or billed as included. */
+function gpzEnquiryData(){
+ computeTotals();
+ const o=gpzCurrentOrder;if(!o)return null;
+ const cash=n=>gpzMoney(Number(n)||0);
+ const isBus=o.fulfillment==='bus',pickup=o.fulfillment==='pickup';
+ const city=(document.getElementById('city')?.value||'').trim();
+ const pin=(document.getElementById('pincode')?.value||'').trim();
+ const destination=isBus?(o.busDestination||'Not selected'):[city,pin].filter(Boolean).join(' · ')||'PIN not entered';
+ const discount=Number(o.discountApplied)||0;
+ const entries=[
+  ['Products + add-ons ('+o.totalQuantity+' items)',cash(o.productTotal)],
+  ...(discount?[['Discount','−'+cash(discount)]]:[]),
+  [isBus?'Shop → Bus Stand Rickshaw':pickup?'Shop Pickup':'Courier ('+o.deliverySpeed+')',cash(o.courierCharge)],
+  ...(o.gstInvoiceIncluded?[['GST '+(o.specialM88Offer?'(included in offer)':'(18% invoice)'),o.specialM88Offer?'Already included':cash(o.productGst)]]:[]),
+  ['VAS / handling',cash(o.vasCharge)]
+ ];
+ return {o,isBus,pickup,city,pin,destination,cash,entries};
+}
+function gpzEnquiryText(data){
+ const {o,isBus,pickup,destination,cash,entries}=data;
+ return [
+  'GAMES PLANET — Delivery Cost Enquiry',
+  'Order ID: '+(document.getElementById('orderId')?.value||''),
+  'Delivery method: '+(isBus?'Bus':pickup?'Shop Pickup':'Courier'),
+  'Destination: '+destination,
+  'Payment mode: '+String(o.paymentMode||'prepaid').toUpperCase(),
+  ...(isBus?['Bus destination: '+(o.busDestination||'Not selected')]:pickup?[]:['Courier company: '+o.courier,'Packed weight: '+o.packedWeight+'g','Chargeable weight: '+o.chargeableKg.toFixed(2)+'kg']),
+  ...o.items.map((i,n)=>(n+1)+'. '+i.name+' — '+cash(i.unitPrice)+' × '+i.quantity+' = '+cash(i.lineTotal)),
+  ...entries.map(([name,value])=>name+': '+value),
+  'GAMES PLANET ORDER TOTAL: '+cash(o.grandTotal),
+  'Pay Now / Advance (payment not verified): '+cash(o.advanceAmount),
+  ...(o.paymentMode==='cod'?['COD balance on delivery (estimate): '+cash(o.restAmount)]:[]),
+  ...(isBus?['Bus operator fare: NOT INCLUDED, paid directly to the bus operator','Overall total including bus fare: to be confirmed after bus fare is known','Bus orders require full prepaid payment.']:
+      pickup?['Pickup from Games Planet. No courier/transport charge.']:
+      ['Courier rate depends on destination PIN, city, weight and payment mode.','Any additional final COD courier difference may be added to the balance due on delivery.']),
+  'Please confirm the final delivery charge before booking.'
+ ].join('\n');
+}
+function gpzRenderDeliveryEnquiry(){
+ const data=gpzEnquiryData();const host=document.getElementById('gpDeliveryEnquiryDetails');if(!host||!data)return;
+ const {o,isBus,pickup,destination,entries,cash}=data;
+ const activeMode=isBus?'bus':'courier';
+ document.querySelectorAll('[data-enquiry-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.enquiryMode===activeMode)));
+ const itemLines=o.items.map(i=>'<div>'+gpzEscape(i.name)+' · '+i.quantity+' × '+cash(i.unitPrice)+' = <b>'+cash(i.lineTotal)+'</b></div>').join('');
+ const costRows=entries.map(([name,amount])=>'<span>'+gpzEscape(name)+'</span><b>'+gpzEscape(amount)+'</b>').join('');
+ const locationNote=isBus&&(!o.busDestination)?'<div class="gp-enquiry-warning">बस का Destination चुनें ताकि booking enquiry सही बने।</div>':'';
+ const info=isBus?'<div class="gp-enquiry-warning"><b>Bus Fare is NOT included.</b> Games Planet से बस स्टैंड तक ₹40 ही इस ऑर्डर में जुड़ा है। इसके आगे बस ऑपरेटर का वास्तविक किराया ग्राहक अलग देगा। किराया पता चलने पर ही पूरे रास्ते का final total बताया जा सकता है। Bus से भेजने के लिए Prepaid जरूरी है।</div>'
+ :pickup?'<div class="gp-enquiry-info">Shop Pickup: delivery charge ₹0 और courier VAS ₹0।</div>'
+ :'<div class="gp-enquiry-info"><b>Courier enquiry:</b> यह चुने गए शहर/PIN, courier, weight और payment mode का वर्तमान checkout estimate है। Final courier booking पर रकम बदल सकती है। COD में अंतर होने पर वह डिलीवरी के balance में जुड़ सकता है।</div>';
+ host.innerHTML='<div class="gp-enquiry-info"><b>'+gpzEscape(isBus?'Bus Stand':pickup?'Shop Pickup':'Courier')+' · '+gpzEscape(destination)+'</b><div>'+gpzEscape(o.paymentMode.toUpperCase())+' · '+(pickup?'No transport':isBus?'Shop to Bus Stand':'Courier: '+gpzEscape(o.courier))+'</div></div>'+
+ '<div class="gp-enquiry-items"><b>Products:</b>'+itemLines+'</div>'+
+ '<div class="gp-enquiry-rows">'+costRows+
+ '<span class="gp-enquiry-total">GAMES PLANET TOTAL</span><b class="gp-enquiry-total">'+cash(o.grandTotal)+'</b>'+
+ '<span>Pay Now / Advance</span><b>'+cash(o.advanceAmount)+'</b>'+
+ (o.paymentMode==='cod'?'<span>Rest on Delivery</span><b>'+cash(o.restAmount)+'</b>':'')+
+ '</div>'+locationNote+info+
+ '<p class="hint">Courier चुनने पर courier charge दिखेगा; Bus चुनने पर केवल Games Planet से bus stand तक का खर्च और ऑर्डर total दिखेगा।</p>';
+}
+function gpzOpenDeliveryEnquiry(){
+ gpzRenderDeliveryEnquiry();
+ const dialog=document.getElementById('gpDeliveryEnquiryDialog');
+ if(dialog&&!dialog.open)dialog.showModal();
+}
+function gpzEnquirySelectMode(next){
+ if(!['courier','bus'].includes(next))return;
+ gpzSetTransportMode(next);
+ gpzRenderDeliveryEnquiry();
+}
+function gpzSendDeliveryCostEnquiry(){
+ const data=gpzEnquiryData();if(!data||!data.o?.items?.length){alert('Please add products first.');return;}
+ if(data.isBus&&!data.o.busDestination){alert('Please select the bus destination first.');document.getElementById('gpDeliveryEnquiryDialog')?.close();document.getElementById('gpzBusDestination')?.focus();return;}
+ const url='https://wa.me/917983624797?text='+encodeURIComponent(gpzEnquiryText(data));
+ // Direct user interaction; no intermediate empty popup or server wait.
+ window.location.href=url;
+}
+
 function gpzUpiLink(amount,note,invoiceIncluded=gpzInvoice()){
   const isGst=Boolean(invoiceIncluded);
   const pa=isGst?GPZ_GST_UPI_ID:GPZ_NON_GST_UPI_ID;
