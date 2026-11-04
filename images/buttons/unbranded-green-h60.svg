@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" role="img" aria-label="H60 unbranded arcade push button, front, side, rear switch and correctly proportioned black mounting nut">
+<defs>
+ <linearGradient id="body" x1="0" x2="1"><stop stop-color="#00aa39"/><stop offset=".15" stop-color="#89ffb1"/><stop offset=".43" stop-color="#06db57"/><stop offset=".78" stop-color="#00aa39"/><stop offset="1" stop-color="#06db57"/></linearGradient>
+ <linearGradient id="top" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#89ffb1"/><stop offset=".38" stop-color="#06db57"/><stop offset="1" stop-color="#00aa39"/></linearGradient>
+ <linearGradient id="metal" x1="0" x2="1"><stop stop-color="#6e7378"/><stop offset=".45" stop-color="#edf4f7"/><stop offset="1" stop-color="#626c75"/></linearGradient>
+ <linearGradient id="nut" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#55575b"/><stop offset=".45" stop-color="#202126"/><stop offset="1" stop-color="#050609"/></linearGradient>
+ <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="16"/></filter>
+</defs>
+<rect width="1080" height="1080" fill="#fff"/>
+<ellipse cx="332" cy="780" rx="214" ry="25" fill="#000" opacity=".11" filter="url(#shadow)"/>
+<!-- Side view, cylinder including its real threaded housing -->
+<path d="M192 304 Q192 284 214 284 L456 284 Q476 284 476 305 L476 750 Q476 777 450 779 L216 779 Q191 779 192 751 Z" fill="url(#body)"/>
+<path d="M193 326 Q331 341 476 326" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 321 Q335 334 475 321" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 351 Q331 366 476 351" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 346 Q335 359 475 346" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 376 Q331 391 476 376" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 371 Q335 384 475 371" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 401 Q331 416 476 401" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 396 Q335 409 475 396" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 426 Q331 441 476 426" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 421 Q335 434 475 421" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 451 Q331 466 476 451" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 446 Q335 459 475 446" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 476 Q331 491 476 476" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 471 Q335 484 475 471" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 501 Q331 516 476 501" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 496 Q335 509 475 496" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 526 Q331 541 476 526" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 521 Q335 534 475 521" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 551 Q331 566 476 551" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 546 Q335 559 475 546" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 576 Q331 591 476 576" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 571 Q335 584 475 571" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 601 Q331 616 476 601" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 596 Q335 609 475 596" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 626 Q331 641 476 626" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 621 Q335 634 475 621" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 651 Q331 666 476 651" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 646 Q335 659 475 646" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 676 Q331 691 476 676" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 671 Q335 684 475 671" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 701 Q331 716 476 701" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 696 Q335 709 475 696" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/><path d="M193 726 Q331 741 476 726" fill="none" stroke="#00aa39" stroke-width="9" opacity=".82"/><path d="M195 721 Q335 734 475 721" fill="none" stroke="#89ffb1" stroke-width="3" opacity=".57"/>
+<path d="M444 521 L477 520 L477 578 L445 580 Z" fill="#101115" opacity=".89"/>
+<path d="M239 782 L431 782 L420 841 L247 841 Z" fill="url(#top)"/>
+<ellipse cx="333" cy="841" rx="88" ry="13" fill="#00aa39" opacity=".75"/>
+<ellipse cx="334" cy="284" rx="200" ry="61" fill="url(#top)" stroke="#00aa39" stroke-width="2"/>
+<path d="M140 282 C159 330 509 331 529 282 Q511 344 335 351 Q162 343 140 282Z" fill="url(#top)"/>
+<path d="M166 275 Q215 241 297 252" stroke="#fff" stroke-width="13" stroke-linecap="round" fill="none" opacity=".50"/>
+<path d="M223 214 L223 176 Q225 141 333 138 Q439 139 441 176 L441 214 Q437 255 334 263 Q227 258 223 214 Z" fill="url(#top)" stroke="#00aa39" stroke-width="2"/>
+<ellipse cx="333" cy="171" rx="107" ry="37" fill="url(#top)" stroke="#89ffb1" stroke-width="1.5"/>
+<path d="M249 155 Q310 121 382 147" stroke="#fff" opacity=".55" stroke-width="8" stroke-linecap="round" fill="none"/>
+<!-- Full-size mounting ring, ring outer diameter closely matches the cylinder -->
+<ellipse cx="783" cy="612" rx="185" ry="27" fill="#000" opacity=".10" filter="url(#shadow)"/>
+<circle cx="785" cy="463" r="186" fill="url(#nut)" stroke="#161719" stroke-width="5"/>
+<circle cx="785" cy="463" r="153" fill="#141519" stroke="#62656b" stroke-width="4"/>
+<circle cx="785" cy="463" r="135" fill="#fff" stroke="#070809" stroke-width="7"/>
+<circle cx="956.0" cy="463.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="905.9" cy="583.9" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="785.0" cy="634.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="664.1" cy="583.9" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="614.0" cy="463.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="664.1" cy="342.1" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="785.0" cy="292.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="905.9" cy="342.1" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/>
+<path d="M650 368 Q732 283 835 309" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".24"/>
+<!-- Top / face -->
+<circle cx="318" cy="951" r="114" fill="url(#top)" stroke="#00aa39" stroke-width="4"/>
+<circle cx="318" cy="951" r="87" fill="url(#top)" stroke="#00aa39" stroke-width="3"/>
+<path d="M256 891 Q305 871 356 892" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".27"/>
+<!-- Bottom / connector view -->
+<circle cx="798" cy="948" r="113" fill="#06db57" stroke="#00aa39" stroke-width="8"/>
+<circle cx="798" cy="948" r="99" fill="#00aa39" opacity=".34"/>
+<rect x="728" y="905" width="143" height="117" rx="8" fill="#1c1e21" stroke="#55585d" stroke-width="3"/>
+<rect x="748" y="849" width="26" height="72" rx="3" fill="url(#metal)" stroke="#434950" stroke-width="2"/>
+<rect x="824" y="849" width="26" height="72" rx="3" fill="url(#metal)" stroke="#434950" stroke-width="2"/>
+<circle cx="761" cy="862" r="7" fill="#434b54"/><circle cx="837" cy="862" r="7" fill="#434b54"/>
+<text x="798" y="974" font-size="31" text-anchor="middle" letter-spacing="2" fill="#64676c">H60</text>
+</svg>
