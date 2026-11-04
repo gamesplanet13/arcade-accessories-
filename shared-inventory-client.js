@@ -31,7 +31,7 @@ function updateBadges(){
   const m=records[norm(name)];const count=m?Math.max(0,Number(m.stock??999)):999;
   let tag=card.querySelector(':scope > .gp-available')||card.querySelector('.product-purchase > .gp-available');
   if(!tag){tag=document.createElement('div');tag.className='gp-available';if(card.classList.contains('trade-product'))(card.querySelector('.product-purchase')||card).prepend(tag);else title?.after(tag);}
-  if(tag){tag.textContent=count?'Available Stock: '+count:'Out of Stock';tag.classList.toggle('gp-no-stock',count===0);}
+  if(tag){const label=count?'Available Stock: '+count:'Out of Stock';if(tag.textContent!==label)tag.textContent=label;tag.classList.toggle('gp-no-stock',count===0);}
   if(m&&card.querySelector('.variant-list')){
    const rows=card.querySelectorAll('.variant-list .variant-row');
    for(const [i,row] of [...rows].entries()){
@@ -39,7 +39,7 @@ function updateBadges(){
     if(!v)continue;
     let st=row.querySelector('.gp-variant-stock');
     if(!st){st=document.createElement('small');st.className='gp-variant-stock';row.querySelector('.variant-label')?.append(st);}
-    if(st){const n=Math.max(0,Number(m.variants[v].stock??999));st.textContent='Available: '+n;st.style.color=n===0?'#b42318':'';}
+    if(st){const n=Math.max(0,Number(m.variants[v].stock??999));const label='Available: '+n;if(st.textContent!==label)st.textContent=label;st.style.color=n===0?'#b42318':'';}
    }
   }
  }
