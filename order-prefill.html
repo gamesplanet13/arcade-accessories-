@@ -1589,12 +1589,13 @@ function computeTotals(){
   payNow.dataset.upi=paymentUpi;
   document.getElementById('courierRateGuide').hidden=bus;
   if(!bus)gpzRenderRateGuide(chargeableKg);
+  if(document.getElementById('gpDeliveryEnquiryDialog')?.open)gpzRenderDeliveryEnquiry(true);
 }
 
 /* Itemized customer enquiry follows the SAME figures as live checkout totals.
    Bus-operator fares must never be invented or billed as included. */
-function gpzEnquiryData(){
- computeTotals();
+function gpzEnquiryData(recompute=true){
+ if(recompute)computeTotals();
  const o=gpzCurrentOrder;if(!o)return null;
  const cash=n=>gpzMoney(Number(n)||0);
  const isBus=o.fulfillment==='bus',pickup=o.fulfillment==='pickup';
@@ -1631,8 +1632,8 @@ function gpzEnquiryText(data){
   'Please confirm the final delivery charge before booking.'
  ].join('\n');
 }
-function gpzRenderDeliveryEnquiry(){
- const data=gpzEnquiryData();const host=document.getElementById('gpDeliveryEnquiryDetails');if(!host||!data)return;
+function gpzRenderDeliveryEnquiry(alreadyComputed=false){
+ const data=gpzEnquiryData(!alreadyComputed);const host=document.getElementById('gpDeliveryEnquiryDetails');if(!host||!data)return;
  const {o,isBus,pickup,destination,entries,cash}=data;
  const activeMode=isBus?'bus':'courier';
  document.querySelectorAll('[data-enquiry-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.enquiryMode===activeMode)));
@@ -1945,6 +1946,20 @@ document.querySelectorAll('input[name="gstInvoice"]').forEach(el=>el.addEventLis
   computeTotals();
 }));
 gpzInitialize();
+// Product-page Enquiry can open this cost sheet without submitting an order.
+(function(){
+ const pin=GPZ_PARAMS.get('deliveryPin');
+ const pincode=document.getElementById('pincode');
+ if(/^[1-9]\d{5}$/.test(pin||'')&&pincode&&!pincode.value){
+  pincode.value=pin;
+  pincode.dispatchEvent(new Event('input',{bubbles:true}));
+ }
+ if(GPZ_PARAMS.get('deliveryEnquiry')==='1'){
+  requestAnimationFrame(()=>setTimeout(()=>{
+   if(gpzCurrentOrder?.items?.length)gpzOpenDeliveryEnquiry();
+  },350));
+ }
+})();
 </script>
 <script src="setup-checkout.js"></script><script src="checkout-browse.js"></script><script src="checkout-invoice.js"></script><script src="site-navigation.js?v=20261102-ps2fmcb-simple"></script><script>window.GP_NATIVE_POSTAL=true;</script><script src="https://gamesplanet13.github.io/arcade-accessories-/orders-config.js?v=20261022-orders"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/unified-postal.js?v=20261022-orders"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/order-records.js?v=20261104-fullscreen-v2"></script><script>window.formatDateRange=function(min,max){var opts={timeZone:"UTC",weekday:"long",day:"2-digit",month:"long",year:"numeric"};return GPPostal.businessDate(min).toLocaleDateString("en-IN",opts)+" – "+GPPostal.businessDate(max).toLocaleDateString("en-IN",opts);};</script><script src="https://gamesplanet13.github.io/Gamesplanet_in/customer-profile.js?v=20261028-checkout"></script><script src="customer-checkout.js?v=20261028-clear-ps2"></script></body>
 </html>
