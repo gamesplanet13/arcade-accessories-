@@ -21,11 +21,11 @@
 <ellipse cx="333" cy="171" rx="107" ry="37" fill="url(#top)" stroke="#fff276" stroke-width="1.5"/>
 <path d="M249 155 Q310 121 382 147" stroke="#fff" opacity=".55" stroke-width="8" stroke-linecap="round" fill="none"/>
 <!-- Full-size mounting ring, ring outer diameter closely matches the cylinder -->
-<ellipse cx="783" cy="612" rx="185" ry="27" fill="#000" opacity=".10" filter="url(#shadow)"/>
-<circle cx="785" cy="463" r="186" fill="url(#nut)" stroke="#161719" stroke-width="5"/>
-<circle cx="785" cy="463" r="153" fill="#141519" stroke="#62656b" stroke-width="4"/>
-<circle cx="785" cy="463" r="135" fill="#fff" stroke="#070809" stroke-width="7"/>
-<circle cx="956.0" cy="463.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="905.9" cy="583.9" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="785.0" cy="634.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="664.1" cy="583.9" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="614.0" cy="463.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="664.1" cy="342.1" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="785.0" cy="292.0" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="905.9" cy="342.1" r="10" fill="#323338" stroke="#77787e" stroke-width="1"/>
+<ellipse cx="783" cy="612" rx="166" ry="27" fill="#000" opacity=".10" filter="url(#shadow)"/>
+<circle cx="785" cy="463" r="166" fill="url(#nut)" stroke="#161719" stroke-width="5"/>
+<circle cx="785" cy="463" r="151" fill="#141519" stroke="#62656b" stroke-width="4"/>
+<circle cx="785" cy="463" r="145" fill="#fff" stroke="#070809" stroke-width="7"/>
+<circle cx="940.0" cy="463.0" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="894.6" cy="572.6" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="785.0" cy="618.0" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="675.4" cy="572.6" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="630.0" cy="463.0" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="675.4" cy="353.4" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="785.0" cy="308.0" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/><circle cx="894.6" cy="353.4" r="7" fill="#323338" stroke="#77787e" stroke-width="1"/>
 <path d="M650 368 Q732 283 835 309" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".24"/>
 <!-- Top / face -->
 <circle cx="318" cy="951" r="114" fill="url(#top)" stroke="#de9f00" stroke-width="4"/>
