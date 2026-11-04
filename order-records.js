@@ -30,9 +30,56 @@ const x=await r.json();if(!r.ok)throw Error(x.error||'Order was not saved');cons
 return x}finally{clearTimeout(timer)}}
 function outbox(){return read(store,memory)}function retain(entry){const all=outbox(),at=all.findIndex(x=>x.orderId===entry.orderId);if(at<0)all.push(entry);else all[at]=entry;memory=all;return write(store,all)}function remove(id){const all=outbox().filter(x=>x.orderId!==id);memory=all;write(store,all)}
 async function flush(){if(flushing||busy||!navigator.onLine)return;flushing=true;let count=0;try{for(const entry of outbox()){try{await post(entry);remove(entry.orderId);count++;}catch(e){notice('Order '+entry.orderId+' is still waiting to sync: '+e.message,true);break;}}if(count)notice(count+' pending order(s) saved online. Payment verification is pending.')}finally{flushing=false}}
-async function send(message,order){if(busy)return;busy=true;const popup=window.open('about:blank','_blank');if(popup)popup.opener=null;let entry;try{notice('Saving your order…');entry=build(message,order);if(!entry.customer.name||!entry.customer.mobile||!entry.order.items.length)throw Error('Customer name, mobile and product are required');if(root.GPPostal&&/^\d{6}$/.test(entry.customer.pincode)){try{const p=await root.GPPostal.lookup(entry.customer.pincode);if(p){entry.order.delivery={...entry.order.delivery,...p.delivery};if(!entry.customer.state)entry.customer.state=p.state;if(!entry.customer.city)entry.customer.city=p.city;if(!entry.customer.postoffice)entry.customer.postoffice=p.postoffices[0]||''}}catch{}}
+
+/* WhatsApp pre-open tab must show a real progress screen, never about:blank. */
+function gpFinalizingMarkup(){
+ return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
+ '<title>GAMES PLANET · Finalizing Order</title><style>'+
+ '*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#edf5fb;color:#153148}'+
+ 'body{min-height:100dvh;display:grid;place-items:center;padding:18px}main{width:min(100%,430px);padding:30px 20px;text-align:center;border:1px solid #d4e6ee;background:#fff;border-radius:20px;box-shadow:0 18px 50px #102f491c}'+
+ '.brand{color:#087394;font-weight:900;font-size:12px;letter-spacing:2px}.wheel{height:62px;width:62px;margin:26px auto 20px;border:5px solid #dbeaf1;border-top-color:#0ba97b;border-right-color:#0e93b8;border-radius:50%;animation:spin 0.85s linear infinite}'+
+ '@keyframes spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.wheel{animation-duration:2s}}'+
+ 'h1{font-size:23px;margin:0 0 11px;line-height:1.3}p{font-size:14px;color:#5b7183;line-height:1.6;margin:0}.step{margin:19px 0;padding:12px;background:#f0f8fa;border-radius:10px;color:#326477;font-weight:700;font-size:13px}'+
+ 'a{display:inline-block;margin-top:12px;padding:11px 16px;background:#0c9769;color:white;text-decoration:none;border-radius:10px;font-weight:800}[hidden]{display:none!important}'+
+ '.footer{font-size:12px;margin-top:20px;color:#8196a4}</style></head><body>'+
+ '<main role="status" aria-live="polite"><div class="brand">GAMES PLANET</div><div class="wheel" aria-hidden="true"></div>'+
+ '<h1 id="gpFinalizeTitle">Finalizing Your Order…</h1>'+
+ '<p id="gpFinalizeDescription">Please keep this page open while your order is saved.</p>'+
+ '<div class="step" id="gpFinalizeStep">Saving your order details…</div>'+
+ '<a id="gpFinalizeLink" hidden href="#">Open WhatsApp</a>'+
+ '<p class="footer">WhatsApp will open automatically after processing.</p></main></body></html>';
+}
+function gpFinalizingWindow(p){
+ if(!p)return;
+ try{p.document.open();p.document.write(gpFinalizingMarkup());p.document.close();p.opener=null}catch(e){console.warn('Order progress window:',e)}
+}
+function gpFinalizingOverlay(){
+ let el=document.getElementById('gpOrderFinalizingOverlay');
+ if(!el){
+  const st=document.createElement('style');st.textContent='@keyframes gpOrderSpin{to{transform:rotate(360deg)}}#gpOrderFinalizingOverlay[hidden]{display:none!important}#gpOrderFinalizingOverlay .spin{animation:gpOrderSpin .85s linear infinite}@media(prefers-reduced-motion:reduce){#gpOrderFinalizingOverlay .spin{animation-duration:2s}}';document.head.append(st);
+  el=document.createElement('div');el.id='gpOrderFinalizingOverlay';el.style.cssText='position:fixed;inset:0;z-index:2147483000;background:#edf5fbf5;display:grid;place-items:center;padding:18px';
+  el.innerHTML='<section role="status" aria-live="polite" style="width:min(100%,390px);padding:30px 20px;text-align:center;background:#fff;color:#153148;border-radius:20px;box-shadow:0 15px 48px #132f4930;font-family:system-ui"><b style="font-size:12px;letter-spacing:2px;color:#0b7790">GAMES PLANET</b><div class="spin" style="height:60px;width:60px;margin:24px auto 17px;border:5px solid #dbeaf1;border-top-color:#0ba97b;border-right-color:#0e93b8;border-radius:50%"></div><h2 id="gpOverlayTitle" style="font-size:22px;margin:0 0 10px">Finalizing Your Order…</h2><p id="gpOverlayDescription" style="margin:0;color:#5b7183">Saving your order before WhatsApp opens.</p></section>';
+  document.body.append(el);
+ }
+ el.hidden=false;document.body.setAttribute('aria-busy','true');
+}
+function gpFinalizingUpdate(p,title,description,url){
+ const a=document.getElementById('gpOverlayTitle'),b=document.getElementById('gpOverlayDescription');
+ if(a)a.textContent=title;if(b)b.textContent=description;
+ try{
+  if(!p||p.closed)return;
+  const d=p.document,t=d.getElementById('gpFinalizeTitle'),n=d.getElementById('gpFinalizeDescription'),step=d.getElementById('gpFinalizeStep');
+  if(t)t.textContent=title;if(n)n.textContent=description;
+  if(step)step.textContent=url?'Redirecting to WhatsApp now…':'Connecting to the order system…';
+  if(url){const link=d.getElementById('gpFinalizeLink');if(link){link.href=url;link.hidden=false}}
+ }catch(e){}
+}
+function gpFinalizingHide(){const el=document.getElementById('gpOrderFinalizingOverlay');if(el)el.hidden=true;document.body.removeAttribute('aria-busy')}
+window.addEventListener('pageshow',gpFinalizingHide);
+
+async function send(message,order){if(busy)return;busy=true;const popup=window.open('about:blank','_blank');gpFinalizingWindow(popup);gpFinalizingOverlay();let entry;try{notice('Finalizing your order…');entry=build(message,order);if(!entry.customer.name||!entry.customer.mobile||!entry.order.items.length)throw Error('Customer name, mobile and product are required');if(root.GPPostal&&/^\d{6}$/.test(entry.customer.pincode)){try{const p=await root.GPPostal.lookup(entry.customer.pincode);if(p){entry.order.delivery={...entry.order.delivery,...p.delivery};if(!entry.customer.state)entry.customer.state=p.state;if(!entry.customer.city)entry.customer.city=p.city;if(!entry.customer.postoffice)entry.customer.postoffice=p.postoffices[0]||''}}catch{}}
 const d=entry.order.delivery||{},fields={Distance:d.distance,[entry.order.paymentMode==='cod'?'COD Order ETA':'Prepaid Order ETA']:entry.order.paymentMode==='cod'?d.etaCod:d.etaPrepaid,'Estimated Delivery':entry.order.paymentMode==='cod'?d.estimatedDeliveryCod:d.estimatedDelivery};for(const [label,value]of Object.entries(fields)){if(!value)continue;const escaped=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),re=new RegExp('^([^\\n]*?'+escaped+'\\s*:\\s*)[^\\n]*$','mi');if(re.test(message))message=message.replace(re,(_,prefix)=>prefix+value);else message+='\n'+label+': '+value;}entry.message=message;
-for(const [label,value]of [['Mobile',entry.customer.mobile],['Alt Mobile',entry.customer.altMobile]]){const re=new RegExp('^([^\\n]*?'+label+'\\s*:\\s*)[^\\n]*$','mi');message=message.replace(re,(_,prefix)=>prefix+value);}entry.message=message;const local=retain(entry);let result;try{result=await post(entry);remove(entry.orderId);
+for(const [label,value]of [['Mobile',entry.customer.mobile],['Alt Mobile',entry.customer.altMobile]]){const re=new RegExp('^([^\\n]*?'+label+'\\s*:\\s*)[^\\n]*$','mi');message=message.replace(re,(_,prefix)=>prefix+value);}entry.message=message;const local=retain(entry);let result;try{gpFinalizingUpdate(popup,'Finalizing Your Order…','Saving your order securely. WhatsApp will open next.');result=await post(entry);remove(entry.orderId);
 if(result?.duplicate){
   popup?.close();
   notice('यह सामान आपके पिछले Order '+result.orderId+' में पहले से है। दोबारा ऑर्डर नहीं बनाया गया।');
@@ -42,7 +89,7 @@ if(result?.merged){
   message=message.replace(/^(\\s*Order ID:\\s*).+$/mi,(_,prefix)=>prefix+result.orderId);
   notice('नया सामान Order '+result.orderId+' में जोड़ दिया गया है। Payment confirmation के लिए Order फिर Pending है।');
 }else notice('Order '+entry.orderId+' saved online ✓ Payment verification is pending. You can now send the WhatsApp message.');}catch(e){notice((local?'Your order is saved on this device and will retry when this page is online. ':'Browser storage is blocked. Keep this page open and retry. ')+e.message+' WhatsApp is a separate backup.',true);}
-const url='https://wa.me/917983624797?text='+encodeURIComponent(message);if(popup)popup.location.href=url;else location.href=url;return result;}catch(e){popup?.close();notice(e.message,true);alert(e.message)}finally{busy=false}}
+const url='https://wa.me/917983624797?text='+encodeURIComponent(message);gpFinalizingUpdate(popup,'Opening WhatsApp…','Your order message is ready. Continue in WhatsApp to send it.',url);if(popup&&!popup.closed)popup.location.href=url;else location.href=url;return result;}catch(e){popup?.close();notice(e.message,true);alert(e.message)}finally{busy=false;gpFinalizingHide()}}
 
 async function editRecentReceipt(receipt,container){
   const apiUrl=API();if(!apiUrl){notice('Order service is not available. Please contact Games Planet.',true);return;}
