@@ -40,7 +40,7 @@ function arrangeConsoleGroups(){
 }
 arrangeConsoleGroups();
 apply();
-window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.parse(localStorage.getItem('gp_cart')||'{}'),products)}catch(_){saved={}};Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,saved);products.forEach((p,i)=>{const el=document.getElementById('q'+i);if(el)el.value=String(state[i]||0);for(const v of p.variants||[]){const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));if(el)el.value=String(state['v_'+i+'_'+v]||0)}});render();apply();});
+window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.parse(localStorage.getItem('gp_cart')||'{}'),products)}catch(_){saved={}};Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,saved);products.forEach((p,i)=>{const el=document.getElementById('q'+i);if(el){const value=String(state[i]||0);if('value' in el)el.value=value;else el.textContent=value};for(const v of p.variants||[]){const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));if(el){const value=String(state['v_'+i+'_'+v]||0);if('value' in el)el.value=value;else el.textContent=value}}});render();apply();});
 })();
 
 
