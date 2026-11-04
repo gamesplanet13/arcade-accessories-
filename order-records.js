@@ -39,7 +39,7 @@ function gpFinalizingOverlay(){
  if(!el){
   const style=document.createElement('style');
   style.id='gpOrderFinalizingStyle';
-  style.textContent='@keyframes gpOrderSpin{to{transform:rotate(360deg)}}#gpOrderFinalizingOverlay[hidden]{display:none!important}#gpOrderFinalizingOverlay .gp-spinner{animation:gpOrderSpin .85s linear infinite}@media(prefers-reduced-motion:reduce){#gpOrderFinalizingOverlay .gp-spinner{animation-duration:2.2s}}';
+  style.textContent='@keyframes gpOrderSpin{to{transform:rotate(360deg)}}#gpOrderFinalizingOverlay[hidden],#gpOpenWhatsAppLink[hidden]{display:none!important}#gpOrderFinalizingOverlay .gp-spinner{animation:gpOrderSpin .85s linear infinite}@media(prefers-reduced-motion:reduce){#gpOrderFinalizingOverlay .gp-spinner{animation-duration:2.2s}}';
   document.head.append(style);
   el=document.createElement('div');el.id='gpOrderFinalizingOverlay';
   el.style.cssText='position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;z-index:2147483000!important;background:#eaf3faf9!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;box-sizing:border-box!important;margin:0!important;overflow:auto!important;transform:none!important';
