@@ -79,7 +79,7 @@ $('productList').addEventListener('click',e=>{
  const b=e.target.closest('button[data-action],button[data-vaction]');if(!b)return;
  const card=b.closest('[data-sku]'),vrow=b.closest('[data-variant]'),p=data.records[card.dataset.sku];
  const target=vrow?p.variants[vrow.dataset.variant]:p,field=vrow?'data-vfield':'data-field',selector='['+field+'="';
- const qty=vrow.querySelector(selector+'qty"]')?.value||card.querySelector(selector+'qty"]')?.value;
+ const qty=vrow?.querySelector(selector+'qty"]')?.value||card.querySelector(selector+'qty"]')?.value;
  const date=vrow?.querySelector(selector+'date"]')?.value||card.querySelector(selector+'date"]')?.value||today();
  const kind=b.dataset.action||b.dataset.vaction;mutateQty(p,target,vrow?.dataset.variant||'',kind,qty,date);draw();
 });
