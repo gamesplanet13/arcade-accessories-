@@ -100,3 +100,4 @@ function start(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
+;(function(){if(document.querySelector('script[data-gp-shared-inventory]'))return;const s=document.createElement('script');s.dataset.gpSharedInventory='1';s.src='https://gamesplanet13.github.io/arcade-accessories-/shared-inventory-client.js?v=20261104-stock-master';document.head.append(s);})();
