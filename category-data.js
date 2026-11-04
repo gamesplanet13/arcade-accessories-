@@ -87,14 +87,14 @@ function gpzGamingShippingProfile(name,variant=''){
 const prepare=GPShop.prepare;
 GPShop.prepare=function(products){
  prepare(products);
- // Arcade button image sets: separate branded BAO LIAN from non-branded H60/H54.
- const gpBtnImg=name=>'images/buttons/'+name+'.svg';
+ // Use only six customer-approved original product photographs.
+ const gpBtnImg=name=>'images/approved/'+name+'.jpg';
  products.forEach(p=>{
   if(p.name==='BAO LIAN Imported Arcade Push Button'){
    p.variantImages={Blue:gpBtnImg('baolian-blue'),Green:gpBtnImg('baolian-green'),Yellow:gpBtnImg('baolian-yellow'),Black:gpBtnImg('baolian-black')};
    p.images=Object.values(p.variantImages);p.price=46;p.weight=12;p.dimensions=[5,4,4];
   }else if(p.name==='Imported Arcade Push Button H60 / H54'){
-   p.variantImages={'Green (H60)':gpBtnImg('unbranded-green-h60'),'Pink (H54)':gpBtnImg('unbranded-pink-h54')};
+   p.variantImages={'Green (H60)':gpBtnImg('h60-green'),'Pink (H54)':gpBtnImg('h54-pink')};
    p.images=Object.values(p.variantImages);p.price=40;p.weight=12;p.dimensions=[5,4,4];
   }
  });
