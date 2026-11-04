@@ -408,7 +408,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": "5 × 4 × 4 cm"
   },
   {
-    "name": "Imported Arcade Push Button – H60 / H54 (Non-Branded)",
+    "name": "Imported Arcade Push Button H60 / H54",
     "price": 40,
     "weight": 12,
     "size": "5 × 4 × 4 cm"
