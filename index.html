@@ -1436,27 +1436,29 @@ variants:["Red"],variantImages:{"Red":"images/jpeg/pushbutton-red.jpeg"},
 features:["Only Red available • Yellow out of stock"],images:["images/jpeg/pushbutton-red.jpeg"]
 },
 
+
 {
-name:"Push Button (Imported)",
-dimensions:[5,4,4],
-category:"Arcade Box Accessories",
-price:46,
-weight:12,
-variants:["Ice Blue","Pink","Green","Black","Yellow"],
+name:"BAO LIAN Imported Arcade Push Button",
+dimensions:[5,4,4],category:"Arcade Box Accessories",price:46,weight:12,
+features:["Branded imported Chinese push button","With matching black fixing ring","2-pin switch","Same size and weight as H60/H54"],
+variants:["Blue","Green","Yellow","Black"],
+variantPrices:{"Blue":46,"Green":46,"Yellow":46,"Black":46},
 variantImages:{
-  "Ice Blue":"images/jpeg/imported-blue.jpeg",
-  "Pink":"images/jpeg/imported-pink.jpeg",
-  "Green":"images/jpeg/imported-green.jpeg",
-  "Black":"images/jpeg/imported-black.jpeg",
-  "Yellow":"images/jpeg/imported-yellow.jpeg"
+ "Blue":"images/jpeg/imported-blue.jpeg",
+ "Green":"images/jpeg/imported-green.jpeg",
+ "Yellow":"images/jpeg/imported-yellow.jpeg",
+ "Black":"images/jpeg/imported-black.jpeg"
 },
-images:[
-  "images/jpeg/imported-blue.jpeg",
-  "images/jpeg/imported-pink.jpeg",
-  "images/jpeg/imported-green.jpeg",
-  "images/jpeg/imported-black.jpeg",
-  "images/jpeg/imported-yellow.jpeg"
-]
+images:["images/jpeg/imported-blue.jpeg","images/jpeg/imported-green.jpeg","images/jpeg/imported-yellow.jpeg","images/jpeg/imported-black.jpeg"]
+},
+{
+name:"Imported Arcade Push Button – H60 / H54 (Non-Branded)",
+dimensions:[5,4,4],category:"Arcade Box Accessories",price:40,weight:12,
+features:["Imported non-branded button","Green H60 and Pink H54","With matching black fixing ring","Same size and weight as BAO LIAN"],
+variants:["Green (H60)","Pink (H54)"],
+variantPrices:{"Green (H60)":40,"Pink (H54)":40},
+variantImages:{"Green (H60)":"images/jpeg/imported-green.jpeg","Pink (H54)":"images/jpeg/imported-pink.jpeg"},
+images:["images/jpeg/imported-green.jpeg","images/jpeg/imported-pink.jpeg"]
 },
 
 {name:"Old Rasila Push Button",category:"Arcade Box Accessories",price:13,weight:12,dimensions:[6,4,4],images:[
@@ -1944,7 +1946,6 @@ products.push(...[{"name":"PS2 Slim 7XXXX Reset Button with PCB","category":"PS2
 /* Automatic bulk/quantity pricing. Product names must match the catalogue. */
 const QUANTITY_PRICE_RULES={
  "Push Button":{min:50,price:35},
- "Push Button (Imported)":{min:50,price:44},
  "Black Switch Button":{min:50,price:20},
  "MD Switch Button":{min:50,price:60},
  "Coin Drop Switch Button":{min:50,price:60},
