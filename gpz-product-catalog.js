@@ -402,10 +402,16 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Push Button (Imported)",
+    "name": "BAO LIAN Imported Arcade Push Button",
     "price": 46,
-    "weight": 0,
-    "size": ""
+    "weight": 12,
+    "size": "5 × 4 × 4 cm"
+  },
+  {
+    "name": "Imported Arcade Push Button – H60 / H54 (Non-Branded)",
+    "price": 40,
+    "weight": 12,
+    "size": "5 × 4 × 4 cm"
   },
   {
     "name": "PXN V3 Pro Steering Wheel and Pedal Set",
