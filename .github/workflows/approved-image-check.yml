@@ -1,0 +1,34 @@
+name: Import approved blue arcade image
+on:
+  push:
+    paths:
+      - .github/workflows/approved-image-check.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original image can be fetched
+        env:
+          URL_SIGNED: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import urllib.request,struct,sys
+          urls=["https://media.canva.com/v2/image-resize/format:PNG/height:1536/quality:100/uri:ifs%3A%2F%2FM%2Fe63a3902-ae79-4b7c-a817-133980c09eb1/watermark:F/width:1536?csig=AAAAAAAAAAAAAAAAAAAAAE_42S7Zku9D9KjQQYixdhWsb8zhK1MPcObSfRxhKXjX&exp=1793828611&osig=AAAAAAAAAAAAAAAAAAAAABDIFvqIVnIdjBHaGqwPfc3wn2ZIeWH73r8sNTnUrSAC&signer=media-rpc&token=AAIAAU0AJGU2M2EzOTAyLWFlNzktNGI3Yy1hODE3LTEzMzk4MGMwOWViMQAAAAABoaiEY7g7luDNFHRh91y7ZlfsSQ_zRefzV5y11pFRlh5bVeL5wQ","https://media.canva.com/v2/image-resize/format:PNG/height:1536/quality:100/uri:ifs%3A%2F%2FM%2Fe63a3902-ae79-4b7c-a817-133980c09eb1/watermark:F/width:1536","https://media.canva.com/v2/image-resize/format:JPG/height:200/quality:75/uri:ifs%3A%2F%2FM%2Fe63a3902-ae79-4b7c-a817-133980c09eb1/watermark:F/width:200?csig=AAAAAAAAAAAAAAAAAAAAAE_42S7Zku9D9KjQQYixdhWsb8zhK1MPcObSfRxhKXjX&exp=1793828611&osig=AAAAAAAAAAAAAAAAAAAAABDIFvqIVnIdjBHaGqwPfc3wn2ZIeWH73r8sNTnUrSAC&signer=media-rpc&token=AAIAAU0AJGU2M2EzOTAyLWFlNzktNGI3Yy1hODE3LTEzMzk4MGMwOWViMQAAAAABoaiEY7g7luDNFHRh91y7ZlfsSQ_zRefzV5y11pFRlh5bVeL5wQ&x-canva-quality=thumbnail"]
+          for i,url in enumerate(urls):
+            try:
+              request=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
+              with urllib.request.urlopen(request, timeout=20) as res:
+                data=res.read()
+                print("attempt",i,"status",res.status,"bytes",len(data),"content-type",res.headers.get("content-type"))
+                if data[:8]==b'\x89PNG\r\n\x1a\n':
+                  w,h=struct.unpack(">II",data[16:24]);print("dimensions",w,h)
+                  if w>=1000 and h>=1000:
+                    open("/tmp/gp-approved-blue.png","wb").write(data)
+                    sys.exit(0)
+            except Exception as exc: print("attempt",i,"error",repr(exc))
+          sys.exit(1)
+          PY
