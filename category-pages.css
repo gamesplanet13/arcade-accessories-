@@ -42,3 +42,42 @@
 #products .gp-product-player iframe{display:block;width:100%;aspect-ratio:16/9;height:auto;border:0;border-radius:6px;background:#111}
 #products .gp-product-video-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 #products .gp-product-video-links a{display:inline-flex;align-items:center;min-height:36px;padding:6px 9px;background:#b91c1c;color:#fff;border-radius:6px;font-size:11px;text-decoration:none}
+
+/* 2026-11-04: Discount badges span the entire compact product card.
+   Without this, CSS Grid auto-places the badge into the 60px image column. */
+html body #products#products .product > .gp-qty-discount-hint{
+  display:block!important;
+  grid-column:1 / -1!important;
+  grid-row:auto!important;
+  align-self:stretch!important;
+  justify-self:stretch!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:5px 0 0!important;
+  padding:6px 9px!important;
+  font-size:11px!important;
+  line-height:1.4!important;
+  font-weight:650!important;
+  letter-spacing:0!important;
+  text-align:left!important;
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+  color:#adf3dc!important;
+  background:rgba(16,185,129,.10)!important;
+  border:1px solid rgba(52,211,153,.25)!important;
+  border-radius:8px!important;
+}
+html body #products#products .product > .gp-qty-discount-hint.is-applied{
+  font-weight:800!important;
+  color:#bbf7d0!important;
+  background:rgba(21,128,61,.2)!important;
+  border-color:rgba(74,222,128,.5)!important;
+}
+html body #products#products .product > .gp-qty-discount-hint.is-flat{
+  color:#cbd5e1!important;
+  background:rgba(148,163,184,.08)!important;
+  border-color:rgba(148,163,184,.18)!important;
+}
