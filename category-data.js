@@ -98,6 +98,24 @@ GPShop.prepare=function(products){
    p.images=Object.values(p.variantImages);p.price=40;p.weight=12;p.dimensions=[5,4,4];
   }
  });
+ // Packed-console courier estimates include listed controller/cables and protective outer carton.
+ // Values extrapolate Sony/SIE console specs and published retail package data;
+ // they are provisional for renewed stock: physically re-weigh each dispatch.
+ const consoleParcel=(n)=>{
+  if(/^PS2 Black Console|^PlayStation 2 Slim 7xxxx Console/i.test(n))return [2400,[40,30,16],"https://sonyinteractive.com/en/press-releases/2004/playstation2-gets-stunning-new-look/"];
+  if(/^PlayStation 3 Slim Console/i.test(n))return [3800,[42,38,17],"https://www.bhphotovideo.com/c/product/1113410-REG/sony_3000346_ps3_500gb.html/overview"];
+  if(/^PS4 Slim 500GB|^PLAYSTATION 4 SLIM 500GB/i.test(n))return [4000,[51,38,16],"https://www.bigw.com.au/product/playstation-4-slim-500gb-gold-console/p/9906187800"];
+  if(/^PS4 Pro 1TB|^PLAYSTATION 4 PRO 1TB/i.test(n))return [5300,[52,42,17],"https://www.bhphotovideo.com/c/product/1280641-REG/sony_ps41tb_sony_playstation_4_pro.html"];
+  return null;
+ };
+ products.forEach(p=>{
+  const box=consoleParcel(String(p.name||''));if(!box)return;
+  p.weight=box[0];p.dimensions=box[1];p.packagingEstimate=true;
+  p.shippingWeightVerified=false;p.shippingDimensionsVerified=false;
+  p.packingReferenceUrl=box[2];
+  p.features=Array.isArray(p.features)?p.features:[];
+  if(!p.features.some(x=>x.includes('Estimated packed parcel')))p.features.push('Estimated packed parcel with included controller, cables and outer box: '+(p.weight/1000).toFixed(2)+' kg; '+p.dimensions.join(' × ')+' cm. Confirm actual parcel size and weight before dispatch.');
+ });
  products.forEach(p=>{
   const shipping=gpzGamingShippingProfile(p.name);
   if(shipping){p.weight=shipping.weight;p.dimensions=shipping.dimensions;p.shippingWeightVerified=true;
