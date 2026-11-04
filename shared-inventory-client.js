@@ -60,6 +60,17 @@ async function start(){
    document.querySelector('#storeSearch')?.dispatchEvent(new Event('input',{bubbles:true}));
   }
   if(typeof window.GP_APPLY_SHARED_INVENTORY==='function')window.GP_APPLY_SHARED_INVENTORY(json);
+  if(typeof products!=='undefined'&&typeof window.updateQty==='function'&&!window.GP_STOCK_GUARDS_INSTALLED){
+   window.GP_STOCK_GUARDS_INSTALLED=true;
+   const originalQty=window.updateQty,originalVariant=window.updateVariantQty;
+   const originalSet=window.setTypedQuantity,originalSetVariant=window.setTypedVariantQuantity;
+   const limit=(i,v)=>Math.max(0,Math.min(999,Math.floor(Number(products[i]?.variantStocks?.[v]??products[i]?.stock??999))));
+   window.updateQty=function(i,n){if(n>0&&(Number(state?.[i])||0)>=limit(i,'')){alert('Only '+limit(i,'')+' units available');return;}return originalQty.apply(this,arguments);};
+   if(typeof originalVariant==='function')window.updateVariantQty=function(i,v,n){if(n>0&&(Number(state?.['v_'+i+'_'+v])||0)>=limit(i,v)){alert('Only '+limit(i,v)+' units available');return;}return originalVariant.apply(this,arguments);};
+   if(typeof originalSet==='function')window.setTypedQuantity=function(i,v){return originalSet.call(this,i,Math.min(limit(i,''),Math.max(0,Number(v)||0)));};
+   if(typeof originalSetVariant==='function')window.setTypedVariantQuantity=function(i,v,q){return originalSetVariant.call(this,i,v,Math.min(limit(i,v),Math.max(0,Number(q)||0)));};
+  }
+
   schedule();
   if(!window.GP_STOCK_OBSERVER){const obs=new MutationObserver(schedule);obs.observe(document.body,{childList:true,subtree:true});window.GP_STOCK_OBSERVER=obs;}
   document.dispatchEvent(new CustomEvent('gp:master-stock-ready',{detail:{updatedAt:json.updatedAt||null}}));
