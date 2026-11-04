@@ -1197,7 +1197,7 @@ img,canvas{
 
 </style>
 
-<script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js?v=20261102-gamepack-shipping-cod-double"></script><link rel="stylesheet" href="category-pages.css"><style id="gp-typed-quantity-css">
+<script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js?v=20261102-gamepack-shipping-cod-double"></script><link rel="stylesheet" href="category-pages.css?v=20261104-qty-layout"><style id="gp-typed-quantity-css">
 #products .product .qty,#products .product:not(.has-variants) .qty,#products .product .variant-row .qty{width:124px!important;min-width:124px!important;max-width:124px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;gap:3px!important}
 #products .product .qty input.gp-typed-quantity{appearance:textfield;-moz-appearance:textfield;box-sizing:border-box!important;width:50px!important;min-width:42px!important;max-width:50px!important;height:32px!important;flex:1 1 auto!important;margin:0!important;padding:2px!important;text-align:center;font-size:14px!important;font-weight:800!important;border:1px solid #9ca3af!important;border-radius:8px!important;background:#fff!important;color:#111827!important;line-height:1!important}
 #products .product .qty input.gp-typed-quantity::-webkit-inner-spin-button,#products .product .qty input.gp-typed-quantity::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
@@ -1992,19 +1992,39 @@ function safeTypedQuantity(v){
  const n=Number(String(v).trim());
  return Number.isFinite(n)?Math.max(0,Math.min(99999,Math.floor(n))):0;
 }
-function quantityDiscountHint(p,i){
+function quantityDiscountStatus(p,i){
  const rule=QUANTITY_PRICE_RULES[p.name];
- if(!rule)return '';
- const qty=selectedProductQuantity(p,i),applied=qty>=rule.min;
- return `<small class="gp-qty-discount-hint ${applied?'is-applied':''}" data-quantity-rule-index="${i}">${applied?'✓ Quantity discount applied':'Quantity discount starts at '+rule.min+' pcs'} · ${applied?'from '+rule.min+' pcs · ':''}₹${rule.price}/pc</small>`;
+ if(!rule)return null;
+ const qty=selectedProductQuantity(p,i);
+ const rows=(p.variants?.length?p.variants.map(v=>({
+  qty:Number(state['v_'+i+'_'+v]||0),
+  base:Number(p.variantPrices?.[v]??p.price)
+ })):[{qty:Number(state[i]||0),base:Number(p.price)}]);
+ const hasDiscount=rows.some(row=>Number.isFinite(row.base)&&row.base>Number(rule.price));
+ const saving=qty>=rule.min?rows.reduce((sum,row)=>sum+row.qty*Math.max(0,row.base-Number(rule.price)),0):0;
+ const applied=qty>=rule.min&&saving>0;
+ const bulkPrice='₹'+Number(rule.price).toLocaleString('en-IN')+'/pc';
+ let label;
+ if(!hasDiscount)label='20+'.replace('20',String(rule.min))+' pcs · No extra discount on listed price';
+ else if(applied)label='✓ Quantity discount applied · '+qty+' pcs (from '+rule.min+') · '+bulkPrice+' · Save ₹'+saving.toLocaleString('en-IN');
+ else if(qty>=rule.min)label=qty+' pcs (from '+rule.min+') · No extra discount on selected variant';
+ else label='Quantity discount from '+rule.min+' pcs · '+bulkPrice;
+ return {label,applied,flat:!hasDiscount||(qty>=rule.min&&!saving)};
+}
+function quantityDiscountHint(p,i){
+ const status=quantityDiscountStatus(p,i);
+ if(!status)return '';
+ return `<small class="gp-qty-discount-hint ${status.applied?'is-applied':''} ${status.flat?'is-flat':''}" data-quantity-rule-index="${i}">${status.label}</small>`;
 }
 function refreshQuantityDiscountHints(){
  document.querySelectorAll('[data-quantity-rule-index]').forEach(el=>{
-  const i=Number(el.dataset.quantityRuleIndex),p=products[i],rule=p&&QUANTITY_PRICE_RULES[p.name];
-  if(!rule)return;
-  const qty=selectedProductQuantity(p,i),applied=qty>=rule.min;
-  el.classList.toggle('is-applied',applied);
-  el.textContent=applied?'✓ Quantity discount applied · '+qty+' pcs (starts '+rule.min+') · ₹'+rule.price+'/pc':'Quantity discount starts at '+rule.min+' pcs · ₹'+rule.price+'/pc';
+  const i=Number(el.dataset.quantityRuleIndex),p=products[i];
+  if(!p)return;
+  const status=quantityDiscountStatus(p,i);
+  if(!status)return;
+  el.classList.toggle('is-applied',status.applied);
+  el.classList.toggle('is-flat',status.flat);
+  el.textContent=status.label;
  });
 }
 function setTypedQuantity(i,v){
@@ -2302,7 +2322,8 @@ function selectedProductQuantity(p,i){
 function effectiveUnitWeight(p,variant=""){ return Number(p.variantWeights?.[variant] ?? p.weight) || 0; }
 function effectiveUnitPrice(p,i,variant=""){
  const rule=QUANTITY_PRICE_RULES[p.name];
- return rule&&selectedProductQuantity(p,i)>=rule.min?rule.price:(p.variantPrices?.[variant]??p.price);
+ const base=Number(p.variantPrices?.[variant]??p.price);
+ return rule&&selectedProductQuantity(p,i)>=rule.min?Math.min(base,Number(rule.price)):base;
 }
 
 function getCourierCalculation(chargeableKg){
@@ -4343,5 +4364,5 @@ document.getElementById("optionalGameModal")?.addEventListener("click",function(
 
 
 
-<script src="setup-data.js?v=20261101-one-batocera-1999"></script><script src="setup-engine.js?v=20261101-sandisk-ultra-supplied-photo"></script><script src="stock-rules.js"></script><script src="stock-ui.js"></script><script src="configured-cart.js?v=20261101-batocera-1999"></script><script src="category-pages.js?v=20261102-ps2-ps3-accessories-fixed"></script><script src="site-navigation.js?v=20261102-ps2fmcb-simple"></script><script src="shared-store.js?v=20261031-mobile-dock-fix"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/ps2-style-footer.js?v=20261016-ps2-view"></script></body>
+<script src="setup-data.js?v=20261101-one-batocera-1999"></script><script src="setup-engine.js?v=20261101-sandisk-ultra-supplied-photo"></script><script src="stock-rules.js"></script><script src="stock-ui.js"></script><script src="configured-cart.js?v=20261101-batocera-1999"></script><script src="category-pages.js?v=20261104-qty-sync"></script><script src="site-navigation.js?v=20261102-ps2fmcb-simple"></script><script src="shared-store.js?v=20261031-mobile-dock-fix"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/ps2-style-footer.js?v=20261016-ps2-view"></script></body>
 </html>
