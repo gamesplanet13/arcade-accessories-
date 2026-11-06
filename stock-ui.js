@@ -1,1 +1,56 @@
-(function(){const rule=GPStock,oldQty=window.updateQty,oldVariant=window.updateVariantQty;window.updateQty=function(i,n){if(!rule.allowed(products[i].name)){alert('This product is out of stock.');return}oldQty(i,n)};window.updateVariantQty=function(i,v,n){if(!rule.allowed(products[i].name,v)){alert('This color is out of stock.');return}oldVariant(i,v,n)};const cards=[...document.querySelectorAll('.product')];products.forEach((p,i)=>{let removed=false;if(!rule.allowed(p.name)&&(state[i]||0)>0){state[i]=0;removed=true}for(const v of p.variants||[]){if(!rule.allowed(p.name,v)){state['v_'+i+'_'+v]=0;removed=true}}if(p.name==='Push Button'){state['v_'+i+'_Yellow']=0;removed=true}const card=cards.find(x=>x.querySelector('.product-title')?.textContent===p.name);if(!card)return;const notice=text=>{const el=document.createElement('p');el.className='stock-note';el.textContent=text;card.append(el)};if(!rule.allowed(p.name)){notice('Out of stock — unavailable');card.querySelectorAll('.qty button').forEach(b=>b.disabled=true)}if(/^Ucom PC USB Controller/.test(p.name)){notice('Available / उपलब्ध');card.querySelectorAll('.qty button').forEach(b=>b.disabled=false)}if(p.name==='Zippy Coin Drop Switch'){card.dataset.stockHidden='true';card.hidden=true;}if(p.name==='MD Handle (With Switch)'){card.querySelectorAll('.image-row img').forEach(img=>{if(/md-handle-black/i.test(img.getAttribute('src')||''))img.remove()});card.querySelectorAll('.variant-row').forEach(row=>{if(row.querySelector('.variant-label')?.textContent.includes('Black')){row.remove()}else if(row.querySelector('.variant-label')?.textContent.includes('Red')){row.querySelectorAll('button').forEach(b=>b.disabled=false);const badge=document.createElement('small');badge.className='variant-stock available';badge.textContent='Red — Available';row.querySelector('.variant-label > span:last-child')?.append(badge)}})}if(removed)card.querySelectorAll('.qty span').forEach(el=>{if(el.id==='q'+i||el.id==='vq'+i+'_Black'||el.id==='vq'+i+'_Yellow')el.textContent='0'})});localStorage.setItem('gp_cart',JSON.stringify(state));const s=document.createElement('style');s.textContent='[data-stock-hidden="true"]{display:none!important}.stock-note{color:#b91c1c;background:#fff1f1;border-radius:7px;padding:9px;font-size:12px;font-weight:bold}.qty button:disabled{cursor:not-allowed;opacity:.35}';document.head.append(s)})();
+(function(){
+'use strict';
+const rule=GPStock,oldQty=window.updateQty,oldVariant=window.updateVariantQty;
+window.updateQty=function(i,n){
+ if(n>0&&!rule.allowed(products[i]?.name)){return;}
+ return oldQty.apply(this,arguments);
+};
+if(typeof oldVariant==='function')window.updateVariantQty=function(i,v,n){
+ if(n>0&&!rule.allowed(products[i]?.name,v)){return;}
+ return oldVariant.apply(this,arguments);
+};
+function updateVisibility(){
+ let changed=false;
+ document.querySelectorAll('#products .product').forEach(card=>{
+  const name=(card.querySelector('.product-title')?.textContent||'').trim();
+  const p=products.find(item=>item.name===name);
+  if(!p)return;
+  const hidden=!rule.allowed(p.name);
+  card.hidden=hidden;card.dataset.stockHidden=String(hidden);
+  if(hidden){
+   const i=products.indexOf(p);
+   if(state[i]){state[i]=0;changed=true;}
+  }
+  const rows=[...card.querySelectorAll('.variant-list .variant-row')];
+  rows.forEach((row,index)=>{
+   const v=p.variants?.[index];
+   if(!v)return;
+   const hide=hidden||!rule.allowed(p.name,v);
+   row.hidden=hide;row.dataset.stockHidden=String(hide);
+   if(hide){
+    const key='v_'+products.indexOf(p)+'_'+v;
+    if(state[key]){state[key]=0;changed=true;}
+   }
+  });
+  if(p.name==='MD Handle (With Switch)'){
+   card.querySelectorAll('.image-row img').forEach(img=>{if(/md-handle-black/i.test(img.getAttribute('src')||''))img.remove()});
+  }
+ });
+ document.querySelectorAll('.latest-mini-card').forEach(card=>{
+  const name=(card.querySelector('.latest-mini-name')?.textContent||'').trim();
+  if(!name)return;
+  const hide=!rule.allowed(name);
+  card.hidden=hide;card.dataset.stockHidden=String(hide);
+ });
+ if(changed){
+  try{localStorage.setItem('gp_cart',JSON.stringify(state));}catch(e){}
+  if(typeof window.render==='function')window.render();
+ }
+}
+const style=document.createElement('style');
+style.textContent='[data-stock-hidden="true"]{display:none!important}.qty button:disabled{cursor:not-allowed;opacity:.35}';
+document.head.append(style);
+window.GP_REFRESH_PRODUCT_VISIBILITY=updateVisibility;
+updateVisibility();
+document.addEventListener('gp:master-stock-ready',updateVisibility);
+})();
