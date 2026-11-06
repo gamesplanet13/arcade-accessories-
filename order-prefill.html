@@ -160,7 +160,18 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
     </div>
 
     <div id="pincodeStatus" class="hint" role="status" aria-live="polite">Offline pincode lookup ready.</div>
-    <div id="areaTypeStatus" class="hint" role="status" aria-live="polite" style="display:none"></div>
+    <div class="grid2" style="margin-top:10px">
+      <div><label class="label" for="areaType">Delivery Area — Rural / Urban</label>
+        <select id="areaType" onchange="updateAreaTypeStatus();updatePrimeCourierAvailability();syncCourierOptions()">
+          <option value="auto">Auto detect from address / post office</option>
+          <option value="rural">Rural — Village / No house number</option>
+          <option value="urban">Urban — City / Town (house number required)</option>
+        </select></div>
+      <div><div class="label">Rural Delivery Policy</div>
+        <div class="hint">House number खाली होने पर Rural माना जाएगा। Rural: Prepaid only, Post Office ₹100 or Speed Post ₹200; COD और private courier उपलब्ध नहीं।</div>
+      </div>
+    </div>
+    <div id="areaTypeStatus" class="hint" role="status" aria-live="polite" style="display:block"></div>
     <div id="deliveryEstimate" class="hint"></div>
 
     <!-- Mini Preview under pincode -->
@@ -523,7 +534,7 @@ function updatePrimeCourierAvailability(){
 
   const city = (document.getElementById("city")?.value || "").trim();
   const pin = (document.getElementById("pincode")?.value || "").trim();
-  const rural = isRuralDeliveryAddress();
+  const rural = gpzIsRuralDestination();
   const locationLoaded = pin.length === 6 && city.length > 0;
   const allowed = locationLoaded && !rural;
 
@@ -783,30 +794,29 @@ function selectedOfficeDetail(){
 }
 
 function gpzIsRuralDestination(){
+  // A house number is required to classify a delivery as Urban.
+  if(!String(document.getElementById('house')?.value||'').trim())return true;
+  const choice=document.getElementById('areaType')?.value||'auto';
+  if(choice==='rural')return true;
+  if(choice==='urban')return false;
   const office=selectedOfficeDetail();
-  if(office)return String(office.type||'').toUpperCase()==='BO';
+  if(office&&String(office.type||'').toUpperCase()==='BO')return true;
   return isRuralDeliveryAddress();
 }
 
 function updateAreaTypeStatus(){
   const el=document.getElementById('areaTypeStatus');
   if(!el)return;
-  const office=selectedOfficeDetail();
+  const house=String(document.getElementById('house')?.value||'').trim();
   const rural=gpzIsRuralDestination();
   el.style.display='block';
-  if(office){
-    const delivery=String(office.delivery||'').toLowerCase().includes('non')?'Non-Delivery office':'Delivery office';
-    const productValue=typeof getSubtotal==='function'?getSubtotal():0;
-    el.textContent=rural
-      ? (productValue>3000
-        ? `🌾 Rural area detected (Branch Office • ${delivery}). Order above ₹3,000: only Delhivery is available.`
-        : `🌾 Rural area detected (Branch Office • ${delivery}). Delhivery and Speed Post are available up to ₹3,000.`)
-      : `🏙️ Urban area detected (${office.type||'PO'} • ${delivery}).`;
-  }else{
-    el.textContent=rural
-      ? '🌾 Rural address detected. Only Delhivery and Speed Post are available.'
-      : 'ℹ️ Select the exact Post Office to confirm Rural/Urban serviceability.';
-  }
+  el.textContent=rural
+    ? (!house
+      ? '🌾 Rural (House number not entered): Prepaid only. Post Office ₹100 / Speed Post ₹200. COD unavailable.'
+      : '🌾 Rural destination: Only Post Office ₹100 / Speed Post ₹200. Full prepaid payment required; COD unavailable.')
+    : '🏙️ Urban destination: Standard courier services. COD is available only via Delhivery for eligible orders.';
+  const codPreview=document.querySelector('#miniPreview > div:nth-child(2)');
+  if(codPreview)codPreview.style.display=rural?'none':'';
 }
 
 function setPostOfficeOptions(postoffices,preferred=''){
@@ -1130,11 +1140,11 @@ postOfficeManualEl?.addEventListener('input',()=>{
   const el=document.getElementById(id);
   if(el){
     el.addEventListener("input",()=>{
-      if(["address","landmark","pincode","city","house"].includes(id)) updatePrimeCourierAvailability();
+      if(["address","landmark","pincode","city","house"].includes(id)){updateAreaTypeStatus();updatePrimeCourierAvailability();syncCourierOptions();}
     });
   }
 });
-document.getElementById("postoffice").addEventListener("change",()=>{ updatePrimeCourierAvailability(); });
+document.getElementById("postoffice").addEventListener("change",()=>{ updateAreaTypeStatus();updatePrimeCourierAvailability();syncCourierOptions(); });
 </script>
 
 <script src="delhivery-config.js"></script>
@@ -1146,7 +1156,7 @@ const GPZ_GST_COURIERS=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
 const GPZ_SURFACE=["Trackon.in","ShreeMaruti.com","DTDC.in","Speed Post",...GPZ_GST_COURIERS];
 const GPZ_AIR=["Trackon.in","ShreeMaruti.com"];
 const GPZ_PRIME=["Trackon.in","ShreeMaruti.com"];
-const GPZ_COD=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
+const GPZ_COD=["Delhivery.com"];
 const GPZ_VAS_COURIERS=["Delhivery.com","BlueDart","Ecom Express","XpressBees"];
 const GPZ_FIVE_STATES=["delhi","rajasthan","uttarakhand","uttar pradesh","punjab"];
 let gpzLiveDelhiveryQuote=null;
@@ -1310,6 +1320,8 @@ function gpzUpdatePaymentQr(invoiceIncluded){
   badge.textContent=invoiceIncluded?"GST Payment QR":"Non-GST Payment QR";
 }
 function gpzCourierRate(courier,speed,payment,kg){
+  if(courier==="Post Office")return 100;
+  if(courier==="Speed Post")return 200;
   const billedKg=Math.max(1,Math.ceil(kg));
   if(speed==="prime") return billedKg*(courier==="ShreeMaruti.com"?250:200);
   if(speed==="air") return billedKg*150;
@@ -1360,6 +1372,10 @@ const GPZ_BUS_RICKSHAW=40;
 function gpzIsBus(){return gpzSelected('transportMode','courier')==='bus';}
 function gpzBusStop(){const stop=(document.getElementById('gpzBusDestination')?.value||'').trim();return GPZ_BUS_STOPS.includes(stop)?stop:'';}
 function gpzSyncTransportUI(){
+  const rural=gpzIsRuralDestination();
+  if(rural&&gpzIsBus()){
+    document.querySelector('input[name="transportMode"][value="courier"]').checked=true;
+  }
   const isPickup=gpzPickup(gpzAllItems());
   const bus=gpzIsBus()&&!isPickup;
   const courierPanel=document.getElementById('gpzCourierDeliveryFields');
@@ -1371,13 +1387,17 @@ function gpzSyncTransportUI(){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     mode='prepaid';
   }
-  document.getElementById('gpzBusChoice').style.display=isPickup?'none':'';
+  document.getElementById('gpzBusChoice').style.display=(isPickup||rural)?'none':'';
   const btn=document.getElementById('gpzBusDestination');
   if(btn)btn.required=bus;
 }
 function gpzSetTransportMode(next){
   if(!['courier','bus'].includes(next))return;
   document.querySelector('input[name="transportMode"][value="'+next+'"]').checked=true;
+  if(next==='bus'&&gpzIsRuralDestination()){
+    next='courier';
+    document.querySelector('input[name="transportMode"][value="courier"]').checked=true;
+  }
   if(next==='bus'){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     mode='prepaid';
@@ -1392,8 +1412,12 @@ function syncCourierOptions(){
     computeTotals();
     return;
   }
-  const payment=gpzMode();
   const rural=gpzIsRuralDestination();
+  let payment=gpzMode();
+  if(rural&&payment==="cod"){
+    document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
+    payment="prepaid";mode="prepaid";
+  }
   const productValue=getSubtotal();
   if(payment==="cod"||rural){
     document.querySelector('input[name="deliverySpeed"][value="surface"]').checked=true;
@@ -1405,25 +1429,28 @@ function syncCourierOptions(){
   }
   const speed=gpzSpeed();
   const allowed=rural
-    ? (payment==="cod"?["Delhivery.com"]:(productValue>3000?["Delhivery.com"]:["Delhivery.com","Speed Post"]))
+    ? ["Post Office","Speed Post"]
     : (payment==="cod"?GPZ_COD:(speed==="air"?GPZ_AIR:(speed==="prime"?GPZ_PRIME:GPZ_SURFACE)));
   const select=document.getElementById("courier");
   const old=select.value;
-  select.innerHTML=allowed.map(c=>`<option value="${c}">${c}</option>`).join("");
+  select.innerHTML=allowed.map(c=>`<option value="${c}">${c}${c==="Post Office"?" — ₹100":c==="Speed Post"&&rural?" — ₹200":""}</option>`).join("");
   select.value=allowed.includes(old)?old:allowed[0];
   const pin=(document.getElementById("pincode").value||"").trim();
-  document.getElementById("courierServiceNote").textContent=/^\d{6}$/.test(pin)
-    ? (rural
-      ? (productValue>3000
-        ? `Rural PIN ${pin}: ₹3,000 से ऊपर केवल Delhivery उपलब्ध है।`
-        : `Rural PIN ${pin}: Delhivery और Speed Post उपलब्ध हैं।`)
-      : `Pincode ${pin}: mode के अनुसार courier list दिखाई गई है। Final serviceability courier booking के समय confirm होगी।`)
-    : "पहले valid 6-digit pincode भरें। Final courier serviceability destination pincode पर depend करेगी।";
+  document.getElementById("courierServiceNote").textContent=rural
+    ? 'Rural delivery is PREPAID ONLY. Choose Post Office ₹100 or Speed Post ₹200. Private courier and COD are unavailable.'
+    : (/^\d{6}$/.test(pin)
+      ? 'Urban delivery: select preferred courier. COD (eligible orders) is available only via Delhivery.'
+      : 'Enter a valid 6-digit PIN code. Final courier serviceability is confirmed at booking.');
+  updateAreaTypeStatus();
   computeTotals();
 }
 function setMode(nextMode){
   const productValue=getSubtotal();
-  if(nextMode==="cod"&&productValue<GPZ_COD_MIN){
+  if(nextMode==="cod"&&gpzIsRuralDestination()){
+    alert("Rural delivery accepts prepaid orders only. Select Post Office ₹100 or Speed Post ₹200.");
+    document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
+    mode="prepaid";
+  }else if(nextMode==="cod"&&productValue<GPZ_COD_MIN){
     alert("COD is available only when product value is ₹1,300 or more.");
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     mode="prepaid";
@@ -1442,9 +1469,9 @@ function computeTotals(){
   const productTotal=items.reduce((s,i)=>s+i.lineTotal,0);
   const totalWeight=items.reduce((s,i)=>s+i.lineWeight,0);
   const pickup=gpzPickup(items);
+  gpzSyncTransportUI();
   const bus=!pickup&&gpzIsBus();
   const busDestination=bus?gpzBusStop():'';
-  gpzSyncTransportUI();
   const packingWeight=GPCPUShipping.pack(items).packingWeight;
   const packedWeight=totalWeight+packingWeight;
   const boxDimensions=gpzBox(items,totalWeight);
@@ -1456,7 +1483,7 @@ function computeTotals(){
   const chargeableKg=(pickup||bus)?0:Math.max(.5,usesVolumetric?Math.max(actualKg,volumetricKg):actualKg);
   let payment=gpzMode();
   if(pickup||bus){document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;payment="prepaid";mode="prepaid";}
-  if(payment==="cod"&&productTotal<GPZ_COD_MIN){
+  if(payment==="cod"&&(gpzIsRuralDestination()||productTotal<GPZ_COD_MIN)){
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     payment="prepaid"; mode="prepaid";
   }
@@ -1470,7 +1497,8 @@ function computeTotals(){
   if(!pickup&&!bus){gpzLoadBigshipQuote();gpzScheduleDelhiveryQuote(courier,payment,actualKg,volumetricKg,boxDimensions);}
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
-  const standardPrepaidCourier=bigshipRate||liveRate||gpzCourierRate(courier,speed,'prepaid',chargeableKg);
+  const rural=gpzIsRuralDestination();
+  const standardPrepaidCourier=rural?gpzCourierRate(courier,speed,'prepaid',chargeableKg):(bigshipRate||liveRate||gpzCourierRate(courier,speed,'prepaid',chargeableKg));
   // These are Forward COD figures. Never substitute the separate RTO/return quotes.
   // Delhivery ONE screenshots: selected cities / weight tiers, total includes courier GST and COD fee.
   const codAdvanceEstimate=m88Offer?600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0):500;
@@ -1504,7 +1532,7 @@ function computeTotals(){
   // prepaid courier fee for the same parcel, courier and service.
   // Bus (₹40 rickshaw) and shop pickup remain separate delivery modes.
   const courierBaseCharge=(emptyOrder||pickup)?0:(bus?GPZ_BUS_RICKSHAW:
-    (payment==='cod'?2*standardPrepaidCourier:(m88Offer?0:standardPrepaidCourier)));
+    (payment==='cod'?2*standardPrepaidCourier:(m88Offer&&!rural?0:standardPrepaidCourier)));
   const courierGst=0; // Delhivery screenshot quotes already include 18% GST.
   const courierEstimate=!bigshipRate&&payment==='cod';
   const codRateSource='COD courier charge = 2× prepaid courier charge for same shipment';
@@ -1522,10 +1550,10 @@ function computeTotals(){
   const grandTotal=totalBeforeVas+vasCharge;
   const advanceAmount=payment==="cod"?(m88Offer?Math.min(grandTotal,600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0)):Math.min(grandTotal,500)):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
-  gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
+  gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",deliveryArea:rural?"Rural":"Urban",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":(bus?"bus":"courier"),deliveryMode:pickup?"pickup":(bus?"bus":"courier"),busDestination:busDestination,busFarePaidToOperator:bus,busRickshawCharge:bus&&!emptyOrder?GPZ_BUS_RICKSHAW:0,deliverySpeed:pickup?"Shop Pickup":(bus?"Bus dispatch":speed),courier:pickup?"Shop Pickup":(bus?"Bus — "+(busDestination||"Select destination"):courier),
-    courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bus?"Bus fare paid separately by customer • ₹40 rickshaw":payment==="cod"?codRateSource:bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),courierEstimate,forwardCodCity:forwardCodCityQuote?.city||"",gstInvoiceIncluded:invoiceIncluded,productGst,
-    discountApplied:appliedDiscount,couponApplied:gpzVerifiedCoupon,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",specialM88Offer:m88Offer,courierIncluded:m88Offer&&!bus,
+    courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bus?"Bus fare paid separately by customer • ₹40 rickshaw":rural?"Fixed Rural India Post rate":payment==="cod"?codRateSource:bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),courierEstimate,forwardCodCity:forwardCodCityQuote?.city||"",gstInvoiceIncluded:invoiceIncluded,productGst,
+    discountApplied:appliedDiscount,couponApplied:gpzVerifiedCoupon,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",specialM88Offer:m88Offer,courierIncluded:m88Offer&&!bus&&!rural,
     discountedProducts,amountBeforeGst,totalBeforeVas,vasApplies,vasCharge,grandTotal,
     // User-facing Base Price is deliberately GST-exclusive and follows:
     // all products + add-ons + courier + VAS. Discount/GST are shown separately.
@@ -1536,10 +1564,10 @@ function computeTotals(){
   document.getElementById("addonsTotal").value=sumAddons();
   document.getElementById("subtotal").value=productTotal;
   document.getElementById("gstDetails").style.display=invoiceIncluded?"block":"none";
-  const codAvailable=!pickup&&!bus&&productTotal>=GPZ_COD_MIN;
+  const codAvailable=!pickup&&!bus&&!rural&&productTotal>=GPZ_COD_MIN;
   document.getElementById("codChoice").style.display=codAvailable?"":"none";
   document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
-  document.getElementById("codNote").textContent=bus?"Bus dispatch: full prepaid payment required; bus fare paid directly to bus operator.":m88Offer
+  document.getElementById("codNote").textContent=rural?"Rural: COD unavailable. Full prepaid only, Post Office ₹100 or Speed Post ₹200.":bus?"Bus dispatch: full prepaid payment required; bus fare paid directly to bus operator.":m88Offer
     ? "M88 COD: ₹600 advance per unit. COD courier charge is 2× the standard prepaid courier rate, added separately."
     : codAvailable?"COD available. Shipping depends on destination city and packed weight.":"COD is available when products + add-ons total is ₹1,300 or more."
   const showCoupon=couponItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
@@ -1751,7 +1779,7 @@ function buildWhatsAppTemplate(){
     `Alt Mobile: ${document.getElementById("altMobile").value}`,`Email: ${document.getElementById("email").value}`,
     `Address: ${address}`,`Landmark: ${document.getElementById("landmark").value}`,
     `Pincode: ${document.getElementById("pincode").value}`,`State: ${document.getElementById("state").value}`,
-    `District/City: ${document.getElementById("city").value}`,`Post office: ${getPostOfficeValue()}`,"",
+    `District/City: ${document.getElementById("city").value}`,`Post office: ${getPostOfficeValue()}`,`Delivery Area: ${o.deliveryArea}`,"",
     `Product: ${simpleProducts}`,
     `Variant: ${simpleVariants}`,
     `Base Price: ${gpzMoney(o.basePriceDisplay||0)}`,
@@ -1798,6 +1826,10 @@ function buildWhatsAppTemplate(){
   ].join("\n");
 }
 function submitOrder(){
+  syncCourierOptions();
+  if(gpzIsRuralDestination()&&(gpzCurrentOrder?.paymentMode!=="prepaid"||!["Post Office","Speed Post"].includes(gpzCurrentOrder?.courier))){
+    alert("Rural orders must be fully prepaid and sent only via Post Office or Speed Post.");return;
+  }
   if(gpzIsBus()&&!gpzBusStop()){
     alert('Please choose one of the 10 available bus destinations before submitting your order.');
     document.getElementById('gpzBusDestination')?.focus();
@@ -1825,6 +1857,7 @@ function submitOrder(){
     total:gpzCurrentOrder.grandTotal,
     courier:gpzCurrentOrder.courier,
     deliveryMode:gpzCurrentOrder.deliveryMode,
+    deliveryArea:gpzCurrentOrder.deliveryArea,
     busDestination:gpzCurrentOrder.busDestination,
     busRickshawCharge:gpzCurrentOrder.busRickshawCharge,
     busFarePaidToOperator:gpzCurrentOrder.busFarePaidToOperator,
