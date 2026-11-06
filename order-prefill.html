@@ -1827,7 +1827,7 @@ function buildWhatsAppTemplate(){
 }
 function submitOrder(){
   syncCourierOptions();
-  if(gpzIsRuralDestination()&&(gpzCurrentOrder?.paymentMode!=="prepaid"||!["Post Office","Speed Post"].includes(gpzCurrentOrder?.courier))){
+  if(gpzIsRuralDestination()&&gpzCurrentOrder?.fulfillment!=="pickup"&&(gpzCurrentOrder?.paymentMode!=="prepaid"||!["Post Office","Speed Post"].includes(gpzCurrentOrder?.courier))){
     alert("Rural orders must be fully prepaid and sent only via Post Office or Speed Post.");return;
   }
   if(gpzIsBus()&&!gpzBusStop()){
