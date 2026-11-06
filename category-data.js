@@ -87,15 +87,21 @@ function gpzGamingShippingProfile(name,variant=''){
 const prepare=GPShop.prepare;
 GPShop.prepare=function(products){
  prepare(products);
- // Use only six customer-approved original product photographs.
+ // Keep archival H60/H54 data in the source and master database, not in customer listings.
  const gpBtnImg=name=>'images/approved/'+name+'.jpg';
  products.forEach(p=>{
   if(p.name==='BAO LIAN Imported Arcade Push Button'){
-   p.variantImages={Blue:gpBtnImg('baolian-blue'),Green:gpBtnImg('baolian-green'),Yellow:gpBtnImg('baolian-yellow'),Black:gpBtnImg('baolian-black')};
+   p.variants=[...new Set([...(p.variants||[]),'Pink (H54)'])];
+   p.variantPrices={...(p.variantPrices||{}),'Pink (H54)':46};
+   p.variantImages={Blue:gpBtnImg('baolian-blue'),Green:gpBtnImg('baolian-green'),Yellow:gpBtnImg('baolian-yellow'),Black:gpBtnImg('baolian-black'),'Pink (H54)':gpBtnImg('h54-pink')};
+   p.variantStocks={...(p.variantStocks||{}),'Pink (H54)':999};
    p.images=Object.values(p.variantImages);p.price=46;p.weight=12;p.dimensions=[5,4,4];
   }else if(p.name==='Imported Arcade Push Button H60 / H54'){
    p.variantImages={'Green (H60)':gpBtnImg('h60-green'),'Pink (H54)':gpBtnImg('h54-pink')};
-   p.images=Object.values(p.variantImages);p.price=40;p.weight=12;p.dimensions=[5,4,4];
+   p.price=46;p.weight=12;p.dimensions=[5,4,4];
+   p.variantPrices={'Green (H60)':46,'Pink (H54)':46};
+   p.variantStocks={'Green (H60)':0,'Pink (H54)':0};
+   p.stock=0;p.available=false;p.hiddenFromStore=true;p.aliasOf='BAO LIAN Imported Arcade Push Button';
   }
  });
  // Packed-console courier estimates include listed controller/cables and protective outer carton.
