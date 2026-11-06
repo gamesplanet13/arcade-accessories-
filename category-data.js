@@ -90,6 +90,7 @@ GPShop.prepare=function(products){
  // Keep archival H60/H54 data in the source and master database, not in customer listings.
  const gpBtnImg=name=>'images/approved/'+name+'.jpg';
  products.forEach(p=>{
+  if(p.name==='Push Button'){p.features=(p.features||[]).map(f=>/yellow out of stock/i.test(f)?'Colour: Red':f);}
   if(p.name==='BAO LIAN Imported Arcade Push Button'){
    p.variants=[...new Set([...(p.variants||[]),'Pink (H54)'])];
    p.variantPrices={...(p.variantPrices||{}),'Pink (H54)':46};
