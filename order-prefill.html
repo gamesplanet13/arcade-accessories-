@@ -172,6 +172,7 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
       </div>
     </div>
     <div id="areaTypeStatus" class="hint" role="status" aria-live="polite" style="display:block"></div>
+    <div class="hint" style="font-size:12px">PIN codes can cover Rural and Urban areas together. Select your exact Post Office. <a href="https://www.indiapost.gov.in/locate-postoffice" target="_blank" rel="noopener noreferrer">Check PIN / Post Office on India Post</a>.</div>
     <div id="deliveryEstimate" class="hint"></div>
 
     <!-- Mini Preview under pincode -->
@@ -794,13 +795,15 @@ function selectedOfficeDetail(){
 }
 
 function gpzIsRuralDestination(){
-  // A house number is required to classify a delivery as Urban.
+  // A PIN is not solely Rural or Urban: one PIN can serve both kinds of offices.
+  // The precise selected Branch Office takes precedence over a manual Urban choice.
+  const office=selectedOfficeDetail();
+  const officeType=String(office?.type||'').toUpperCase().replace(/[^A-Z]/g,'');
+  if(officeType==='BO'||officeType==='BRANCHOFFICE'||officeType==='BRANCHPOSTOFFICE')return true;
   if(!String(document.getElementById('house')?.value||'').trim())return true;
   const choice=document.getElementById('areaType')?.value||'auto';
   if(choice==='rural')return true;
   if(choice==='urban')return false;
-  const office=selectedOfficeDetail();
-  if(office&&String(office.type||'').toUpperCase()==='BO')return true;
   return isRuralDeliveryAddress();
 }
 
@@ -810,10 +813,14 @@ function updateAreaTypeStatus(){
   const house=String(document.getElementById('house')?.value||'').trim();
   const rural=gpzIsRuralDestination();
   el.style.display='block';
+  const selectedOffice=selectedOfficeDetail();
+  const officeType=String(selectedOffice?.type||'').toUpperCase().replace(/[^A-Z]/g,'');
   el.textContent=rural
-    ? (!house
+    ? ((officeType==='BO'||officeType==='BRANCHOFFICE'||officeType==='BRANCHPOSTOFFICE')
+      ? '🌾 Rural (selected Branch Post Office): Prepaid only. 0–499g ₹100/₹200; 500g–1kg ₹150/₹300 (Post Office/Speed Post). COD unavailable.'
+      : (!house
       ? '🌾 Rural (house number missing): Prepaid only. 0–499g ₹100/₹200; 500g–1kg ₹150/₹300 (Post Office/Speed Post). COD unavailable.'
-      : '🌾 Rural: Prepaid only. 0–499g ₹100/₹200; 500g–1kg ₹150/₹300 (Post Office/Speed Post). COD unavailable.')
+      : '🌾 Rural: Prepaid only. 0–499g ₹100/₹200; 500g–1kg ₹150/₹300 (Post Office/Speed Post). COD unavailable.'))
     : '🏙️ Urban destination: Standard courier services. COD is available only via Delhivery for eligible orders.';
   const codPreview=document.querySelector('#miniPreview > div:nth-child(2)');
   if(codPreview)codPreview.style.display=rural?'none':'';
