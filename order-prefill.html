@@ -168,7 +168,7 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
           <option value="urban">Urban — City / Town (house number required)</option>
         </select></div>
       <div><div class="label">Rural Delivery Policy</div>
-        <div class="hint">House number खाली होने पर Rural माना जाएगा। Rural: Prepaid only, Post Office ₹100 or Speed Post ₹200; COD और private courier उपलब्ध नहीं।</div>
+        <div class="hint">House number खाली होने पर Rural माना जाएगा। Rural Prepaid only: 0–499g Post Office ₹100 / Speed Post ₹200; 500g–1kg Post Office ₹150 / Speed Post ₹300. Over 1kg: quote required.</div>
       </div>
     </div>
     <div id="areaTypeStatus" class="hint" role="status" aria-live="polite" style="display:block"></div>
@@ -812,8 +812,8 @@ function updateAreaTypeStatus(){
   el.style.display='block';
   el.textContent=rural
     ? (!house
-      ? '🌾 Rural (House number not entered): Prepaid only. Post Office ₹100 / Speed Post ₹200. COD unavailable.'
-      : '🌾 Rural destination: Only Post Office ₹100 / Speed Post ₹200. Full prepaid payment required; COD unavailable.')
+      ? '🌾 Rural (house number missing): Prepaid only. 0–499g ₹100/₹200; 500g–1kg ₹150/₹300 (Post Office/Speed Post). COD unavailable.'
+      : '🌾 Rural: Prepaid only. 0–499g ₹100/₹200; 500g–1kg ₹150/₹300 (Post Office/Speed Post). COD unavailable.')
     : '🏙️ Urban destination: Standard courier services. COD is available only via Delhivery for eligible orders.';
   const codPreview=document.querySelector('#miniPreview > div:nth-child(2)');
   if(codPreview)codPreview.style.display=rural?'none':'';
@@ -1319,9 +1319,15 @@ function gpzUpdatePaymentQr(invoiceIncluded){
   link.download=invoiceIncluded?"Games_Planet_Zone_GST_QR.png":"Games_Planet_Zone_Non_GST_QR.jpg";
   badge.textContent=invoiceIncluded?"GST Payment QR":"Non-GST Payment QR";
 }
+function gpzPostalRate(courier,packedKg){
+  // Store-configured India Post fees, based on actual packed weight.
+  const grams=Math.round(Number(packedKg)*1000);
+  if(!Number.isFinite(grams)||grams<0||grams>1000)return null;
+  const base=grams>=500?150:100;
+  return courier==="Speed Post"?base*2:base;
+}
 function gpzCourierRate(courier,speed,payment,kg){
-  if(courier==="Post Office")return 100;
-  if(courier==="Speed Post")return 200;
+  if(courier==="Post Office"||courier==="Speed Post")return gpzPostalRate(courier,kg)??0;
   const billedKg=Math.max(1,Math.ceil(kg));
   if(speed==="prime") return billedKg*(courier==="ShreeMaruti.com"?250:200);
   if(speed==="air") return billedKg*150;
@@ -1433,11 +1439,11 @@ function syncCourierOptions(){
     : (payment==="cod"?GPZ_COD:(speed==="air"?GPZ_AIR:(speed==="prime"?GPZ_PRIME:GPZ_SURFACE)));
   const select=document.getElementById("courier");
   const old=select.value;
-  select.innerHTML=allowed.map(c=>`<option value="${c}">${c}${c==="Post Office"?" — ₹100":c==="Speed Post"&&rural?" — ₹200":""}</option>`).join("");
+  select.innerHTML=allowed.map(c=>`<option value="${c}">${c}${c==="Post Office"?" — ₹100/₹150 by weight":c==="Speed Post"&&rural?" — ₹200/₹300 by weight":""}</option>`).join("");
   select.value=allowed.includes(old)?old:allowed[0];
   const pin=(document.getElementById("pincode").value||"").trim();
   document.getElementById("courierServiceNote").textContent=rural
-    ? 'Rural delivery is PREPAID ONLY. Choose Post Office ₹100 or Speed Post ₹200. Private courier and COD are unavailable.'
+    ? 'Rural PREPAID only: 0–499g Post Office ₹100 / Speed Post ₹200; 500g–1kg Post Office ₹150 / Speed Post ₹300. Above 1kg needs confirmed rate.'
     : (/^\d{6}$/.test(pin)
       ? 'Urban delivery: select preferred courier. COD (eligible orders) is available only via Delhivery.'
       : 'Enter a valid 6-digit PIN code. Final courier serviceability is confirmed at booking.');
@@ -1447,7 +1453,7 @@ function syncCourierOptions(){
 function setMode(nextMode){
   const productValue=getSubtotal();
   if(nextMode==="cod"&&gpzIsRuralDestination()){
-    alert("Rural delivery accepts prepaid orders only. Select Post Office ₹100 or Speed Post ₹200.");
+    alert("Rural delivery accepts prepaid orders only. Select Post Office or Speed Post; rates depend on packed weight.");
     document.querySelector('input[name="paymentMode"][value="prepaid"]').checked=true;
     mode="prepaid";
   }else if(nextMode==="cod"&&productValue<GPZ_COD_MIN){
@@ -1498,7 +1504,9 @@ function computeTotals(){
   const liveRate=GPZ_VAS_COURIERS.includes(courier)&&gpzLiveDelhiveryQuote?.key===liveKey?Number(gpzLiveDelhiveryQuote.amount):0;
   const bigshipRate=gpzBigshipQuote?.key===liveKey?Math.ceil(Number(gpzBigshipQuote.amount||0)/10)*10:0;
   const rural=gpzIsRuralDestination();
-  const standardPrepaidCourier=rural?gpzCourierRate(courier,speed,'prepaid',chargeableKg):(bigshipRate||liveRate||gpzCourierRate(courier,speed,'prepaid',chargeableKg));
+  const postalQuote=rural&&!pickup&&!bus&&!emptyOrder?gpzPostalRate(courier,actualKg):0;
+  const postalRatePending=rural&&!pickup&&!bus&&!emptyOrder&&postalQuote===null;
+  const standardPrepaidCourier=rural?(postalQuote??0):(bigshipRate||liveRate||gpzCourierRate(courier,speed,'prepaid',chargeableKg));
   // These are Forward COD figures. Never substitute the separate RTO/return quotes.
   // Delhivery ONE screenshots: selected cities / weight tiers, total includes courier GST and COD fee.
   const codAdvanceEstimate=m88Offer?600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0):500;
@@ -1550,7 +1558,7 @@ function computeTotals(){
   const grandTotal=totalBeforeVas+vasCharge;
   const advanceAmount=payment==="cod"?(m88Offer?Math.min(grandTotal,600*couponItems.reduce((n,i)=>n+(Number(i.quantity)||1),0)):Math.min(grandTotal,500)):grandTotal;
   const restAmount=payment==="cod"?Math.max(0,grandTotal-advanceAmount):0;
-  gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",deliveryArea:rural?"Rural":"Urban",items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
+  gpzCurrentOrder={source:GPZ_PARAMS.get("source")==="cart"?"cart":"direct",deliveryArea:rural?"Rural":"Urban",postalRatePending,postalWeightGrams:packedWeight,items,productTotal,totalWeight,totalQuantity:items.reduce((s,i)=>s+i.quantity,0),packingWeight,packedWeight,
     boxDimensions,actualKg,volumetricKg,usesVolumetric,chargeableKg,paymentMode:payment,fulfillment:pickup?"pickup":(bus?"bus":"courier"),deliveryMode:pickup?"pickup":(bus?"bus":"courier"),busDestination:busDestination,busFarePaidToOperator:bus,busRickshawCharge:bus&&!emptyOrder?GPZ_BUS_RICKSHAW:0,deliverySpeed:pickup?"Shop Pickup":(bus?"Bus dispatch":speed),courier:pickup?"Shop Pickup":(bus?"Bus — "+(busDestination||"Select destination"):courier),
     courierBaseCharge,courierGst,courierCharge,courierRateSource:pickup?"Shop Pickup — Courier ₹0":bus?"Bus fare paid separately by customer • ₹40 rickshaw":rural?"Fixed Rural India Post rate":payment==="cod"?codRateSource:bigshipRate?"Bigship selected live rate":(liveRate?"Delhivery Live API":"Configured fallback"),courierEstimate,forwardCodCity:forwardCodCityQuote?.city||"",gstInvoiceIncluded:invoiceIncluded,productGst,
     discountApplied:appliedDiscount,couponApplied:gpzVerifiedCoupon,discountCode:appliedDiscount?(document.getElementById("couponCode").value||"").trim():"",specialM88Offer:m88Offer,courierIncluded:m88Offer&&!bus&&!rural,
@@ -1564,10 +1572,18 @@ function computeTotals(){
   document.getElementById("addonsTotal").value=sumAddons();
   document.getElementById("subtotal").value=productTotal;
   document.getElementById("gstDetails").style.display=invoiceIncluded?"block":"none";
+  const postalNotice=document.getElementById('courierServiceNote');
+  if(postalNotice&&rural&&!pickup&&!bus){
+    postalNotice.style.display='block';
+    postalNotice.setAttribute('aria-hidden','false');
+    postalNotice.textContent=postalRatePending
+      ? 'Packed weight '+packedWeight+'g exceeds 1kg. Confirm postal charge before payment or submission.'
+      : 'Packed weight '+packedWeight+'g: '+courier+' '+gpzMoney(postalQuote)+'. Speed Post is double Post Office.';
+  }
   const codAvailable=!pickup&&!bus&&!rural&&productTotal>=GPZ_COD_MIN;
   document.getElementById("codChoice").style.display=codAvailable?"":"none";
   document.querySelector('input[name="paymentMode"][value="cod"]').disabled=!codAvailable;
-  document.getElementById("codNote").textContent=rural?"Rural: COD unavailable. Full prepaid only, Post Office ₹100 or Speed Post ₹200.":bus?"Bus dispatch: full prepaid payment required; bus fare paid directly to bus operator.":m88Offer
+  document.getElementById("codNote").textContent=rural?"Rural: COD unavailable; 0–499g Post Office ₹100 / Speed Post ₹200; 500g–1kg Post Office ₹150 / Speed Post ₹300.":bus?"Bus dispatch: full prepaid payment required; bus fare paid directly to bus operator.":m88Offer
     ? "M88 COD: ₹600 advance per unit. COD courier charge is 2× the standard prepaid courier rate, added separately."
     : codAvailable?"COD available. Shipping depends on destination city and packed weight.":"COD is available when products + add-ons total is ₹1,300 or more."
   const showCoupon=couponItems.some(i=>['m88','gamebox'].includes(i.couponCategory));
@@ -1591,7 +1607,7 @@ function computeTotals(){
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:appliedDiscount?"-"+gpzMoney(appliedDiscount):gpzMoney(0),sumProductGst:(m88Offer&&invoiceIncluded?'Included: ':'')+gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
     sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:usesVolumetric?volumetricKg.toFixed(2)+"kg":"Not applicable for "+courier,
     sumChargeable:bus?"Bus — charged by operator":chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
-    sumCourier:gpzMoney(courierCharge)+(m88Offer?' (included in offer)':''),sumRateSource:m88Offer?'Included in M88 coupon offer':gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
+    sumCourier:gpzMoney(courierCharge)+(m88Offer&&!rural?' (included in offer)':''),sumRateSource:m88Offer?'Included in M88 coupon offer':gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
     sumPaid:gpzMoney(advanceAmount),sumRest:gpzMoney(restAmount)};
   Object.entries(values).forEach(([id,value])=>document.getElementById(id).textContent=value);
   document.getElementById('sumCourierBaseLabel').textContent=bus?'Shop → Bus Rickshaw Charge':'Courier Base Charge';
@@ -1608,8 +1624,8 @@ function computeTotals(){
   const paymentNote=payment==="cod"?"COD Payment":(invoiceIncluded?"GST Invoice Payment":"Prepaid Order");
   const payNow=document.getElementById("payNow");
   const busStopMissing=bus&&!busDestination;
-  payNow.style.pointerEvents=(emptyOrder||busStopMissing)?'none':'';
-  payNow.style.opacity=(emptyOrder||busStopMissing)?'0.45':'';
+  payNow.style.pointerEvents=(emptyOrder||busStopMissing||postalRatePending)?'none':'';
+  payNow.style.opacity=(emptyOrder||busStopMissing||postalRatePending)?'0.45':'';
   if(busStopMissing)document.getElementById('gpzBusFareNote').textContent='Select a bus destination first. Rickshaw ₹40 is added to this order; bus fare is paid separately to the bus operator.';
   else document.getElementById('gpzBusFareNote').innerHTML='<b>Shop to Bus Stand — Rickshaw Charge: ₹40</b> (included in order). <b>Bus fare paid directly to bus operator</b>; not included in order. Bus booking/dispatch is subject to confirmation.';
   const paymentUpi=gpzUpiLink(advanceAmount,paymentNote,invoiceIncluded);
@@ -1713,6 +1729,7 @@ function launchUpiPayment(event){
     return false;
   }
   const o=gpzCurrentOrder;
+  if(o?.postalRatePending){if(event)event.preventDefault();alert('Packed weight over 1kg: please confirm postal charges before paying.');return false;}
   if(!o||!Number(o.advanceAmount)){
     if(event) event.preventDefault();
     alert("Payment amount is not ready. Please complete the order details first.");
@@ -1827,6 +1844,7 @@ function buildWhatsAppTemplate(){
 }
 function submitOrder(){
   syncCourierOptions();
+  if(gpzCurrentOrder?.postalRatePending){alert('Packed weight above 1kg: postal charge must be confirmed before submission.');return;}
   if(gpzIsRuralDestination()&&gpzCurrentOrder?.fulfillment!=="pickup"&&(gpzCurrentOrder?.paymentMode!=="prepaid"||!["Post Office","Speed Post"].includes(gpzCurrentOrder?.courier))){
     alert("Rural orders must be fully prepaid and sent only via Post Office or Speed Post.");return;
   }
