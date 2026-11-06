@@ -11,6 +11,14 @@ if(typeof oldVariant==='function')window.updateVariantQty=function(i,v,n){
 };
 function updateVisibility(){
  let changed=false;
+ // Clean saved carts too: archived products may have no visible card to inspect.
+ products.forEach((p,i)=>{
+  if(!rule.allowed(p.name)&&state[i]){state[i]=0;changed=true;}
+  for(const v of p.variants||[]){
+   const key='v_'+i+'_'+v;
+   if(!rule.allowed(p.name,v)&&state[key]){state[key]=0;changed=true;}
+  }
+ });
  document.querySelectorAll('#products .product').forEach(card=>{
   const name=(card.querySelector('.product-title')?.textContent||'').trim();
   const p=products.find(item=>item.name===name);
