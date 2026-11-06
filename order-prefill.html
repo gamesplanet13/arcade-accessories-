@@ -1614,8 +1614,8 @@ function computeTotals(){
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:appliedDiscount?"-"+gpzMoney(appliedDiscount):gpzMoney(0),sumProductGst:(m88Offer&&invoiceIncluded?'Included: ':'')+gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
     sumBox:boxDimensions.join(" × ")+" cm",sumActual:actualKg.toFixed(2)+"kg",sumVolumetric:usesVolumetric?volumetricKg.toFixed(2)+"kg":"Not applicable for "+courier,
     sumChargeable:bus?"Bus — charged by operator":chargeableKg.toFixed(2)+"kg",sumCourierBase:gpzMoney(courierBaseCharge),sumCourierGst:gpzMoney(courierGst),
-    sumCourier:gpzMoney(courierCharge)+(m88Offer&&!rural?' (included in offer)':''),sumRateSource:m88Offer?'Included in M88 coupon offer':gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:gpzMoney(grandTotal),
-    sumPaid:gpzMoney(advanceAmount),sumRest:gpzMoney(restAmount)};
+    sumCourier:postalRatePending?'Rate confirmation required':gpzMoney(courierCharge)+(m88Offer&&!rural?' (included in offer)':''),sumRateSource:postalRatePending?'Postal rate pending for packed weight over 1kg':m88Offer&&!rural?'Included in M88 coupon offer':gpzCurrentOrder.courierRateSource,sumVas:gpzMoney(vasCharge),sumGrand:postalRatePending?'Final total pending postage':gpzMoney(grandTotal),
+    sumPaid:postalRatePending?'Do not pay — quote pending':gpzMoney(advanceAmount),sumRest:gpzMoney(restAmount)};
   Object.entries(values).forEach(([id,value])=>document.getElementById(id).textContent=value);
   document.getElementById('sumCourierBaseLabel').textContent=bus?'Shop → Bus Rickshaw Charge':'Courier Base Charge';
   document.getElementById('sumCourierLabel').textContent=bus?'Shop → Bus Transport Total':'Courier Total';
@@ -1650,6 +1650,8 @@ function gpzEnquiryData(recompute=true){
  const o=gpzCurrentOrder;if(!o)return null;
  const cash=n=>gpzMoney(Number(n)||0);
  const isBus=o.fulfillment==='bus',pickup=o.fulfillment==='pickup';
+ const isPostal=!isBus&&!pickup&&['Post Office','Speed Post'].includes(o.courier);
+ const pendingPostal=isPostal&&Boolean(o.postalRatePending);
  const city=(document.getElementById('city')?.value||'').trim();
  const pin=(document.getElementById('pincode')?.value||'').trim();
  const destination=isBus?(o.busDestination||'Not selected'):[city,pin].filter(Boolean).join(' · ')||'PIN not entered';
@@ -1657,35 +1659,44 @@ function gpzEnquiryData(recompute=true){
  const entries=[
   ['Products + add-ons ('+o.totalQuantity+' items)',cash(o.productTotal)],
   ...(discount?[['Discount','−'+cash(discount)]]:[]),
-  [isBus?'Shop → Bus Stand Rickshaw':pickup?'Shop Pickup':'Courier ('+o.deliverySpeed+')',cash(o.courierCharge)],
+  [isBus?'Shop → Bus Stand Rickshaw':pickup?'Shop Pickup':isPostal?o.courier+' (packed '+o.packedWeight+'g)':'Courier ('+o.deliverySpeed+')',pendingPostal?'Rate confirmation required (>1kg)':cash(o.courierCharge)],
   ...(o.gstInvoiceIncluded?[['GST '+(o.specialM88Offer?'(included in offer)':'(18% invoice)'),o.specialM88Offer?'Already included':cash(o.productGst)]]:[]),
   ['VAS / handling',cash(o.vasCharge)]
  ];
- return {o,isBus,pickup,city,pin,destination,cash,entries};
+ return {o,isBus,pickup,isPostal,pendingPostal,city,pin,destination,cash,entries};
 }
 function gpzEnquiryText(data){
- const {o,isBus,pickup,destination,cash,entries}=data;
+ const {o,isBus,pickup,isPostal,pendingPostal,destination,cash,entries}=data;
  return [
   'GAMES PLANET — Delivery Cost Enquiry',
   'Order ID: '+(document.getElementById('orderId')?.value||''),
-  'Delivery method: '+(isBus?'Bus':pickup?'Shop Pickup':'Courier'),
+  'Delivery method: '+(isBus?'Bus':pickup?'Shop Pickup':isPostal?'Post Office / Speed Post':'Courier'),
   'Destination: '+destination,
   'Payment mode: '+String(o.paymentMode||'prepaid').toUpperCase(),
-  ...(isBus?['Bus destination: '+(o.busDestination||'Not selected')]:pickup?[]:['Courier company: '+o.courier,'Packed weight: '+o.packedWeight+'g','Chargeable weight: '+o.chargeableKg.toFixed(2)+'kg']),
+  ...(isBus?['Bus destination: '+(o.busDestination||'Not selected')]:pickup?[]:isPostal?['Postal service: '+o.courier,'Packed weight: '+o.packedWeight+'g','Postage calculated on actual packed weight']:['Courier company: '+o.courier,'Packed weight: '+o.packedWeight+'g','Chargeable weight: '+o.chargeableKg.toFixed(2)+'kg']),
   ...o.items.map((i,n)=>(n+1)+'. '+i.name+' — '+cash(i.unitPrice)+' × '+i.quantity+' = '+cash(i.lineTotal)),
   ...entries.map(([name,value])=>name+': '+value),
-  'GAMES PLANET ORDER TOTAL: '+cash(o.grandTotal),
-  'Pay Now / Advance (payment not verified): '+cash(o.advanceAmount),
+  ...(pendingPostal?[
+    'Products subtotal (postal charge excluded): '+cash(o.productTotal),
+    'GAMES PLANET FINAL ORDER TOTAL: PENDING POSTAL RATE',
+    'Pay Now / Advance: NOT AVAILABLE — postal charge not confirmed'
+  ]:[
+    'GAMES PLANET ORDER TOTAL: '+cash(o.grandTotal),
+    'Pay Now / Advance (payment not verified): '+cash(o.advanceAmount)
+  ]),
   ...(o.paymentMode==='cod'?['COD balance on delivery (estimate): '+cash(o.restAmount)]:[]),
   ...(isBus?['Bus operator fare: NOT INCLUDED, paid directly to the bus operator','Overall total including bus fare: to be confirmed after bus fare is known','Bus orders require full prepaid payment.']:
       pickup?['Pickup from Games Planet. No courier/transport charge.']:
-      ['Courier rate depends on destination PIN, city, weight and payment mode.','Any additional final COD courier difference may be added to the balance due on delivery.']),
-  'Please confirm the final delivery charge before booking.'
+      pendingPostal?['Postal weight exceeds 1kg. No rate has been configured for this weight.','Postage and final total must be confirmed manually before payment or dispatch.','Rural orders are PREPAID only; COD is unavailable.']:
+      isPostal?['Postal postage is included in the amount above and is based on actual packed weight.','Rural postal orders require full prepaid payment.']:
+      o.paymentMode==='cod'?['COD courier charges depend on destination city, weight and COD value.','Final confirmed COD courier difference, if any, may be added to COD balance.']:
+      ['Prepaid courier charges are an estimate for the selected service and destination.']),
+  ...(pendingPostal?['Please confirm postal charge before accepting payment or booking.']:['Please confirm final delivery charge before booking.'])
  ].join('\n');
 }
 function gpzRenderDeliveryEnquiry(alreadyComputed=false){
  const data=gpzEnquiryData(!alreadyComputed);const host=document.getElementById('gpDeliveryEnquiryDetails');if(!host||!data)return;
- const {o,isBus,pickup,destination,entries,cash}=data;
+ const {o,isBus,pickup,isPostal,pendingPostal,destination,entries,cash}=data;
  const activeMode=isBus?'bus':'courier';
  document.querySelectorAll('[data-enquiry-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.enquiryMode===activeMode)));
  const itemLines=o.items.map(i=>'<div>'+gpzEscape(i.name)+' · '+i.quantity+' × '+cash(i.unitPrice)+' = <b>'+cash(i.lineTotal)+'</b></div>').join('');
@@ -1693,15 +1704,18 @@ function gpzRenderDeliveryEnquiry(alreadyComputed=false){
  const locationNote=isBus&&(!o.busDestination)?'<div class="gp-enquiry-warning">बस का Destination चुनें ताकि booking enquiry सही बने।</div>':'';
  const info=isBus?'<div class="gp-enquiry-warning"><b>Bus Fare is NOT included.</b> Games Planet से बस स्टैंड तक ₹40 ही इस ऑर्डर में जुड़ा है। इसके आगे बस ऑपरेटर का वास्तविक किराया ग्राहक अलग देगा। किराया पता चलने पर ही पूरे रास्ते का final total बताया जा सकता है। Bus से भेजने के लिए Prepaid जरूरी है।</div>'
  :pickup?'<div class="gp-enquiry-info">Shop Pickup: delivery charge ₹0 और courier VAS ₹0।</div>'
- :'<div class="gp-enquiry-info"><b>Courier enquiry:</b> यह चुने गए शहर/PIN, courier, weight और payment mode का वर्तमान checkout estimate है। Final courier booking पर रकम बदल सकती है। COD में अंतर होने पर वह डिलीवरी के balance में जुड़ सकता है।</div>';
+ :pendingPostal?'<div class="gp-enquiry-warning"><b>Postal rate pending:</b> Packed parcel exceeds 1kg. Post Office/Speed Post charge has not been confirmed. Product subtotal is NOT the final order total; do not accept payment until postage is confirmed.</div>'
+ :isPostal?'<div class="gp-enquiry-info"><b>Postal delivery:</b> Prepaid only. Postage is calculated from packed weight and included in the total.</div>'
+ :o.paymentMode==='cod'?'<div class="gp-enquiry-info"><b>COD courier:</b> Courier charge depends on city and weight. The confirmed difference may be included in COD balance.</div>'
+ :'<div class="gp-enquiry-info"><b>Prepaid courier:</b> Delivery charge is an estimate until final courier booking.</div>';
  host.innerHTML='<div class="gp-enquiry-info"><b>'+gpzEscape(isBus?'Bus Stand':pickup?'Shop Pickup':'Courier')+' · '+gpzEscape(destination)+'</b><div>'+gpzEscape(o.paymentMode.toUpperCase())+' · '+(pickup?'No transport':isBus?'Shop to Bus Stand':'Courier: '+gpzEscape(o.courier))+'</div></div>'+
  '<div class="gp-enquiry-items"><b>Products:</b>'+itemLines+'</div>'+
  '<div class="gp-enquiry-rows">'+costRows+
- '<span class="gp-enquiry-total">GAMES PLANET TOTAL</span><b class="gp-enquiry-total">'+cash(o.grandTotal)+'</b>'+
- '<span>Pay Now / Advance</span><b>'+cash(o.advanceAmount)+'</b>'+
+ '<span class="gp-enquiry-total">'+(pendingPostal?'FINAL ORDER TOTAL — PENDING POSTAGE':'GAMES PLANET TOTAL')+'</span><b class="gp-enquiry-total">'+(pendingPostal?'To be confirmed':cash(o.grandTotal))+'</b>'+
+ '<span>Pay Now / Advance</span><b>'+(pendingPostal?'Not available — postage pending':cash(o.advanceAmount))+'</b>'+
  (o.paymentMode==='cod'?'<span>Rest on Delivery</span><b>'+cash(o.restAmount)+'</b>':'')+
  '</div>'+locationNote+info+
- '<p class="hint">Courier चुनने पर courier charge दिखेगा; Bus चुनने पर केवल Games Planet से bus stand तक का खर्च और ऑर्डर total दिखेगा।</p>';
+ '<p class="hint">'+(pendingPostal?'Postage for this packed weight is not yet configured. The enquiry may be shared for a rate quote, but not treated as a payable order.':isPostal?'Post Office/Speed Post charges follow packed parcel weight.':'Courier rate is subject to final confirmation; bus fare is paid separately when applicable.')+'</p>';
 }
 function gpzOpenDeliveryEnquiry(){
  gpzRenderDeliveryEnquiry();
