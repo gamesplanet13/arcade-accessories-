@@ -1220,7 +1220,7 @@ img,canvas{
 #products .product:not(.has-variants) .qty span{font-size:14px!important}
 #products .product:not(.has-variants) .product-features,#products .product:not(.has-variants) .product-extra-actions,#products .product:not(.has-variants) .stock-note{grid-column:1/-1!important;margin:3px 0!important}
 #products .product .product-specs{display:none!important}
-</style><style id="compact-features-v5">#products .product:not(.has-variants) .product-title{grid-row:1!important}#products .product:not(.has-variants) .image-row,#products .product:not(.has-variants) .info{grid-row:2!important}#products .product:not(.has-variants) .product-features{grid-row:3!important;font-size:10px!important;padding:5px 7px!important;line-height:1.35!important;border-radius:7px!important}#products .product:not(.has-variants) .product-features>div{padding:1px 0!important;margin:0!important}#products .product:not(.has-variants) .product-extra-actions{grid-row:4!important}#products .product:not(.has-variants) .stock-note{grid-row:5!important;font-size:10px!important;padding:5px 7px!important;margin:3px 0!important}</style></head>
+</style><style id="compact-features-v5">#products .product:not(.has-variants) .product-title{grid-row:1!important}#products .product:not(.has-variants) .image-row,#products .product:not(.has-variants) .info{grid-row:2!important}#products .product:not(.has-variants) .product-features{grid-row:3!important;font-size:10px!important;padding:5px 7px!important;line-height:1.35!important;border-radius:7px!important}#products .product:not(.has-variants) .product-features>div{padding:1px 0!important;margin:0!important}#products .product:not(.has-variants) .product-extra-actions{grid-row:4!important}#products .product:not(.has-variants) .stock-note{grid-row:5!important;font-size:10px!important;padding:5px 7px!important;margin:3px 0!important}</style><style id="gp-tripod-gallery-fix">.gp-tripod-3366 .image-row{grid-column:1 / -1!important;display:flex!important;width:100%!important;overflow-x:auto!important;gap:8px!important}.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:112px!important;height:140px!important;max-width:none!important;min-width:112px!important;object-fit:contain!important;flex:0 0 112px!important}@media(max-width:600px){.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:96px!important;height:120px!important;min-width:96px!important;flex-basis:96px!important}}</style></head>
 
 <body data-shop-page="mobile"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
 
@@ -2003,7 +2003,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
  const showTopGallery=!(p.variants && p.variantImages);
  const imgs=showTopGallery?p.images.map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join(""):"";
  categoryProducts.insertAdjacentHTML('beforeend',`
- <div class="product ${p.variants?'has-variants':''}" data-category="${cat}">
+ <div class="product ${p.variants?'has-variants':''} ${p.name==='3366 Tripod'?'gp-tripod-3366':''}" data-category="${cat}">
   <b class="product-title">${p.name}</b>
   <div class="product-specs">
     <span>📏 Size: <b>${p.sizeLabel || (p.dimensions?.length ? p.dimensions.join(" × ")+" cm" : "Not set")}</b></span>
