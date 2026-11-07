@@ -3,6 +3,7 @@
 const MASTER='https://gamesplanet13.github.io/arcade-accessories-/data/master-products.json';
 const norm=n=>String(n||'').trim().toLowerCase().replace(/[‐‑–—−]/g,'-').replace(/\s+/g,' ');
 let master=null,scheduled=false;
+const normalizeRecords=records=>Object.fromEntries(Object.entries(records||{}).map(([key,value])=>[norm(key),value]));
 function applyToProducts(arr,records){
  if(!Array.isArray(arr))return;
  for(const p of arr){
@@ -26,7 +27,7 @@ function applyToProducts(arr,records){
 }
 function updateBadges(){
  if(!master)return;
- const records=master.records||{};
+ const records=normalizeRecords(master.records);
  const cards=document.querySelectorAll('#products .product, #shopGrid .product-card, #productPageContent .trade-product');
  for(const card of cards){
   const title=card.querySelector('.product-title')||card.querySelector('.product-purchase h1');
@@ -73,7 +74,7 @@ function updateBadges(){
 }
 function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;updateBadges()});}
 const style=document.createElement('style');
-style.textContent='[data-stock-hidden="true"]{display:none!important}.gp-available{display:block!important;width:max-content!important;max-width:100%!important;white-space:nowrap!important;overflow:hidden;text-overflow:clip;min-height:0!important;min-width:0!important;line-height:1.15!important;font-size:9px!important;letter-spacing:0!important;font-weight:400!important;color:#8a919a!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;margin:2px 0 3px!important}.gp-available.gp-no-stock{color:#a32827!important}.gp-variant-stock{display:inline!important;white-space:nowrap!important;font-size:9px!important;font-weight:400!important;color:#8a919a!important;margin:0 0 0 5px!important;padding:0!important}.product-card .gp-available{margin:2px 0 3px!important}.product-purchase .gp-available{margin:3px 0!important}';
+style.textContent='[data-stock-hidden="true"]{display:none!important}.gp-available{display:block!important;width:auto!important;max-width:100%!important;white-space:normal!important;overflow:visible!important;text-overflow:clip;min-height:0!important;min-width:0!important;line-height:1.4!important;font-size:13px!important;letter-spacing:0!important;font-weight:700!important;color:#16804a!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;margin:2px 0 3px!important}.gp-available.gp-no-stock{color:#a32827!important}.gp-variant-stock{display:inline!important;white-space:nowrap!important;font-size:9px!important;font-weight:400!important;color:#8a919a!important;margin:0 0 0 5px!important;padding:0!important}.product-card .gp-available{margin:2px 0 3px!important}.product-purchase .gp-available{margin:3px 0!important}';
 document.head.append(style);
 async function start(){
  try{
@@ -82,7 +83,7 @@ async function start(){
   const json=await res.json();if(!json?.records)throw Error('No master product records');
   master=json;window.GP_MASTER_PRODUCTS=json;
   if(typeof products!=='undefined'&&Array.isArray(products)){
-   applyToProducts(products,json.records);
+   applyToProducts(products,normalizeRecords(json.records));
    if(typeof render==='function')render();
    document.querySelector('#storeSearch')?.dispatchEvent(new Event('input',{bubbles:true}));
   }
