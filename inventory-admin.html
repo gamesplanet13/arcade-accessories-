@@ -20,7 +20,7 @@ footer{color:#738398;text-align:center;font-size:12px;padding:18px}
 <header><h1>GAMES PLANET · Price & Stock Manager</h1><a href="index.html">Storefront</a></header>
 <main>
 <section><h2>Central product control</h2>
-<p>Products start at 999 available units until edited. Change the price, manually adjust stock, record received stock with its date, or record a confirmed sale. Publish changes to the central GitHub file to make them visible to the linked shops.</p>
+<p>Products start at 999 available units until edited. Remove from store hides an item while keeping its record and stock; Restore brings it back. Change the price, manually adjust stock, record received stock with its date, or record a confirmed sale. Publish changes to the central GitHub file to make them visible to the linked shops.</p>
 <div class="cred"><div><label for="token">GitHub fine-grained token (Contents: Read and write for arcade-accessories-)</label><input id="token" type="password" autocomplete="off" placeholder="Only needed to publish changes"></div><button id="load" class="secondary">Load Products</button><button id="save" class="good" disabled>Publish Changes</button></div>
 <p>Your token stays only in this open tab; it is not saved in the product catalog or browser storage. Only the repository owner should publish edits.</p>
 <div id="status" role="status"></div></section>
@@ -52,6 +52,7 @@ function draw(){
   let variants=Object.entries(p.variants||{});
   let row='<div class="itemhead"><div><div class="name">'+esc(p.name)+'</div><div class="subtle">Last stock received: '+esc(p.lastStockInDate||'Not recorded')+' · Qty: '+safeNum(p.lastStockInQty)+'</div></div><span class="badge">Stock: '+safeNum(p.stock??999)+'</span></div>';
   row+='<div class="fields"><div><label>Price ₹</label><input data-field="price" type="number" step="0.01" min="0" value="'+esc(p.price??0)+'"></div><div><label>Available Qty</label><input data-field="stock" type="number" min="0" step="1" value="'+esc(p.stock??999)+'"></div><div><label>Received Date</label><input data-field="date" type="date" value="'+esc(p.lastStockInDate||today())+'"></div><div><label>Stock adjustment Qty</label><div class="controls"><input data-field="qty" type="number" min="1" step="1" value="1"><button data-action="receive" class="good">Stock In</button><button data-action="reduce" class="secondary">Reduce</button><button data-action="sale" class="warn">Sale −</button></div></div></div>';
+  row+='<div class="controls"><button type="button" data-action="visibility" class="secondary">'+(p.hiddenFromStore||p.available===false?'Restore to store':'Remove from store')+'</button></div>';
   for(const [v,info] of variants){
    row+='<div class="variant" data-variant="'+esc(v)+'"><div class="name">↳ '+esc(v)+'</div><div class="fields"><div><label>Variant Price ₹</label><input data-vfield="price" type="number" min="0" step="0.01" value="'+esc(info.price??p.price??0)+'"></div><div><label>Available Qty</label><input data-vfield="stock" type="number" min="0" value="'+esc(info.stock??999)+'"></div><div><label>Received Date</label><input data-vfield="date" type="date" value="'+esc(info.lastStockInDate||today())+'"></div><div><label>Stock adjustment Qty</label><div class="controls"><input data-vfield="qty" type="number" min="1" value="1"><button data-vaction="receive" class="good">Stock In</button><button data-vaction="reduce" class="secondary">Reduce</button><button data-vaction="sale" class="warn">Sale −</button></div></div></div></div>';
   }
@@ -78,6 +79,7 @@ $('productList').addEventListener('input',e=>{
 $('productList').addEventListener('click',e=>{
  const b=e.target.closest('button[data-action],button[data-vaction]');if(!b)return;
  const card=b.closest('[data-sku]'),vrow=b.closest('[data-variant]'),p=data.records[card.dataset.sku];
+ if(b.dataset.action==='visibility'){const hidden=p.hiddenFromStore||p.available===false; if(!confirm((hidden?'Restore ':'Remove ')+p.name+(hidden?' to the store?':' from the store? The record and stock will be kept.')))return; p.hiddenFromStore=!hidden;p.available=hidden;mark(p);draw();return;}
  const target=vrow?p.variants[vrow.dataset.variant]:p,field=vrow?'data-vfield':'data-field',selector='['+field+'="';
  const qty=vrow?.querySelector(selector+'qty"]')?.value||card.querySelector(selector+'qty"]')?.value;
  const date=vrow?.querySelector(selector+'date"]')?.value||card.querySelector(selector+'date"]')?.value||today();
