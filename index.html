@@ -1201,8 +1201,8 @@ img,canvas{
 #products .product .qty,#products .product:not(.has-variants) .qty,#products .product .variant-row .qty{width:124px!important;min-width:124px!important;max-width:124px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;gap:3px!important}
 #products .product .qty input.gp-typed-quantity{appearance:textfield;-moz-appearance:textfield;box-sizing:border-box!important;width:50px!important;min-width:42px!important;max-width:50px!important;height:32px!important;flex:1 1 auto!important;margin:0!important;padding:2px!important;text-align:center;font-size:14px!important;font-weight:800!important;border:1px solid #9ca3af!important;border-radius:8px!important;background:#fff!important;color:#111827!important;line-height:1!important}
 #products .product .qty input.gp-typed-quantity::-webkit-inner-spin-button,#products .product .qty input.gp-typed-quantity::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-#products .product .gp-qty-discount-hint{display:block;margin-top:4px;padding:3px 5px;color:#0f766e;font-size:10px;line-height:1.35;white-space:normal;letter-spacing:0}
-#products .product .gp-qty-discount-hint.is-applied{color:#15803d;font-weight:800}
+#products .product .gp-qty-discount-hint{display:block!important;margin:2px 0!important;padding:0!important;color:#88939f!important;font-size:9px!important;line-height:1.15!important;font-weight:400!important;letter-spacing:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important}
+#products .product .gp-qty-discount-hint.is-applied{color:#88939f!important;font-weight:400!important}
 </style></head>
 
 <body data-shop-page="arcade"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
@@ -1997,20 +1997,12 @@ function quantityDiscountStatus(p,i){
  const rule=QUANTITY_PRICE_RULES[p.name];
  if(!rule)return null;
  const qty=selectedProductQuantity(p,i);
- const rows=(p.variants?.length?p.variants.map(v=>({
-  qty:Number(state['v_'+i+'_'+v]||0),
-  base:Number(p.variantPrices?.[v]??p.price)
- })):[{qty:Number(state[i]||0),base:Number(p.price)}]);
- const hasDiscount=rows.some(row=>Number.isFinite(row.base)&&row.base>Number(rule.price));
- const saving=qty>=rule.min?rows.reduce((sum,row)=>sum+row.qty*Math.max(0,row.base-Number(rule.price)),0):0;
- const applied=qty>=rule.min&&saving>0;
- const bulkPrice='₹'+Number(rule.price).toLocaleString('en-IN')+'/pc';
- let label;
- if(!hasDiscount)label='20+'.replace('20',String(rule.min))+' pcs · No extra discount on listed price';
- else if(applied)label='✓ Quantity discount applied · '+qty+' pcs (from '+rule.min+') · '+bulkPrice+' · Save ₹'+saving.toLocaleString('en-IN');
- else if(qty>=rule.min)label=qty+' pcs (from '+rule.min+') · No extra discount on selected variant';
- else label='Quantity discount from '+rule.min+' pcs · '+bulkPrice;
- return {label,applied,flat:!hasDiscount||(qty>=rule.min&&!saving)};
+ const unit=/wire.*(?:per meter|meter)/i.test(p.name)?'m':'pcs';
+ const rateUnit=unit==='m'?'m':'pc';
+ const price=Math.min(Number(p.price),Number(rule.price));
+ const label=rule.min+'+ '+unit+' · ₹'+Number(price).toLocaleString('en-IN')+'/'+rateUnit;
+ const applied=qty>=rule.min;
+ return {label,applied,flat:true};
 }
 function quantityDiscountHint(p,i){
  const status=quantityDiscountStatus(p,i);
@@ -2112,6 +2104,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
   <div class="info">
    <div>
     <div class="price">${p.priceLabel || ("₹"+p.price)}</div>
+    ${quantityDiscountHint(p,i)}
     <small>${p.weight} g / ${p.packLabel?"pack":"piece"}${p.compatibility?'<br><b>Compatibility:</b> '+p.compatibility:''}</small>
    </div>
    ${p.variants?`<div class="variant-list">${p.variants.map(v=>{const variantImg=p.variantImages?.[v]||p.images?.[0]||"",variantPrice=p.variantPrices?.[v]??p.price;return `<div class="variant-row"><span class="variant-label">${variantImg?`<img class="variant-thumb" src="${variantImg}" loading="lazy" decoding="async" alt="${p.name} ${v}" onclick="openImg('${variantImg}')">`:`<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${colorDots[v]||'#ccc'};border:2px solid #999"></span>`}<span>${v} — ₹${variantPrice}${p.variantWeights?` • ${effectiveUnitWeight(p,v)} g`:""}</span></span><div class="qty"><button onclick="updateVariantQty(${i},'${v}',-1)">−</button><input class="gp-typed-quantity" type="number" inputmode="numeric" min="0" max="99999" step="1" aria-label="Quantity of ${p.name} ${v}" id="vq${i}_${v.replace(/\s+/g,'_')}" value="${state['v_'+i+'_'+v]||0}" onchange="setTypedVariantQuantity(${i},'${v}',this.value)" onkeydown="if(event.key==='Enter')this.blur()"><button onclick="updateVariantQty(${i},'${v}',1)">+</button></div></div>`}).join('')}</div>`:`<div class="qty">
@@ -2120,7 +2113,6 @@ categoryOrder.forEach((cat,categoryIndex)=>{
     <button onclick="updateQty(${i},1)">+</button>
    </div>`}
   </div>
-  ${quantityDiscountHint(p,i)}
  </div>`);
 });
 });
