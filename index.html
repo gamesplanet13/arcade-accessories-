@@ -1203,7 +1203,7 @@ img,canvas{
 #products .product .qty input.gp-typed-quantity::-webkit-inner-spin-button,#products .product .qty input.gp-typed-quantity::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 #products .product .gp-qty-discount-hint{display:block!important;margin:2px 0!important;padding:0!important;color:#88939f!important;font-size:9px!important;line-height:1.15!important;font-weight:400!important;letter-spacing:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important}
 #products .product .gp-qty-discount-hint.is-applied{color:#88939f!important;font-weight:400!important}
-</style></head>
+</style><style id="gp-tripod-gallery-fix">.gp-tripod-3366 .image-row{grid-column:1 / -1!important;display:flex!important;width:100%!important;overflow-x:auto!important;gap:8px!important}.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:112px!important;height:140px!important;max-width:none!important;min-width:112px!important;object-fit:contain!important;flex:0 0 112px!important}@media(max-width:600px){.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:96px!important;height:120px!important;min-width:96px!important;flex-basis:96px!important}}</style></head>
 
 <body data-shop-page="arcade"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
 
@@ -2096,7 +2096,7 @@ categoryOrder.forEach((cat,categoryIndex)=>{
  const showTopGallery=!(p.variants && p.variantImages);
  const imgs=showTopGallery?p.images.map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join(""):"";
  categoryProducts.insertAdjacentHTML('beforeend',`
- <div class="product ${p.variants?'has-variants':''}" data-category="${cat}">
+ <div class="product ${p.variants?'has-variants':''} ${p.name==='3366 Tripod'?'gp-tripod-3366':''}" data-category="${cat}">
   <b class="product-title">${p.name}</b>
   <div class="product-specs">
     <span>📏 Size: <b>${p.sizeLabel || (p.dimensions?.length ? p.dimensions.join(" × ")+" cm" : "Not set")}</b></span>
