@@ -123,6 +123,7 @@ GPShop.prepare=function(products){
   p.features=Array.isArray(p.features)?p.features:[];
   if(!p.features.some(x=>x.includes('Estimated packed parcel')))p.features.push('Estimated packed parcel with included controller, cables and outer box: '+(p.weight/1000).toFixed(2)+' kg; '+p.dimensions.join(' × ')+' cm. Confirm actual parcel size and weight before dispatch.');
  });
+ products.forEach(p=>{if(p.name==='Remote Plate (White Colour)')p.stock=0;});
  products.forEach(p=>{
   const shipping=gpzGamingShippingProfile(p.name);
   if(shipping){p.weight=shipping.weight;p.dimensions=shipping.dimensions;p.shippingWeightVerified=true;
