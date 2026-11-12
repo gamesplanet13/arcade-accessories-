@@ -380,10 +380,10 @@ body.gpz-coupon-checkout #couponCodNotice{display:none!important}
       <span>Products Amount</span><b id="sumProducts">₹0</b>
       <span hidden>Discount Applied</span><b id="sumDiscount">₹0</b>
       <span>Product GST (optional 18%)</span><b id="sumProductGst">₹0</b>
-      <span hidden>Product Weight</span><b id="sumWeight" hidden>0g</b>
+      <span>Product Weight</span><b id="sumWeight">0g</b>
       <span hidden>Packaging Weight</span><b hidden>250g</b>
-      <span hidden>Packed Weight</span><b id="sumPacked" hidden>250g</b>
-      <span hidden>Recommended Box</span><b id="sumBox" hidden>—</b>
+      <span>Estimated Packed Weight</span><b id="sumPacked">250g</b>
+      <span>Estimated Box Size</span><b id="sumBox">—</b>
       <span hidden>Actual Weight</span><b id="sumActual" hidden>0kg</b>
       <span hidden>Volumetric Weight</span><b id="sumVolumetric" hidden>0kg</b>
       <span hidden>Chargeable Weight</span><b id="sumChargeable" hidden>1kg</b>
@@ -1608,7 +1608,11 @@ function computeTotals(){
     if(i.pack) details.push(`Pack: <b>${gpzEscape(i.pack)}</b>`);
     details.push(`Quantity: <b>${i.quantity}</b>`);
     details.push(`Price: ${gpzMoney(i.unitPrice)} × ${i.quantity} = <b>${gpzMoney(i.lineTotal)}</b>`);
-    // Weight and box dimensions stay in calculations and staff-facing order data only.
+    const dims=Array.isArray(i.dimensions)&&i.dimensions.length===3&&i.dimensions.every(x=>Number(x)>0)?i.dimensions.map(Number):null;
+    details.push(`Unit weight: <b>${i.unitWeight>0?gpzEscape(i.unitWeight)+' g':'Not available'}</b>`);
+    details.push(`Weight × ${i.quantity}: <b>${i.unitWeight>0?gpzEscape(i.lineWeight)+' g':'Not available'}</b>`);
+    details.push(`Unit dimensions: <b>${dims?gpzEscape(dims.join(' × '))+' cm':'Not available'}</b>`);
+    if(dims){const volume=dims.reduce((a,b)=>a*b,1);details.push(`Volume × ${i.quantity}: <b>${gpzEscape(Number((volume*i.quantity).toFixed(2)))} cm³</b> (item volume; final box size may differ)`);}
     return `<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${details.join("<br>")}</div>`;
   }).join("");
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:appliedDiscount?"-"+gpzMoney(appliedDiscount):gpzMoney(0),sumProductGst:(m88Offer&&invoiceIncluded?'Included: ':'')+gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",
