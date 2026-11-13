@@ -86,6 +86,24 @@ function gpzGamingShippingProfile(name,variant=''){
 }
 const prepare=GPShop.prepare;
 GPShop.prepare=function(products){
+ // Separate 28mm 5V LED model: do not overwrite the existing BAO LIAN ₹46 button.
+ if(!products.some(p=>p.name==='28mm Imported LED Illuminated Arcade Push Button')){
+  const f='images/led-buttons/';
+  products.push({
+   name:'28mm Imported LED Illuminated Arcade Push Button',
+   category:'Arcade Box Accessories',
+   price:160,weight:22,dimensions:[4,4,4],
+   sizeLabel:'28mm',stock:999,available:true,arcadePushButton:true,
+   variants:['Blue','Red','Green'],variantPrices:{Blue:160,Red:160,Green:160},
+   variantStocks:{Blue:999,Red:999,Green:999},
+   variantWeights:{Blue:22,Red:22,Green:22},
+   variantImages:{Blue:f+'led-arcade-blue-option.svg',Red:f+'led-arcade-red-option.svg',Green:f+'led-arcade-green-option.svg'},
+   images:[f+'led-arcade-panel-preview.svg',f+'led-arcade-blue-option.svg',f+'led-arcade-red-option.svg',f+'led-arcade-green-option.svg'],
+   subtitle:'28mm • 5V DC LED • Blue / Red / Green • Black fitting ring',
+   features:['28mm transparent imported LED arcade push button','5V DC LED supply','Four metal terminals (LED + switch)','Microswitch contact','Black locking nut included','Weight: 22 g per button','Dimensions: 4 × 4 × 4 cm (same as standard push button)','Large arcade panel preview and colour selection below'],
+   technicalTable:[['Button size','28mm'],['LED power','5V DC'],['Switch','Microswitch'],['Terminals','4'],['Body','Transparent plastic'],['Mounting','Threaded body with black fitting ring'],['Unit weight','22g'],['Dimensions','4 × 4 × 4 cm']]
+  });
+ }
  prepare(products);
  // Keep archival H60/H54 data in the source and master database, not in customer listings.
  const gpBtnImg=name=>'images/approved/'+name+'.jpg';
