@@ -1076,5 +1076,13 @@ window.GPZ_PRODUCT_CATALOG = [
 
 window.GPZ_PRODUCT_CATALOG.push(...[{"name": "3 Pin Multi-Slot AC Adapter", "price": 30, "weight": 50, "size": "5 × 5 × 5 cm"}, {"name": "Ansol Aluminium Soldering Flux", "price": 120, "weight": 150, "size": "6 × 6 × 6 cm"}]);
 
+// 28mm imported illuminated arcade button; 5V LED, 22g per unit.
+for(const colour of ['Blue','Red','Green']){
+ const name='28mm Imported LED Illuminated Arcade Push Button - '+colour;
+ if(!window.GPZ_PRODUCT_CATALOG.some(p=>p.name===name)){
+  window.GPZ_PRODUCT_CATALOG.push({name,price:160,weight:22,size:'4 × 4 × 4 cm'});
+ }
+}
+
 // Archival products remain in this source file, but must not enter customer order selections.
 window.GPZ_PRODUCT_CATALOG=window.GPZ_PRODUCT_CATALOG.filter(p=>p.hiddenFromStore!==true&&p.available!==false&&p.stock!==0);
