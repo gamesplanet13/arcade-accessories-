@@ -1203,7 +1203,8 @@ img,canvas{
 #products .product .qty input.gp-typed-quantity::-webkit-inner-spin-button,#products .product .qty input.gp-typed-quantity::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 #products .product .gp-qty-discount-hint{display:block!important;margin:2px 0!important;padding:0!important;color:#88939f!important;font-size:9px!important;line-height:1.15!important;font-weight:400!important;letter-spacing:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important}
 #products .product .gp-qty-discount-hint.is-applied{color:#88939f!important;font-weight:400!important}
-</style><style id="gp-tripod-gallery-fix">.gp-tripod-3366 .image-row{grid-column:1 / -1!important;display:flex!important;width:100%!important;overflow-x:auto!important;gap:8px!important}.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:112px!important;height:140px!important;max-width:none!important;min-width:112px!important;object-fit:contain!important;flex:0 0 112px!important}@media(max-width:600px){.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:96px!important;height:120px!important;min-width:96px!important;flex-basis:96px!important}}</style></head>
+</style><style id="gp-tripod-gallery-fix">.gp-tripod-3366 .image-row{grid-column:1 / -1!important;display:flex!important;width:100%!important;overflow-x:auto!important;gap:8px!important}.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:112px!important;height:140px!important;max-width:none!important;min-width:112px!important;object-fit:contain!important;flex:0 0 112px!important}@media(max-width:600px){.gp-tripod-3366 .image-row img,.gp-tripod-3366 .image-row.multi-image img{width:96px!important;height:120px!important;min-width:96px!important;flex-basis:96px!important}}</style><style id="gp-led-arcade-hero">.led-arcade-product .image-row{display:block;max-width:780px;margin:10px auto}.led-arcade-product .image-row img,.led-arcade-product .image-row.multi-image img{display:block;width:100%;height:auto;aspect-ratio:1200/760;object-fit:contain;border-radius:14px}.led-arcade-product .info{display:flex;flex-direction:column;align-items:stretch;gap:9px}.led-arcade-product .variant-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%}.led-arcade-product .variant-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid #64748b55}.led-arcade-product .variant-label{display:flex;flex-direction:column;text-align:center;gap:4px;font-size:12px}.led-arcade-product .variant-thumb{width:56px;height:56px;flex-basis:auto}.led-arcade-product .qty{width:100%!important;max-width:118px!important}.led-arcade-product .product-specs{display:flex!important}.led-arcade-product .product-features{font-size:12px}@media(max-width:450px){.led-arcade-product .variant-list{gap:4px}.led-arcade-product .variant-row{padding:5px 1px}.led-arcade-product .variant-thumb{width:46px;height:46px}}</style>
+</head>
 
 <body data-shop-page="arcade"><div style="padding:9px 16px;text-align:right;background:#132333;color:#fff"><a style="color:#fff;text-decoration:none" href="index.html">Classic View / New Website ↔</a></div>
 
@@ -2093,10 +2094,11 @@ categoryOrder.forEach((cat,categoryIndex)=>{
  const i=products.indexOf(p);
  if(state[i]===undefined) state[i]=0;
 
- const showTopGallery=!(p.variants && p.variantImages);
- const imgs=showTopGallery?p.images.map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join(""):"";
+ const isLed28=p.name==='28mm Imported LED Illuminated Arcade Push Button';
+ const showTopGallery=isLed28||!(p.variants && p.variantImages);
+ const imgs=showTopGallery?(isLed28?p.images.slice(0,1):p.images).map((img,imageIndex)=>`<img src="${img}" loading="lazy" decoding="async" alt="${p.name} — view ${imageIndex+1}" onclick="openImg('${img}')">`).join(""):"";
  categoryProducts.insertAdjacentHTML('beforeend',`
- <div class="product ${p.variants?'has-variants':''} ${p.name==='3366 Tripod'?'gp-tripod-3366':''}" data-category="${cat}">
+ <div class="product ${p.variants?'has-variants':''} ${isLed28?'led-arcade-product':''} ${p.name==='3366 Tripod'?'gp-tripod-3366':''}" data-category="${cat}">
   <b class="product-title">${p.name}</b>
   <div class="product-specs">
     <span>📏 Size: <b>${p.sizeLabel || (p.dimensions?.length ? p.dimensions.join(" × ")+" cm" : "Not set")}</b></span>
