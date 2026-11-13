@@ -98,7 +98,8 @@ GPShop.prepare=function(products){
    variantStocks:{Blue:999,Red:999,Green:999},
    variantWeights:{Blue:22,Red:22,Green:22},
    variantImages:{Blue:f+'led-arcade-blue-option.svg',Red:f+'led-arcade-red-option.svg',Green:f+'led-arcade-green-option.svg'},
-   images:[f+'led-arcade-panel-preview.svg',f+'led-arcade-blue-option.svg',f+'led-arcade-red-option.svg',f+'led-arcade-green-option.svg'],
+   images:[f+'led-arcade-panel-preview.svg',f+'28mm-led-blue-original-views.svg',f+'28mm-led-red-original-views.svg',f+'28mm-led-green-original-views.svg'],
+   ledViews:{Blue:f+'28mm-led-blue-original-views.svg',Red:f+'28mm-led-red-original-views.svg',Green:f+'28mm-led-green-original-views.svg'},
    subtitle:'28mm • 5V DC LED • Blue / Red / Green • Black fitting ring',
    features:['28mm transparent imported LED arcade push button','5V DC LED supply','Four metal terminals (LED + switch)','Microswitch contact','Black locking nut included','Weight: 22 g per button','Dimensions: 4 × 4 × 4 cm (same as standard push button)','Large arcade panel preview and colour selection below'],
    technicalTable:[['Button size','28mm'],['LED power','5V DC'],['Switch','Microswitch'],['Terminals','4'],['Body','Transparent plastic'],['Mounting','Threaded body with black fitting ring'],['Unit weight','22g'],['Dimensions','4 × 4 × 4 cm']]
