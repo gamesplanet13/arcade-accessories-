@@ -105,3 +105,23 @@ body #products{scroll-margin-top:10px}
  body #products{padding-top:0!important;margin-top:0!important}
  body .gp-category-nav + #products{margin-top:0!important}
 }
+
+
+/* Keep the LED product's main photo full-width in the compact catalogue. */
+html body #products#products .product.led-arcade-product .image-row[data-gp-gallery]{
+ display:block!important;
+ width:100%!important;
+ max-width:480px!important;
+ padding:0!important;
+ margin:8px auto!important;
+}
+html body #products#products .product.led-arcade-product .image-row[data-gp-gallery] img{
+ display:block!important;
+ width:100%!important;
+ height:auto!important;
+ max-width:100%!important;
+ aspect-ratio:3 / 2!important;
+ object-fit:contain!important;
+ background:#fff;
+ border-radius:10px!important;
+}

@@ -96,6 +96,39 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
  });
 })();
 
-;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261028-swipe';document.head.append(s);})();
+/* Show the 28mm LED button photo in both storefront views. */
+(function(){
+ const button=products.find(product=>product.variantPhotos);
+ if(!button)return;
+
+ document.querySelectorAll('#products .product').forEach(card=>{
+  const title=card.querySelector('.product-title');
+  if(title?.textContent.trim()!==button.name)return;
+  card.classList.add('led-arcade-product');
+  let hero=card.querySelector('.image-row');
+  if(!hero){
+   hero=document.createElement('div');
+   hero.className='image-row';
+   (card.querySelector('.product-specs')||title).after(hero);
+  }
+  hero.classList.remove('multi-image');
+  hero.dataset.gpGallery=JSON.stringify(button.images);
+  const photo=document.createElement('img');
+  photo.src=button.images[0];
+  photo.alt=button.name+' — '+button.variants[0];
+  photo.loading='lazy';
+  photo.decoding='async';
+  photo.onclick=()=>window.openImg?.(photo.src);
+  hero.replaceChildren(photo);
+
+  const colorByPhoto=new Map(button.variants.map(color=>[button.variantImages[color],color]));
+  card.querySelectorAll('img.variant-thumb').forEach(thumb=>{
+   const color=colorByPhoto.get(thumb.getAttribute('src'));
+   if(color)thumb.dataset.gpGallery=JSON.stringify(button.variantPhotos[color]);
+  });
+ });
+})();
+
+;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261115-led-photos';document.head.append(s);})();
 
 ;(function(){const style=document.createElement('style');style.textContent='#products#products .product .product-specs{display:flex!important}';document.head.appendChild(style)})();
