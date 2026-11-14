@@ -104,7 +104,12 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
  document.querySelectorAll('#products .product').forEach(card=>{
   const title=card.querySelector('.product-title');
   if(title?.textContent.trim()!==button.name)return;
+  const importedButton = [...card.parentElement.children].find(product =>
+   product.querySelector('.product-title')?.textContent.trim()==='BAO LIAN Imported Arcade Push Button'
+  );
+  if(importedButton)importedButton.after(card);
   card.classList.add('led-arcade-product');
+  card.id='led-arcade-push-button';
   let hero=card.querySelector('.image-row');
   if(!hero){
    hero=document.createElement('div');
@@ -113,13 +118,16 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
   }
   hero.classList.remove('multi-image');
   hero.dataset.gpGallery=JSON.stringify(button.images);
-  const photo=document.createElement('img');
-  photo.src=button.images[0];
-  photo.alt=button.name+' — '+button.variants[0];
-  photo.loading='lazy';
-  photo.decoding='async';
-  photo.onclick=()=>window.openImg?.(photo.src);
-  hero.replaceChildren(photo);
+  const photos=button.variants.map(color=>{
+   const photo=document.createElement('img');
+   photo.src=button.variantImages[color];
+   photo.alt=button.name+' — '+color;
+   photo.loading='lazy';
+   photo.decoding='async';
+   photo.onclick=()=>window.openImg?.(photo.src);
+   return photo;
+  });
+  hero.replaceChildren(...photos);
 
   const colorByPhoto=new Map(button.variants.map(color=>[button.variantImages[color],color]));
   card.querySelectorAll('img.variant-thumb').forEach(thumb=>{

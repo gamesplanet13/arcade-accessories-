@@ -107,11 +107,17 @@ body #products{scroll-margin-top:10px}
 }
 
 
-/* Keep the LED product's main photo full-width in the compact catalogue. */
+/* Keep the three LED colors visible in the catalogue. */
+html body #products#products .category-products > .product.led-arcade-product{
+ grid-column:1 / -1!important;
+ scroll-margin-top:16px;
+}
 html body #products#products .product.led-arcade-product .image-row[data-gp-gallery]{
- display:block!important;
+ display:grid!important;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:6px!important;
  width:100%!important;
- max-width:480px!important;
+ max-width:780px!important;
  padding:0!important;
  margin:8px auto!important;
 }
@@ -123,5 +129,5 @@ html body #products#products .product.led-arcade-product .image-row[data-gp-gall
  aspect-ratio:3 / 2!important;
  object-fit:contain!important;
  background:#fff;
- border-radius:10px!important;
+ border-radius:8px!important;
 }
