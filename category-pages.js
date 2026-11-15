@@ -162,7 +162,7 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
   const width=row.scrollWidth;
   if(width>row.clientWidth){
    const size=parseFloat(getComputedStyle(row).fontSize);
-   row.style.setProperty('--spec-fit',size*(row.clientWidth-2)/width+'px');
+   row.style.setProperty('--spec-fit',size*(row.clientWidth-5)/width+'px');
   }
  };
  const trackSize=new ResizeObserver(entries=>{
@@ -176,6 +176,11 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
  catalog.querySelectorAll('.product').forEach(card=>{
   const specs=card.querySelector(':scope > .product-specs');
   if(specs){
+   const pack=specs.querySelector(':scope > span:nth-child(3):not(.gp-available)');
+   if(pack){
+    pack.classList.add('gp-product-pack');
+    specs.after(pack);
+   }
    trackSize.observe(specs);
    trackText.observe(specs,{childList:true,subtree:true});
   }
