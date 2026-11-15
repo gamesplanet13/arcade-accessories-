@@ -150,6 +150,60 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
  });
 })();
 
-;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261115-led-photos';document.head.append(s);})();
+/* Keep all product photos visible and fit the details to the card width. */
+(function(){
+ const catalog=document.getElementById('products');
+ catalog.classList.add('gp-responsive-catalog');
+ const byName=new Map(products.map(product=>[product.name,product]));
+
+ const fitSpecs=row=>{
+  if(!row.clientWidth)return;
+  row.style.removeProperty('--spec-fit');
+  const width=row.scrollWidth;
+  if(width>row.clientWidth){
+   const size=parseFloat(getComputedStyle(row).fontSize);
+   row.style.setProperty('--spec-fit',size*(row.clientWidth-2)/width+'px');
+  }
+ };
+ const trackSize=new ResizeObserver(entries=>{
+  entries.forEach(({target})=>fitSpecs(target));
+ });
+ const trackText=new MutationObserver(records=>{
+  const rows=new Set(records.map(({target})=>target.closest('.product-specs')));
+  rows.forEach(fitSpecs);
+ });
+
+ catalog.querySelectorAll('.product').forEach(card=>{
+  const specs=card.querySelector(':scope > .product-specs');
+  if(specs){
+   trackSize.observe(specs);
+   trackText.observe(specs,{childList:true,subtree:true});
+  }
+  const title=card.querySelector('.product-title');
+  const product=byName.get(title?.textContent.trim());
+  if(!product?.variantImages||card.classList.contains('led-arcade-product'))return;
+  let row=card.querySelector(':scope > .image-row');
+  if(!row){
+   row=document.createElement('div');
+   row.className='image-row';
+   (specs||title).after(row);
+  }
+  const existing=new Set([...row.querySelectorAll('img')].map(image=>image.getAttribute('src')));
+  for(const color of product.variants||[]){
+   const src=product.variantImages[color];
+   if(!src||existing.has(src)||product.unavailableVariants?.includes(color)||product.variantStocks?.[color]===0)continue;
+   const photo=document.createElement('img');
+   photo.src=src;
+   photo.alt=product.name+' — '+color;
+   photo.loading='lazy';
+   photo.decoding='async';
+   photo.onclick=()=>window.openImg?.(photo.src);
+   row.append(photo);
+   existing.add(src);
+  }
+ });
+})();
+
+;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261115-product-photos';document.head.append(s);})();
 
 ;(function(){const style=document.createElement('style');style.textContent='#products#products .product .product-specs{display:flex!important}';document.head.appendChild(style)})();

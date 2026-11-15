@@ -38,17 +38,20 @@ function updateBadges(){
   const count=m?Math.max(0,Number(m.stock??999)):Math.max(0,Number(p?.stock??999));
   const unavailable=(m?.hiddenFromStore===true||m?.available===false||count===0||p?.hiddenFromStore===true||p?.available===false);
   card.hidden=unavailable;card.dataset.stockHidden=String(unavailable);
-  let tag=card.querySelector(':scope > .gp-available')||card.querySelector('.product-purchase > .gp-available');
+  const specs=card.closest('#products.gp-responsive-catalog')?card.querySelector(':scope > .product-specs'):null;
+  let tag=specs?.querySelector('.gp-available')||card.querySelector(':scope > .gp-available')||card.querySelector('.product-purchase > .gp-available');
   if(unavailable){
    if(tag)tag.remove();
    continue;
   }
   if(!tag){
-   tag=document.createElement('div');tag.className='gp-available';
-   if(card.classList.contains('trade-product'))(card.querySelector('.product-purchase')||card).prepend(tag);
+   tag=document.createElement(specs?'span':'div');tag.className='gp-available';
+   if(specs)specs.append(tag);
+   else if(card.classList.contains('trade-product'))(card.querySelector('.product-purchase')||card).prepend(tag);
    else title?.after(tag);
   }
-  if(tag){const label='Available Stock: '+count;if(tag.textContent!==label)tag.textContent=label;}
+  if(specs&&tag.parentElement!==specs)specs.append(tag);
+  const label='Available Stock: '+count;if(tag.textContent!==label)tag.textContent=label;
   if(m&&card.querySelector('.variant-list')){
    const rows=[...card.querySelectorAll('.variant-list .variant-row')];
    for(const [i,row] of rows.entries()){

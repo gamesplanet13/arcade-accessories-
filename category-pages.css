@@ -177,3 +177,90 @@ html body #products#products .product:not(.has-variants).arcade-crimp-socket > .
 html body #products#products .product:not(.has-variants).arcade-crimp-socket > .product-specs{
  grid-area:5 / 1 / auto / -1!important;
 }
+
+
+/* One product per row on phones, with more columns when space is available. */
+html body #products#products.gp-responsive-catalog{
+ max-width:1520px;
+}
+html body #products#products.gp-responsive-catalog .is-open > .category-products{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:10px!important;
+ align-items:start;
+}
+@media(min-width:680px){
+ html body #products#products.gp-responsive-catalog .is-open > .category-products{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+}
+@media(min-width:1010px){
+ html body #products#products.gp-responsive-catalog .is-open > .category-products{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ }
+}
+@media(min-width:1360px){
+ html body #products#products.gp-responsive-catalog .is-open > .category-products{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ }
+}
+
+html body #products#products.gp-responsive-catalog .category-products > .product{
+ display:flex!important;
+ flex-direction:column;
+ align-items:stretch!important;
+ gap:8px!important;
+ grid-column:auto!important;
+ min-width:0;
+ container-type:inline-size;
+}
+html body #products#products.gp-responsive-catalog .category-products > .product[hidden]{
+ display:none!important;
+}
+html body #products#products.gp-responsive-catalog .product > .product-title{order:-4}
+html body #products#products.gp-responsive-catalog .product > .image-row{order:-3}
+html body #products#products.gp-responsive-catalog .product:not(.has-variants) > .info{order:-2}
+html body #products#products.gp-responsive-catalog .product > .product-specs{
+ order:-1;
+ flex-wrap:nowrap!important;
+ align-items:center;
+ gap:.35em!important;
+ min-width:0;
+ margin:0!important;
+ font-size:var(--spec-fit,clamp(7px,2.9cqi,14px))!important;
+}
+html body #products#products.gp-responsive-catalog .product > .product-specs > span{
+ flex:0 0 auto;
+ display:inline-block!important;
+ max-width:none!important;
+ min-width:0!important;
+ margin:0!important;
+ padding:.32em .43em!important;
+ border:1px solid #879ab44d!important;
+ border-radius:6px!important;
+ background:#879ab419!important;
+ color:inherit!important;
+ font:inherit!important;
+ line-height:1.25!important;
+ white-space:nowrap!important;
+}
+html body #products#products.gp-responsive-catalog .product:not(.led-arcade-product) > .image-row{
+ display:flex!important;
+ flex-wrap:wrap!important;
+ align-items:flex-start!important;
+ gap:6px!important;
+ width:100%!important;
+ padding:0!important;
+ margin:0!important;
+ overflow:visible!important;
+}
+html body #products#products.gp-responsive-catalog .product:not(.led-arcade-product):not(.arcade-crimp-socket) > .image-row img{
+ width:clamp(78px,29cqi,150px)!important;
+ height:clamp(78px,29cqi,150px)!important;
+ flex:none!important;
+ min-width:0!important;
+ max-width:100%!important;
+ object-fit:contain!important;
+ border-radius:8px!important;
+ cursor:pointer;
+}
