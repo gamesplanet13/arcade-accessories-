@@ -91,7 +91,7 @@ GPShop.prepare=function(products){
   const variants=['Blue','Red','Green'];
   const variantPhotos=Object.fromEntries(variants.map(color=>{
    const base='images/led-buttons/28mm-led-'+color.toLowerCase();
-   return [color,[base+'-closeup.webp',base+'-angles.webp']];
+   return [color,[base+'-closeup.webp',base+'-angles.webp',base+'-handheld.webp']];
   }));
   const variantImages=Object.fromEntries(variants.map(color=>[color,variantPhotos[color][0]]));
   products.push({
@@ -103,6 +103,7 @@ GPShop.prepare=function(products){
    variantStocks:{Blue:999,Red:999,Green:999},
    variantWeights:{Blue:22,Red:22,Green:22},
    variantImages,variantPhotos,
+   panelPhoto:'images/led-buttons/28mm-led-arcade-preview.webp',
    images:variants.flatMap(color=>variantPhotos[color]),
    subtitle:'28mm • 5V DC • 4 female sockets included • Blue / Red / Green',
    features:['28mm transparent imported LED arcade push button','5V DC LED supply','Four metal terminals (LED + switch)','Microswitch contact','Black locking nut included','Four female crimp sockets included with each button','Weight: 22 g per button','Dimensions: 4 × 4 × 4 cm (same as standard push button)'],
@@ -114,7 +115,7 @@ GPShop.prepare=function(products){
    name:'Female Push Button Crimp Socket — Pack of 10',
    category:'Arcade Box Accessories',price:20,weight:0,dimensions:[],
    stock:999,available:true,packLabel:'Pack of 10',sizeLabel:'Female spade connector',
-   images:['images/led-buttons/female-crimp-socket-views.svg'],
+   images:['images/led-buttons/female-crimp-socket-photo.webp'],
    features:['10 female crimp terminals per pack','For arcade push button spade connections','Two sides of the same socket shown','₹2 per socket; pack price ₹20','Included quantity with the 28mm 5V LED button: 4 sockets (no extra charge)']
   });
  }

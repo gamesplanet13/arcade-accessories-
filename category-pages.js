@@ -98,12 +98,26 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
 
 /* Show the 28mm LED button photo in both storefront views. */
 (function(){
- const button=products.find(product=>product.variantPhotos);
+ const button=products.find(product=>product.panelPhoto);
  if(!button)return;
+
+ const rowLabels=['close-up','multi-angle view','in-hand views'];
+ const photoRows=rowLabels.flatMap((label,index)=>button.variants.map(color=>({
+  src:button.variantPhotos[color][index],
+  alt:color+' LED button — '+label
+ })));
+ const photos=[{src:button.panelPhoto,alt:'Blue, red and green LED buttons fitted to an arcade panel'},...photoRows];
+ const socketName='Female Push Button Crimp Socket — Pack of 10';
 
  document.querySelectorAll('#products .product').forEach(card=>{
   const title=card.querySelector('.product-title');
-  if(title?.textContent.trim()!==button.name)return;
+  const name=title?.textContent.trim();
+  if(name===socketName){
+   card.classList.add('arcade-crimp-socket');
+   card.id='arcade-crimp-socket';
+   return;
+  }
+  if(name!==button.name)return;
   const importedButton = [...card.parentElement.children].find(product =>
    product.querySelector('.product-title')?.textContent.trim()==='BAO LIAN Imported Arcade Push Button'
   );
@@ -117,17 +131,16 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
    (card.querySelector('.product-specs')||title).after(hero);
   }
   hero.classList.remove('multi-image');
-  hero.dataset.gpGallery=JSON.stringify(button.images);
-  const photos=button.variants.map(color=>{
+  hero.dataset.gpGallery=JSON.stringify(photos.map(photo=>photo.src));
+  hero.replaceChildren(...photos.map(({src,alt})=>{
    const photo=document.createElement('img');
-   photo.src=button.variantImages[color];
-   photo.alt=button.name+' — '+color;
+   photo.src=src;
+   photo.alt=alt;
    photo.loading='lazy';
    photo.decoding='async';
    photo.onclick=()=>window.openImg?.(photo.src);
    return photo;
-  });
-  hero.replaceChildren(...photos);
+  }));
 
   const colorByPhoto=new Map(button.variants.map(color=>[button.variantImages[color],color]));
   card.querySelectorAll('img.variant-thumb').forEach(thumb=>{

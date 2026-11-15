@@ -131,3 +131,40 @@ html body #products#products .product.led-arcade-product .image-row[data-gp-gall
  background:#fff;
  border-radius:8px!important;
 }
+
+html body #products#products .product.led-arcade-product .image-row[data-gp-gallery] img:first-child{
+ grid-column:1 / -1;
+ aspect-ratio:4 / 3!important;
+}
+html body #products#products .product.led-arcade-product .image-row[data-gp-gallery] img:nth-child(n+5){
+ aspect-ratio:1 / 1!important;
+}
+html body #products#products .product:not(.has-variants) > .gp-available{
+ grid-column:1 / -1!important;
+ grid-row:10!important;
+}
+html body #products#products .product:not(.has-variants).arcade-crimp-socket > .image-row{
+ grid-column:1 / -1!important;
+ grid-row:3!important;
+ width:100%!important;
+ max-width:340px!important;
+ justify-self:center;
+}
+html body #products#products .product:not(.has-variants).arcade-crimp-socket > .image-row img{
+ width:100%!important;
+ height:auto!important;
+ flex:0 0 100%!important;
+ aspect-ratio:3 / 2;
+ object-fit:contain!important;
+ background:#fff;
+}
+html body #products#products .product:not(.has-variants).arcade-crimp-socket > .info{
+ grid-column:1 / -1!important;
+ grid-row:2!important;
+}
+html body #products#products .product:not(.has-variants).arcade-crimp-socket > .product-features{
+ grid-area:4 / 1 / auto / -1!important;
+}
+html body #products#products .product:not(.has-variants).arcade-crimp-socket > .product-specs{
+ grid-area:5 / 1 / auto / -1!important;
+}
