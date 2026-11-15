@@ -139,9 +139,18 @@ html body #products#products .product.led-arcade-product .image-row[data-gp-gall
 html body #products#products .product.led-arcade-product .image-row[data-gp-gallery] img:nth-child(n+5){
  aspect-ratio:1 / 1!important;
 }
-html body #products#products .product:not(.has-variants) > .gp-available{
+/* Keep stock and specs on full-width rows without reserving empty rows. */
+html body #products#products .product:not(.has-variants) > :is(.gp-available,.product-specs){
  grid-column:1 / -1!important;
- grid-row:10!important;
+ grid-row:auto!important;
+}
+html body #products#products .product:not(.has-variants) > .product-specs{
+ min-width:0;
+ margin:0!important;
+ gap:4px 6px!important;
+}
+html body #products#products .product:not(.has-variants) > .product-specs span{
+ white-space:nowrap;
 }
 html body #products#products .product:not(.has-variants).arcade-crimp-socket > .image-row{
  grid-column:1 / -1!important;
