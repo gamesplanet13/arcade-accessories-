@@ -55,6 +55,7 @@ window.GPShop={pages,group,recentProducts,prepare(products){
   if(window.GP_CPU_IMAGES?.[p.name])p.images=[GP_CPU_IMAGES[p.name]];
   if(/^(Cabinet \+ SMPS|Zebronics Basic Cabinet \+ SMPS)$/.test(p.name)){p.name='Cabinet with SMPS';p.price=1390;p.features=['Cabinet ₹690 + SMPS ₹700'];}
   if(p.customType==='cpu'){p.price=7810;p.priceLabel='From ₹7,810';}
+  p.cpuAddonOnly=p.category==='Computer Parts & Services'&&/\b(?:assembl(?:e|ing|y)|windows (?:setup|install(?:ation)?)|games? (?:setup|load(?:ing)?|install(?:ation)?))\b/i.test(p.name);
   p.shopPage=group(p);if(p.shopPage==='gamebox')p.category='Game Stick, Game Box & Handheld Consoles';
  });
  // These cables fit several consoles; keep one product and one cart identity.

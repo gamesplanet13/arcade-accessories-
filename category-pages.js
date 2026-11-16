@@ -1,11 +1,21 @@
 (function(){'use strict';
 const modern=location.pathname.split('/').pop().startsWith('new'),prefix=modern?'new-':'';
-const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const newView=view==='new';const label=newView?'New Arrivals':allView?'Arcade Accessories':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
+const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&view!=='new'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const newView=view==='new';const label=newView?'New Arrivals':allView?'Arcade Accessories':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
 // PS2 Accessories must remain in this store. PS2 consoles use the separate Buy PS2 link.
 sessionStorage.setItem('gp_store_view',modern?'new.html':'index.html');sessionStorage.setItem('gp_category_page',page);
 const href=slug=>(['arcade-box','consoles'].includes(slug)?slug+'.html':prefix+slug+'.html')+(slug==='arcade'?'?view=category':'');
 const allHref=prefix+'arcade.html?view=all';
-const links=()=>`<a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''} style="background:#0e7490;color:white;font-weight:900">🆕 New Products / नए प्रोडक्ट</a>`+`<a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`+GPShop.pages.map(([slug,title])=>`<a href="${href(slug)}" ${slug===page?'aria-current="page"':''}>${title}</a>`).join('');
+const overviewPages=[
+ ['arcade','Arcade Accessories'],['ps2','PS2 Accessories'],['ps3','PS3 Accessories'],
+ ['pc','PC Accessories'],['electrical','Electrical Items'],['cables','Cables'],
+ ['batteries','Batteries & Chargers'],
+ ...GPShop.pages.filter(([slug])=>!['arcade','ps2','ps3','cpu','electrical','cables','batteries'].includes(slug))
+];
+const overviewHref=slug=>allHref+'#gp-category-'+slug;
+const links=()=>overviewPages.map(([slug,title])=>{
+ const url=allView?'#gp-category-'+slug:slug==='pc'?overviewHref(slug):href(slug);
+ return `<a href="${url}" ${!allView&&slug===page?'aria-current="page"':''}>${title}</a>`;
+}).join('')+`<a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''}>New Products</a><a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`;
 const nav=document.createElement('section');nav.className='gp-category-nav';nav.innerHTML=`<div class="gp-page-tools gp-compact-tools"><button type="button" id="gpCart">Cart & Checkout</button><a href="${prefix}arcade.html?view=new">New Arrivals</a></div><h1>${label}</h1><nav class="gp-category-links" aria-label="Product categories">${links()}</nav>`;
 const catalog=document.getElementById('products');catalog.before(nav);
 
@@ -20,7 +30,99 @@ function categoryProductAllowed(p){
  if(page==='ps3')return p.category==='PS3';
  return true;
 }
-function apply(){let count=0;const q=search?.value.toLowerCase().trim()||'';document.querySelectorAll('#products .category-panel').forEach(panel=>{let visible=0;panel.classList.add('is-open');if(allView){const toggle=panel.querySelector('.category-toggle');if(toggle){toggle.onclick=e=>{e.preventDefault();panel.classList.add('is-open');};toggle.setAttribute('aria-expanded','true');}}panel.querySelectorAll('.product').forEach(card=>{const title=card.querySelector('.product-title');const name=card.dataset.productName||(title?.textContent||'');card.dataset.productName=name;const p=products.find(x=>x.name===name);const arcadeExcluded=p&&(allView||page==='arcade')&&(/xbox/i.test(p.name)||(/turbo/i.test(p.name)&&/controller|gamepad/i.test(p.name)));const ok=p&&!p.includedOnly&&!p.hiddenFromStore&&p.available!==false&&p.stock!==0&&(typeof GPStock==='undefined'||GPStock.allowed(p.name))&&(newView||!arcadeExcluded)&&!(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name))&&p.name!=='Zippy Coin Drop Switch'&&!p.aliasOf&&(newView?p.isNew:allView?!['cpu','gamebox','arcade-box','ps2','ps3','ps4','ps5','consoles','mobile','coolers'].includes(p.shopPage):categoryProductAllowed(p))&&(!q||card.textContent.toLowerCase().includes(q));card.hidden=!ok;card.style.display=ok?'':'none';if(p?.isNew){card.dataset.newProduct='true';if(!card.querySelector('.gp-new-badge')){const badge=document.createElement('span');badge.className='gp-new-badge';badge.textContent='🆕 NEW';badge.style.cssText='display:inline-block;background:#0e7490;color:#fff;padding:3px 7px;border-radius:6px;font-weight:bold;margin-bottom:4px';card.querySelector('.product-title')?.prepend(badge);}}if(ok)visible++});panel.hidden=!visible;panel.style.display=visible?'':'none';count+=visible});const empty=document.getElementById('storeEmpty');if(empty)empty.style.display=count?'none':'block';const ct=document.getElementById('storeCount');if(ct)ct.textContent=count+' products';document.title=label+' | GAMES PLANET';}
+function overviewGroup(p){
+ if(p.customType==='ps2')return 'consoles';
+ if(p.category==='Computer & Network Accessories'){
+  return /\bcables?\b|\bpatch cord\b/i.test(p.name)?'cables':'pc';
+ }
+ if(/^Ucom PC USB Controller\b/.test(p.name))return 'pc';
+ return p.shopPage;
+}
+
+function setCategoryOpen(panel,open){
+ panel.classList.toggle('is-open',open);
+ panel.querySelector('.category-toggle').setAttribute('aria-expanded',String(open));
+ panel.querySelector('.category-products').hidden=!open;
+}
+
+function arrangeOverview(){
+ const original=[...catalog.querySelectorAll('.category-panel')];
+ const panels=new Map(overviewPages.map(([slug,title],index)=>{
+  const panel=document.createElement('section');
+  panel.className='category-panel';
+  panel.id='gp-category-'+slug;
+  panel.innerHTML=`<button class="category-toggle" type="button" aria-controls="${panel.id}-products">
+    <span>${title}</span><span class="cat-count"></span><span class="cat-arrow" aria-hidden="true">⌄</span>
+   </button><div class="category-products" id="${panel.id}-products"></div>`;
+  panel.dataset.expanded=String(index===0);
+  setCategoryOpen(panel,index===0);
+  panel.querySelector('button').addEventListener('click',()=>{
+   const open=!panel.classList.contains('is-open');
+   panel.dataset.expanded=String(open);
+   setCategoryOpen(panel,open);
+  });
+  return [slug,panel];
+ }));
+ catalog.querySelectorAll('.product').forEach(card=>{
+  const product=products.find(p=>p.name===card.querySelector('.product-title')?.textContent);
+  if(product)panels.get(overviewGroup(product))?.querySelector('.category-products').append(card);
+ });
+ original.forEach(panel=>panel.remove());
+ catalog.append(...panels.values());
+}
+
+function openLinkedCategory(hash){
+ const panel=hash.startsWith('#gp-category-')?document.getElementById(hash.slice(1)):null;
+ if(panel&&!panel.hidden){
+  panel.dataset.expanded='true';
+  setCategoryOpen(panel,true);
+ }
+}
+
+function apply(){
+ let count=0;
+ const q=search?.value.toLowerCase().trim()||'';
+ catalog.querySelectorAll('.category-panel').forEach(panel=>{
+  let visible=0;
+  if(!allView)panel.classList.add('is-open');
+  panel.querySelectorAll('.product').forEach(card=>{
+   const title=card.querySelector('.product-title');
+   const name=card.dataset.productName||(title?.textContent||'');
+   card.dataset.productName=name;
+   const p=products.find(x=>x.name===name);
+   const arcadeExcluded=p&&(allView||page==='arcade')&&(/xbox/i.test(p.name)||(/turbo/i.test(p.name)&&/controller|gamepad/i.test(p.name)));
+   const ok=p&&!p.includedOnly&&!p.cpuAddonOnly&&!p.hiddenFromStore&&p.available!==false&&p.stock!==0
+    &&(typeof GPStock==='undefined'||GPStock.allowed(p.name))&&(newView||!arcadeExcluded)
+    &&!(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name))
+    &&p.name!=='Zippy Coin Drop Switch'&&!p.aliasOf
+    &&(newView?p.isNew:allView||categoryProductAllowed(p))&&(!q||card.textContent.toLowerCase().includes(q));
+   card.hidden=!ok;
+   card.style.display=ok?'':'none';
+   if(p?.isNew){
+    card.dataset.newProduct='true';
+    if(!card.querySelector('.gp-new-badge')){
+     const badge=document.createElement('span');
+     badge.className='gp-new-badge';badge.textContent='🆕 NEW';
+     badge.style.cssText='display:inline-block;background:#0e7490;color:#fff;padding:3px 7px;border-radius:6px;font-weight:bold;margin-bottom:4px';
+     title?.prepend(badge);
+    }
+   }
+   if(ok)visible++;
+  });
+  panel.hidden=!visible;
+  panel.style.display=visible?'':'none';
+  if(allView){
+   panel.querySelector('.cat-count').textContent=visible+' Products';
+   setCategoryOpen(panel,Boolean(q)||panel.dataset.expanded==='true');
+  }
+  count+=visible;
+ });
+ const empty=document.getElementById('storeEmpty');
+ if(empty)empty.style.display=count?'none':'block';
+ const counter=document.getElementById('storeCount');
+ if(counter)counter.textContent=count+' products';
+ document.title=label+' | GAMES PLANET';
+}
 window.filterCatalog=value=>{const match=products.find(p=>p.category===value);if(value==='all'){location.href=allHref;return}if(match)location.href=href(match.shopPage)};
 const select=document.getElementById('catalogFilter');if(select)select.closest('.catalog-controls')?.setAttribute('hidden','');if(select)select.style.display='none';
 if(search){search.oninput=apply;search.closest('form').onsubmit=e=>{e.preventDefault();apply()};}
@@ -37,14 +139,24 @@ function arrangeConsoleGroups(){
  document.querySelectorAll('#products .product').forEach(card=>{const name=card.dataset.productName||card.querySelector('.product-title')?.textContent;const p=products.find(p=>p.name===name);if(p?.shopPages.includes('consoles')&&!p.includedOnly&&p.consoleOrder!==undefined)groups[p.consoleOrder].querySelector('.category-products').append(card);});
  catalog.prepend(...groups);
 }
-arrangeConsoleGroups();
+if(allView){
+ arrangeOverview();
+ document.addEventListener('click',event=>{
+  const link=event.target.closest('a[href^="#gp-category-"]');
+  if(link)openLinkedCategory(link.hash);
+ });
+ window.addEventListener('hashchange',()=>openLinkedCategory(location.hash));
+}else{
+ arrangeConsoleGroups();
+}
 apply();
+if(allView)openLinkedCategory(location.hash);
 window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.parse(localStorage.getItem('gp_cart')||'{}'),products)}catch(_){saved={}};Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,saved);products.forEach((p,i)=>{const el=document.getElementById('q'+i);if(el){const value=String(state[i]||0);if('value' in el)el.value=value;else el.textContent=value};for(const v of p.variants||[]){const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));if(el){const value=String(state['v_'+i+'_'+v]||0);if('value' in el)el.value=value;else el.textContent=value}}});render();apply();});
 })();
 
 
 
-(function(){const style=document.createElement('style');style.id='all-categories-compact-v1';style.textContent="html body.gp-all-categories #products#products .category-products{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))!important;gap:7px!important;padding:7px!important;align-items:start!important}\nhtml body.gp-all-categories #products#products .product{grid-column:auto!important;grid-row:auto!important;height:auto!important;min-height:0!important;align-self:start!important;margin:0!important;padding:9px!important;gap:5px!important;border-radius:10px!important}\nhtml body.gp-all-categories #products#products .product:not(.has-variants){display:grid!important;grid-template-columns:60px minmax(0,1fr)!important;align-items:center!important}\nhtml body.gp-all-categories #products#products .product .product-title{grid-column:1/-1!important;grid-row:1!important;font-size:14px!important;line-height:1.35!important;margin:0 0 4px!important;min-height:0!important}\nhtml body.gp-all-categories #products#products .product .image-row{grid-column:1!important;grid-row:2!important;order:0!important;width:60px!important;display:flex!important;flex-wrap:wrap!important;min-height:0!important;height:auto!important;gap:3px!important;margin:0!important;padding:0!important}\nhtml body.gp-all-categories #products#products .product .image-row img{width:42px!important;height:42px!important;flex:0 0 42px!important;max-width:100%!important;object-fit:contain!important}\nhtml body.gp-all-categories #products#products .product .image-row.multi-image img{width:27px!important;height:27px!important;flex:0 0 27px!important}\nhtml body.gp-all-categories #products#products .product .info{grid-column:2!important;grid-row:2!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:5px!important;margin:0!important;padding:0!important;min-width:0!important;width:100%!important}\nhtml body.gp-all-categories #products#products .product .price{font-size:15px!important;line-height:1.3!important;padding:5px 7px!important;min-height:0!important}\nhtml body.gp-all-categories #products#products .product .info>div:first-child{flex:0 1 auto!important;width:auto!important}\nhtml body.gp-all-categories #products#products .product .qty{width:96px!important;min-width:96px!important;height:32px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:2px!important}\nhtml body.gp-all-categories #products#products .product .qty button{width:30px!important;min-width:30px!important;height:32px!important;min-height:32px!important;max-height:32px!important;font-size:18px!important;padding:0!important}\nhtml body.gp-all-categories #products#products .product .qty span{font-size:13px!important}\nhtml body.gp-all-categories #products#products .product .product-features{grid-column:1/-1!important;grid-row:3!important;font-size:10px!important;line-height:1.35!important;margin:3px 0!important;padding:5px!important}\nhtml body.gp-all-categories #products#products .product .product-extra-actions{grid-column:1/-1!important;grid-row:4!important;margin:3px 0!important}\nhtml body.gp-all-categories #products#products .product.has-variants{display:block!important}\nhtml body.gp-all-categories #products#products .product.has-variants .info{display:block!important}\nhtml body.gp-all-categories #products#products .product.has-variants .info>div:first-child{display:none!important}\nhtml body.gp-all-categories #products#products .product .variant-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:5px!important;min-width:0!important;width:100%!important}\nhtml body.gp-all-categories #products#products .product .variant-row{display:grid!important;grid-template-columns:minmax(0,1fr) 96px!important;gap:5px!important;padding:5px!important;min-height:0!important}\nhtml body.gp-all-categories #products#products .product .variant-label{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;gap:6px!important;text-align:left!important}\nhtml body.gp-all-categories #products#products .product .variant-thumb{width:32px!important;height:32px!important;max-width:32px!important}\nhtml body.gp-all-categories #products#products .product .variant-label>span{font-size:11px!important;line-height:1.35!important}\nhtml body.gp-all-categories #products#products .product .info small{display:none!important}\nhtml body.gp-all-categories #products#products .product.setup-navigation-card .qty{display:none!important}\nhtml body.gp-all-categories #products#products .product[hidden],html body.gp-all-categories #products#products .product[style*=\"display: none\"],html body.gp-all-categories #products#products .category-panel[hidden]{display:none!important}\n@media(max-width:600px){html body.gp-all-categories #products#products .category-products{grid-template-columns:minmax(0,1fr)!important}}\n";document.head.append(style)})();
+(function(){const style=document.createElement('style');style.id='all-categories-compact-v1';style.textContent="html body.gp-all-categories #products#products .is-open > .category-products{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))!important;gap:7px!important;padding:7px!important;align-items:start!important}\nhtml body.gp-all-categories #products#products .product{grid-column:auto!important;grid-row:auto!important;height:auto!important;min-height:0!important;align-self:start!important;margin:0!important;padding:9px!important;gap:5px!important;border-radius:10px!important}\nhtml body.gp-all-categories #products#products .product:not(.has-variants){display:grid!important;grid-template-columns:60px minmax(0,1fr)!important;align-items:center!important}\nhtml body.gp-all-categories #products#products .product .product-title{grid-column:1/-1!important;grid-row:1!important;font-size:14px!important;line-height:1.35!important;margin:0 0 4px!important;min-height:0!important}\nhtml body.gp-all-categories #products#products .product .image-row{grid-column:1!important;grid-row:2!important;order:0!important;width:60px!important;display:flex!important;flex-wrap:wrap!important;min-height:0!important;height:auto!important;gap:3px!important;margin:0!important;padding:0!important}\nhtml body.gp-all-categories #products#products .product .image-row img{width:42px!important;height:42px!important;flex:0 0 42px!important;max-width:100%!important;object-fit:contain!important}\nhtml body.gp-all-categories #products#products .product .image-row.multi-image img{width:27px!important;height:27px!important;flex:0 0 27px!important}\nhtml body.gp-all-categories #products#products .product .info{grid-column:2!important;grid-row:2!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:5px!important;margin:0!important;padding:0!important;min-width:0!important;width:100%!important}\nhtml body.gp-all-categories #products#products .product .price{font-size:15px!important;line-height:1.3!important;padding:5px 7px!important;min-height:0!important}\nhtml body.gp-all-categories #products#products .product .info>div:first-child{flex:0 1 auto!important;width:auto!important}\nhtml body.gp-all-categories #products#products .product .qty{width:96px!important;min-width:96px!important;height:32px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:2px!important}\nhtml body.gp-all-categories #products#products .product .qty button{width:30px!important;min-width:30px!important;height:32px!important;min-height:32px!important;max-height:32px!important;font-size:18px!important;padding:0!important}\nhtml body.gp-all-categories #products#products .product .qty span{font-size:13px!important}\nhtml body.gp-all-categories #products#products .product .product-features{grid-column:1/-1!important;grid-row:3!important;font-size:10px!important;line-height:1.35!important;margin:3px 0!important;padding:5px!important}\nhtml body.gp-all-categories #products#products .product .product-extra-actions{grid-column:1/-1!important;grid-row:4!important;margin:3px 0!important}\nhtml body.gp-all-categories #products#products .product.has-variants{display:block!important}\nhtml body.gp-all-categories #products#products .product.has-variants .info{display:block!important}\nhtml body.gp-all-categories #products#products .product.has-variants .info>div:first-child{display:none!important}\nhtml body.gp-all-categories #products#products .product .variant-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:5px!important;min-width:0!important;width:100%!important}\nhtml body.gp-all-categories #products#products .product .variant-row{display:grid!important;grid-template-columns:minmax(0,1fr) 96px!important;gap:5px!important;padding:5px!important;min-height:0!important}\nhtml body.gp-all-categories #products#products .product .variant-label{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;gap:6px!important;text-align:left!important}\nhtml body.gp-all-categories #products#products .product .variant-thumb{width:32px!important;height:32px!important;max-width:32px!important}\nhtml body.gp-all-categories #products#products .product .variant-label>span{font-size:11px!important;line-height:1.35!important}\nhtml body.gp-all-categories #products#products .product .info small{display:none!important}\nhtml body.gp-all-categories #products#products .product.setup-navigation-card .qty{display:none!important}\nhtml body.gp-all-categories #products#products .product[hidden],html body.gp-all-categories #products#products .product[style*=\"display: none\"],html body.gp-all-categories #products#products .category-panel[hidden],html body.gp-all-categories #products#products .category-products[hidden]{display:none!important}\n@media(max-width:600px){html body.gp-all-categories #products#products .category-products{grid-template-columns:minmax(0,1fr)!important}}\n";document.head.append(style)})();
 
 (function(){const s=document.createElement('style');s.id='category-visibility-fix';s.textContent='#products .product[hidden],#products .category-panel[hidden],.app-live-panel[hidden]{display:none!important}body[data-shop-page="cpu"] .app-live-panel{display:none!important}';document.head.append(s);})();
 
