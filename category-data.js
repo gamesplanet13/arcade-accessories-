@@ -183,6 +183,21 @@ GPShop.prepare=function(products){
    p.consoleOrder=3;
   }
  });
+ const sourcedCatalogPhotos={
+  "PlayX Spiderman Controller": "https://media-assets.hyperinvento.com/companies/f46ca46e-5107-4f91-b519-a11f686eb902/products/assetss/files/f1e8194b967a4f3fb20ec1e6e10dbd9e-product-assets.jpg",
+  "M88": "images/catalog/m88-128gb.jpg",
+  "M23": "https://gbcrobsdnfggsfsvdmpy.supabase.co/storage/v1/render/image/public/product-images/products/temp/temp_0_1769456869449.jpg?quality=70&width=1000",
+  "M66 Neon": "https://down-br.img.susercontent.com/file/sg-11134202-825zr-mj9j8o1y3itgab",
+  "GD20": "https://www.game-gaga.com/uploads/111.png",
+  "G90": "https://cubonicindia.com/cdn/shop/files/DSC06128.jpg?v=1783315604&width=1445",
+  "MZ 204 Bluetooth Speaker": "https://image.cdn.shpy.in/16980/e588f8c2-f1d7-4da7-b384-dc184c1c6890-1752753903564.jpeg?format=webp&width=600"
+ };
+ products.forEach(p=>{
+  const photo=sourcedCatalogPhotos[p.name];
+  if(photo)p.images=[photo];
+  const gallery=[...(p.images||[]),...Object.values(p.variantImages||{})];
+  p.photoUnavailable=gallery.every(src=>!src||src==='images/product-pending.svg'||/^images\/png\/p5-look-(blue|black)\.png$/.test(src));
+ });
  const pro=products.findIndex(p=>p.name==='PS4 Pro 1TB Black');
  products.forEach(p=>{if(p.name==='PS4 Pro Console'&&pro>=0)p.aliasOf=pro;});
 };

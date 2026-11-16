@@ -36,7 +36,7 @@ function updateBadges(){
   const m=records[norm(name)];
   const p=(typeof products!=='undefined'&&Array.isArray(products))?products.find(x=>x.name===name):null;
   const count=m?Math.max(0,Number(m.stock??999)):Math.max(0,Number(p?.stock??999));
-  const unavailable=(m?.hiddenFromStore===true||m?.available===false||count===0||p?.hiddenFromStore===true||p?.available===false);
+  const unavailable=(m?.hiddenFromStore===true||m?.available===false||count===0||p?.photoUnavailable===true||p?.hiddenFromStore===true||p?.available===false);
   card.hidden=unavailable;card.dataset.stockHidden=String(unavailable);
   const specs=card.closest('#products.gp-responsive-catalog')?card.querySelector(':scope > .product-specs'):null;
   let tag=specs?.querySelector('.gp-available')||card.querySelector(':scope > .gp-available')||card.querySelector('.product-purchase > .gp-available');
