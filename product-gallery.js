@@ -4,14 +4,15 @@ const style=document.createElement('style');style.textContent=`
 .gp-photo-host{position:relative!important}.gp-free-sticker{position:absolute;right:3%;top:3%;z-index:2;width:clamp(65px,27%,130px);aspect-ratio:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;background:linear-gradient(145deg,#fff06a,#ffb800);color:#102347;clip-path:polygon(50% 0,61% 9%,75% 5%,80% 18%,95% 24%,91% 39%,100% 50%,91% 61%,95% 76%,80% 82%,75% 95%,61% 91%,50% 100%,39% 91%,25% 95%,20% 82%,5% 76%,9% 61%,0 50%,9% 39%,5% 24%,20% 18%,25% 5%,39% 9%);filter:drop-shadow(0 3px 3px #0005);font-family:system-ui,sans-serif;line-height:1.04;pointer-events:none;transform:rotate(7deg)}.gp-free-sticker strong{font-size:clamp(13px,2.3vw,23px);font-weight:900}.gp-free-sticker b{font-size:clamp(13px,2.4vw,25px);color:#b32e00;font-weight:950}.gp-free-sticker small{font-size:clamp(7px,1vw,10px);font-weight:850}.gallery-main .image-enlarge{top:auto;bottom:14px;right:14px}.gp-inline-controls{display:flex;align-items:center;justify-content:center;gap:20px;padding:8px;font-size:13px}.gp-inline-controls button{border:1px solid #cbd5e1;border-radius:100px;width:36px;height:36px;background:#fff;color:#152238;font-size:22px;cursor:pointer}.gp-lightbox{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#060c17f2;color:#fff;padding:65px 12px;touch-action:none}.gp-lightbox[hidden]{display:none!important}.gp-lightbox .gp-lightbox-frame img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;touch-action:none;user-select:none}.gp-lightbox button{position:absolute;z-index:2;border:1px solid #ffffff60;background:#16243be6;color:white;border-radius:100px;width:42px;height:42px;font-size:28px;cursor:pointer;display:grid;place-items:center}.gp-lightbox .gp-prev{left:5px;top:48%}.gp-lightbox .gp-next{right:5px;top:48%}.gp-lightbox .gp-close{right:14px;top:14px}.gp-image-count{position:absolute;bottom:20px;left:12px;right:12px;text-align:center;font:14px system-ui}.gp-lightbox button[hidden],.gp-inline-controls[hidden]{display:none!important}.gp-lightbox-frame{position:relative;overflow:hidden;width:100%;height:100%;max-width:1200px;max-height:80vh;min-width:0;min-height:0}.gp-lightbox-frame .gp-free-sticker{width:clamp(75px,23%,130px)}
 
 .gp-watermark-host{position:relative}
-.gp-product-watermark{position:absolute;z-index:3;display:grid;width:max-content;gap:3px;padding:5px 7px;border:1px solid #9bb5d577;border-radius:6px;background:#071324ed;color:white;line-height:1.15;font-family:system-ui,sans-serif;letter-spacing:normal;text-align:left;white-space:nowrap;pointer-events:none;user-select:none;transform-origin:top left;transform:scale(var(--gp-stamp-scale,1))}
+.gp-product-watermark{position:absolute;z-index:3;display:flex;align-items:center;gap:5px;box-sizing:border-box;width:224px;padding:3px 5px;border-radius:4px;background:#08182bc9;color:#fff;text-align:left;font:600 9px/1.18 system-ui,sans-serif;letter-spacing:normal;pointer-events:none;user-select:none;transform-origin:top left;transform:scale(var(--gp-stamp-scale,1))}
 .gp-product-watermark[hidden]{display:none!important}
-.gp-watermark-contact{display:flex;align-items:center;gap:5px}
-.gp-watermark-logo{display:block;flex:0 0 25px;width:25px;height:25px;background:var(--gp-watermark-logo) center/contain no-repeat}
-.gp-watermark-contact strong,.gp-watermark-contact small{display:block;font-family:inherit;font-size:11px;line-height:1.15;color:inherit}
-.gp-watermark-contact strong{font-weight:800}.gp-watermark-contact small{font-weight:600}
-.gp-watermark-url{color:#e0f0ff;font-size:10px;font-weight:600;line-height:1.2}
-.gp-product-watermark[data-existing="logo-and-phone"] .gp-watermark-contact,.gp-product-watermark[data-existing="name"] strong{display:none}
+.gp-product-watermark .gp-watermark-logo{display:block!important;position:static!important;flex:0 0 23px!important;width:23px!important;height:23px!important;min-width:23px!important;min-height:23px!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:visible!important;background:#fff;border-radius:50%}
+.gp-watermark-copy{display:block;min-width:0}
+.gp-watermark-contact{display:block;white-space:nowrap;font:600 9px/1.18 system-ui,sans-serif}
+.gp-watermark-contact strong{font-weight:800}
+.gp-watermark-url{display:block;color:#edf7ff;font:600 8px/1.18 system-ui,sans-serif;overflow-wrap:anywhere}
+.gp-product-watermark[data-existing="logo-and-phone"]{width:188px;padding:3px 5px}
+.gp-product-watermark[data-existing="logo-and-phone"] :is(.gp-watermark-logo,.gp-watermark-contact),.gp-product-watermark[data-existing="name"] strong{display:none!important}
 .gp-lightbox>.gp-product-watermark{top:14px;left:12px}
 .gp-lightbox .gp-lightbox-frame img{cursor:zoom-in;transform-origin:center;user-select:none;-webkit-user-drag:none}
 .gp-lightbox .gp-lightbox-frame.gp-is-zoomed img{cursor:grab}
@@ -19,7 +20,6 @@ const style=document.createElement('style');style.textContent=`
 .gp-lightbox .gp-image-count{left:55px;right:55px;bottom:25px;font-size:12px;pointer-events:none}
 .gp-lightbox .gp-zoom-out,.gp-lightbox .gp-zoom-in{bottom:12px}
 .gp-lightbox .gp-zoom-out{left:12px}.gp-lightbox .gp-zoom-in{right:12px}
-@media(max-width:325px){.gp-lightbox>.gp-product-watermark{--gp-stamp-scale:.87}}
 
 `;
 document.head.append(style);
@@ -43,8 +43,7 @@ function existingBrand(src){
 function watermark(){
  const stamp=document.createElement('span');
  stamp.className='gp-product-watermark';
- stamp.style.setProperty('--gp-watermark-logo','url('+logoSrc+')');
- stamp.innerHTML='<span class="gp-watermark-contact"><span class="gp-watermark-logo" aria-hidden="true"></span><span><strong>GAMES PLANET</strong><small>WhatsApp 7983624797</small></span></span><span class="gp-watermark-url">'+publicLink+'</span>';
+ stamp.innerHTML='<svg class="gp-watermark-logo" viewBox="0 0 192 192" aria-hidden="true"><image href="'+logoSrc+'" width="192" height="192"></image></svg><span class="gp-watermark-copy"><span class="gp-watermark-contact"><strong>GAMES PLANET · </strong>WhatsApp 7983624797</span><span class="gp-watermark-url">'+publicLink.replace('/arcade-accessories-','/<wbr>arcade-accessories-')+'</span></span>';
  return stamp;
 }
 
@@ -75,12 +74,21 @@ function paintPreviews(){
   if(!visible)continue;
   const box=host.getBoundingClientRect();
   const fit=fittedSize(img,rect.width,rect.height);
-  const w=fit.width,h=fit.height;
-  mark.dataset.existing=existingBrand(img.src);
-  mark.style.top=(rect.top-box.top-host.clientTop+host.scrollTop+(rect.height-h)/2+2)+'px';
-  mark.style.left=(rect.left-box.left-host.clientLeft+host.scrollLeft+(rect.width-w)/2+2)+'px';
-  mark.style.setProperty('--gp-stamp-scale',String(Math.min(1,Math.max(.08,(w-4)/270))));
+  const left=rect.left-box.left-host.clientLeft+host.scrollLeft+(rect.width-fit.width)/2;
+  const top=rect.top-box.top-host.clientTop+host.scrollTop+(rect.height-fit.height)/2;
+  placeWatermark(mark,existingBrand(img.src),left,top,fit.width);
+
  }
+}
+function placeWatermark(mark,existing,left,top,width){
+ const linkOnly=existing==='logo-and-phone';
+ const badgeWidth=linkOnly?188:224;
+ const inset=Math.min(6,width*.035);
+ const scale=Math.min(1,Math.max(.05,(width*(linkOnly?.52:.68)-2*inset)/badgeWidth));
+ mark.dataset.existing=existing;
+ mark.style.left=(existing==='name'?left+width-badgeWidth*scale-inset:left+inset)+'px';
+ mark.style.top=(top+inset)+'px';
+ mark.style.setProperty('--gp-stamp-scale',String(scale));
 }
 function fittedSize(img,width,height){
  if(!img.naturalWidth||getComputedStyle(img).objectFit!=='contain')return {width,height};
@@ -105,11 +113,16 @@ function drawZoom(){
  photo.style.transform='translate('+x+'px,'+y+'px) scale('+zoom+')';
  frame.classList.toggle('gp-is-zoomed',zoom>1);
  const rect=frame.getBoundingClientRect();
- const left=rect.left+Math.max(0,(rect.width-fit.width*zoom)/2+x);
- const top=rect.top+Math.max(0,(rect.height-fit.height*zoom)/2+y);
- lightboxMark.style.left=(left+6)+'px';
- lightboxMark.style.top=(top+6)+'px';
- lightboxMark.dataset.existing=zoom===1?existingBrand(photo.src):'';
+ const photoWidth=fit.width*zoom,photoHeight=fit.height*zoom;
+ const photoLeft=rect.left+(rect.width-photoWidth)/2+x;
+ const photoTop=rect.top+(rect.height-photoHeight)/2+y;
+ const left=Math.max(rect.left,photoLeft);
+ const right=Math.min(rect.right,photoLeft+photoWidth);
+ const top=Math.max(rect.top,photoTop);
+ const existing=existingBrand(photo.src);
+ // The LED originals have their mark at the upper right of the source photo.
+ const originalInView=existing==='logo-and-phone'&&photoTop+photoHeight*.03>=rect.top&&photoLeft+photoWidth*.98<=rect.right;
+ placeWatermark(lightboxMark,zoom===1||originalInView?existing:'',left,top,Math.max(0,right-left));
 }
 function zoomAt(next,point,oldPoint=point){
  const rect=frame.getBoundingClientRect();
