@@ -1,6 +1,7 @@
 (function(root){function allowed(name,variant=''){
  if(name==='Imported Arcade Push Button H60 / H54')return false;
  if(variant==='Green (H60)')return false;
+ if(/^PlayX\s.*controller$/i.test(name))return false;
  const p=typeof products!=='undefined'&&Array.isArray(products)?products.find(item=>item.name===name):null;
  if(p?.cpuAddonOnly===true||p?.photoUnavailable===true||p?.hiddenFromStore===true||p?.available===false||p?.active===false||p?.stock===0||p?.status==='unavailable')return false;
  if(variant&&(p?.variantStocks?.[variant]===0||p?.unavailableVariants?.includes(variant)))return false;
