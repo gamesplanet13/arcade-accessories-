@@ -104,6 +104,11 @@ function drawZoom(){
  y=cap(y,-maxY,maxY);
  photo.style.transform='translate('+x+'px,'+y+'px) scale('+zoom+')';
  frame.classList.toggle('gp-is-zoomed',zoom>1);
+ const rect=frame.getBoundingClientRect();
+ const left=rect.left+Math.max(0,(rect.width-fit.width*zoom)/2+x);
+ const top=rect.top+Math.max(0,(rect.height-fit.height*zoom)/2+y);
+ lightboxMark.style.left=(left+6)+'px';
+ lightboxMark.style.top=(top+6)+'px';
  lightboxMark.dataset.existing=zoom===1?existingBrand(photo.src):'';
 }
 function zoomAt(next,point,oldPoint=point){

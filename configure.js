@@ -125,4 +125,4 @@ render();})();
 
 
 
-;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261117-branded-zoom';document.head.append(s);})();
+;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261117-photo-corner';document.head.append(s);})();
