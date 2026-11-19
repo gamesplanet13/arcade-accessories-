@@ -233,13 +233,13 @@ mount();window.GPProductGallery={open,close,next:()=>step(1),previous:()=>step(-
    }
    const visible=img.getClientRects().length&&getComputedStyle(img).visibility!=='hidden'&&right>0&&left<innerWidth&&bottom>0&&top<innerHeight&&right-left>8&&bottom-top>8;
    let layer=layers.get(img);
-   if(!visible){if(layer)layer.hidden=true;continue;}
+   if(!visible){if(layer&&!layer.hidden)layer.hidden=true;continue;}
    if(!layer){
     layer=document.createElement('div');layer.className='gp-capture-watermark';layer.setAttribute('aria-hidden','true');
     layer.innerHTML='<span><b>GAMES PLANET</b><b>WhatsApp 7983624797</b><small>gamesplanet13.github.io/arcade-accessories-/</small></span>';
     document.body.append(layer);layers.set(img,layer);
    }
-   layer.hidden=false;
+   if(layer.hidden)layer.hidden=false;
    layer.style.cssText='left:'+left+'px;top:'+top+'px;width:'+(right-left)+'px;height:'+(bottom-top)+'px;font-size:'+Math.max(5,Math.min(19,(right-left)*.044))+'px';
   }
  }
