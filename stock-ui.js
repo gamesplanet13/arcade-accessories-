@@ -10,6 +10,12 @@ if(typeof oldVariant==='function')window.updateVariantQty=function(i,v,n){
  if(n>0&&products[i]?.variantStocks?.[v]!=null&&(Number(state['v_'+i+'_'+v])||0)>=products[i].variantStocks[v])return;
  return oldVariant.apply(this,arguments);
 };
+const previousTypedVariant=window.setTypedVariantQuantity;
+if(typeof previousTypedVariant==='function')window.setTypedVariantQuantity=function(i,v,value){
+ const p=products[i];
+ const limit=rule.allowed(p?.name,v)?Number(p?.variantStocks?.[v]??p?.stock??999):0;
+ return previousTypedVariant.call(this,i,v,Math.min(limit,Math.max(0,Number(value)||0)));
+};
 function updateVisibility(){
  let changed=false;
  // Clean saved carts too: archived products may have no visible card to inspect.
