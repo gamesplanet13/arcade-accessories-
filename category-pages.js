@@ -343,7 +343,7 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
  });
 })();
 
-;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261120-transparent-watermark';document.head.append(s);})();
+;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261120-no-watermark-v2';document.head.append(s);})();
 
 ;(function(){const style=document.createElement('style');style.textContent='#products#products .product .product-specs{display:flex!important}';document.head.appendChild(style)})();
 
@@ -420,3 +420,5 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
 })();
 
 (function(){const s=document.createElement('style');s.textContent='html body #products#products#products#products .product .gp-photo-purchase-line>.info{grid-column:2!important;grid-row:1!important}html body #products#products#products#products .product .gp-photo-purchase-line>.image-row{grid-column:1!important;grid-row:1!important}';document.head.append(s)})();
+
+(function(){const style=document.createElement('style');style.textContent='.gp-capture-watermark,.gp-product-watermark,.gp-photo-brand,.gp-photo-link,.gp-led-logo-replacement{display:none!important}';document.head.append(style);document.querySelectorAll('.gp-capture-watermark,.gp-product-watermark').forEach(node=>node.remove());})();
