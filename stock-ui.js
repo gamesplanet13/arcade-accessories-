@@ -37,6 +37,11 @@ function updateVisibility(){
    const v=p.variants?.[index];
    if(!v)return;
    const hide=hidden||!rule.allowed(p.name,v);
+   if(!hide&&p.variantStocks?.[v]!=null){
+    let stock=row.querySelector('.gp-variant-stock');
+    if(!stock){stock=document.createElement('small');stock.className='gp-variant-stock';row.querySelector('.variant-label')?.append(stock);}
+    stock.textContent='Available: '+p.variantStocks[v];
+   }
    row.hidden=hide;row.dataset.stockHidden=String(hide);
    if(hide){
     const key='v_'+products.indexOf(p)+'_'+v;
