@@ -52,7 +52,9 @@ function updateBadges(){
    else title?.after(tag);
   }
   if(specs&&tag.parentElement!==specs)specs.append(tag);
-  const label='Available Stock: '+count;if(tag.textContent!==label)tag.textContent=label;
+  const variantNames=p?.variants||Object.keys(m?.variants||{});
+  const summary=!selectedVariant&&variantNames.length?variantNames.map(v=>[v,Number(m?.variants?.[v]?.stock??p?.variantStocks?.[v]??999)]).filter(([,n])=>n>0).map(([v,n])=>v+' '+n).join(' / '):'';
+  const label='Available Stock: '+(summary||count);if(tag.textContent!==label)tag.textContent=label;
   if(m&&card.querySelector('.variant-list')){
    const rows=[...card.querySelectorAll('.variant-list .variant-row')];
    for(const [i,row] of rows.entries()){
