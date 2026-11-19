@@ -199,6 +199,7 @@ GPShop.prepare=function(products){
   const gallery=[...(p.images||[]),...Object.values(p.variantImages||{})];
   p.photoUnavailable=gallery.every(src=>!src||src==='images/product-pending.svg'||/^images\/png\/p5-look-(blue|black)\.png$/.test(src));
  });
+ products.forEach(p=>{if(p.name==='Old Rasila Push Button'){p.stock=0;p.available=false;p.hiddenFromStore=true;p.discontinued=true;}});
  const pro=products.findIndex(p=>p.name==='PS4 Pro 1TB Black');
  products.forEach(p=>{if(p.name==='PS4 Pro Console'&&pro>=0)p.aliasOf=pro;});
 };
