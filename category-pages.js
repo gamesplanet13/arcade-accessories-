@@ -17,7 +17,7 @@ const links=()=>overviewPages.map(([slug,title])=>{
  return `<a href="${url}" ${!allView&&slug===page?'aria-current="page"':''}>${title}</a>`;
 }).join('')+`<a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''}>New Products</a><a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`;
 const nav=document.createElement('section');nav.className='gp-category-nav';nav.innerHTML=`<div class="gp-page-tools gp-compact-tools"><button type="button" id="gpCart">Cart & Checkout</button><a href="${prefix}arcade.html?view=new">New Arrivals</a></div><h1>${label}</h1><nav class="gp-category-links" aria-label="Product categories">${links()}</nav>`;
-const arcadeProductOrder=["BAO LIAN Imported Arcade Push Button", "28mm Imported LED Illuminated Arcade Push Button", "Female Push Button Crimp Socket — Pack of 10", "Rasila Handle (Without Switch)", "Rasila Handle with 4 Black Switches", "MD Handle (With Switch)", "MD Switch Button", "Black Switch Button", "ZING Crystal Switch", "4.8mm Handle Switch Connector Pin", "Acrylic Coin Machine", "Acrylic Coin Machine with Switch", "Coin Drop Switch Button", "Zippy Coin Drop Switch", "Coin Packet", "Remote Plate (Red Colour)", "Remote Lead", "USB to PS2/PS3/PC Converter", "10 Core Wire — ₹35 per Meter", "10 Core Wire"];
+const arcadeProductOrder=["28mm Imported Arcade Push Button", "28mm Imported LED Illuminated Arcade Push Button", "Female Push Button Crimp Socket — Pack of 10", "Rasila Handle (Without Switch)", "Rasila Handle with 4 Black Switches", "MD Handle (With Switch)", "MD Switch Button", "Black Switch Button", "ZING Crystal Switch", "4.8mm Handle Switch Connector Pin", "Acrylic Coin Machine", "Acrylic Coin Machine with Switch", "Coin Drop Switch Button", "Coin Packet", "Remote Plate (Red Colour)", "Remote Lead", "USB to PS2/PS3/PC Converter", "10 Core Wire — ₹35 per Meter", "10 Core Wire"];
 function arcadeRank(name){const i=arcadeProductOrder.indexOf(name);return i<0?arcadeProductOrder.length:i;}
 const catalog=document.getElementById('products');catalog.before(nav);
 
@@ -115,7 +115,7 @@ function apply(){
    const ok=p&&!p.includedOnly&&!p.cpuAddonOnly&&!p.hiddenFromStore&&p.available!==false&&p.stock!==0
     &&(typeof GPStock==='undefined'||GPStock.allowed(p.name))&&(newView||!arcadeExcluded)
     &&!(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name))
-    &&p.name!=='Zippy Coin Drop Switch'&&!p.aliasOf
+    &&!p.aliasOf
     &&(newView?p.isNew:allView||categoryProductAllowed(p))&&(!q||card.textContent.toLowerCase().includes(q));
    card.hidden=!ok;
    card.style.display=ok?'':'none';
@@ -253,7 +253,7 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
   }
   if(name!==button.name)return;
   const importedButton = [...card.parentElement.children].find(product =>
-   product.querySelector('.product-title')?.textContent.trim()==='BAO LIAN Imported Arcade Push Button'
+   product.querySelector('.product-title')?.textContent.trim()==='28mm Imported Arcade Push Button'
   );
   if(importedButton)importedButton.after(card);
   card.classList.add('led-arcade-product');

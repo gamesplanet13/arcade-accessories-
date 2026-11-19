@@ -1,10 +1,5 @@
 window.GPZ_PRODUCT_CATALOG = [
-  {
-    "name": "10 Core Wire (Per Meter)",
-    "price": 50,
-    "weight": 0,
-    "size": ""
-  },
+  
   {
     "name": "10 Socket Extension Board",
     "price": 170,
@@ -101,12 +96,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "weight": 0,
     "size": ""
   },
-  {
-    "name": "Zippy Coin Drop Switch",
-    "price": 99,
-    "weight": 0,
-    "size": ""
-  },
+  
   {
     "name": "PS4 / PC / Android Red PCB",
     "price": 2000,
@@ -391,7 +381,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "BAO LIAN Imported Arcade Push Button",
+    "name": "28mm Imported Arcade Push Button",
     "price": 46,
     "weight": 12,
     "size": "5 × 4 × 4 cm"
@@ -453,12 +443,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "weight": 0,
     "size": ""
   },
-  {
-    "name": "Remote Plate (White Colour)",
-    "price": 300,
-    "weight": 15,
-    "size": "10 \u00d7 10 \u00d7 2 cm"
-  },
+  
   {
     "name": "Remote Plate (Red Colour)",
     "price": 199,

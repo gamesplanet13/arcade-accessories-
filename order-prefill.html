@@ -1311,8 +1311,6 @@ function gpzBox(items,totalWeight){
   if(manual.every(n=>n>0))return manual;
   if(items.some(i=>i.cpuBuild||i.arcadeBuild||gpzGamingShippingProfile(i.product||i.name,i.variant))){const computed=GPCPUShipping.pack(items,manual).dimensions;if(computed)return computed;}
   const quantities=Object.fromEntries(items.map(item=>[item.name,Number(item.quantity||0)]));
-  const hamidProfile=quantities["Push Button (Imported) - Green"]===10&&quantities["MD Switch Button"]===5&&quantities["Zippy Coin Drop Switch"]===2&&quantities["MD Handle (With Switch) - Black"]===2&&quantities["Coin Packet"]===1&&quantities["10 Core Wire (Per Meter)"]===1;
-  if(hamidProfile)return [17,12,14];
   const qty=items.reduce((s,i)=>s+i.quantity,0);
   if(totalWeight<=100) return [15,13,4];
   if(totalWeight<=500) return [22,17,9];

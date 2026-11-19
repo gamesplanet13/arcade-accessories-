@@ -1197,7 +1197,7 @@ img,canvas{
 
 </style>
 
-<link rel="stylesheet" href="storefront.css"><script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js?v=20261120-stock-order"></script><link rel="stylesheet" href="category-pages.css?v=20261115-wide-cards"><link rel="stylesheet" href="layout-safety.css"><style id="modern-large-mobile">
+<link rel="stylesheet" href="storefront.css"><script src="store-navigation.js"></script><script src="cpu-images.js"></script><script src="category-data.js?v=20261120-catalog-clean"></script><link rel="stylesheet" href="category-pages.css?v=20261115-wide-cards"><link rel="stylesheet" href="layout-safety.css"><style id="modern-large-mobile">
 body.modern-view{overflow-x:hidden}
 body.modern-view #products .category-products{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important;padding:12px!important}
 body.modern-view #products .product,body.modern-view #products .product:not(.has-variants){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:12px!important;padding:16px!important;min-width:0!important;min-height:0!important;border-radius:14px!important}
@@ -1468,16 +1468,11 @@ Products: 0 | Amount: ₹0 | Weight: 0g | Courier: ₹0 | Total: ₹0
 
 const products=[
 
-{
-name:"Push Button",stock:0,available:false,hiddenFromStore:true,
-dimensions:[4,4,4],category:"Arcade Box Accessories",price:35,weight:12,
-variants:["Red"],variantImages:{"Red":"images/jpeg/pushbutton-red.jpeg"},
-features:["Only Red available • Yellow out of stock"],images:["images/jpeg/pushbutton-red.jpeg"]
-},
+
 
 
 {
-name:"BAO LIAN Imported Arcade Push Button",
+name:"28mm Imported Arcade Push Button",
 dimensions:[5,4,4],category:"Arcade Box Accessories",price:46,weight:12,
 features:["Imported arcade push button","With matching black fixing ring","2-pin switch","Mounting nut included"],
 variants:["Blue","Green","Yellow","Black"],
@@ -1500,9 +1495,7 @@ variantImages:{"Green (H60)":"images/approved/h60-green.jpg","Pink (H54)":"image
 images:["images/approved/h60-green.jpg","images/approved/h54-pink.jpg"]
 },
 
-{name:"Old Rasila Push Button",stock:0,available:false,hiddenFromStore:true,discontinued:true,category:"Arcade Box Accessories",price:13,weight:12,dimensions:[6,4,4],images:[
-"images/jpeg/old-raisla-pursh-button.jpeg"
-]},
+
 
 {name:"MD Switch Button",category:"Arcade Box Accessories",price:60,weight:5,dimensions:[5,3,1],images:[
 "images/jpeg/mdswitch.jpeg"
@@ -1518,13 +1511,10 @@ images:["images/approved/h60-green.jpg","images/approved/h54-pink.jpg"]
 ]},
 
 {name:"Coin Drop Switch Button",category:"Arcade Box Accessories",price:60,weight:12,dimensions:[11,4,2],images:[
-"images/jpeg/coindropswitch.jpeg"
+"images/coin-drop-switch-current.png"
 ]},
 
-{name:"Zippy Coin Drop Switch",category:"Arcade Box Accessories",price:99,weight:12,dimensions:[11,4,2],images:[
-"images/jpeg/zippy-coin-drop-switch.jpg",
-"images/jpeg/zippy-coin-drop-switch-2.jpg"
-]},
+
 
 {name:"Rasila Handle (Without Switch)",category:"Arcade Box Accessories",price:210,weight:280,dimensions:[14,11,8],images:[
 "images/jpeg/rasila-handle.jpeg"
@@ -1562,12 +1552,10 @@ images:[
 
 {name:"Acrylic Coin Machine with Switch",category:"Arcade Box Accessories",price:260,weight:135,dimensions:[13,15,8],images:[
 "images/jpeg/acrylic-coin-machine.jpeg",
-"images/jpeg/coindropswitch.jpeg"
+"images/coin-drop-switch-current.png"
 ]},
 
-{name:"Remote Plate (White Colour)",category:"Arcade Box Accessories",price:300,weight:15,dimensions:[10,10,2],images:[
-"images/jpeg/ps2plate.jpeg"
-]},
+
 
 {name:"Remote Plate (Red Colour)",category:"Arcade Box Accessories",price:199,weight:15,dimensions:[10,10,2],images:[
 "images/jpeg/red-arcade-plate.jpg"
@@ -1595,9 +1583,7 @@ images:[
 "images/jpeg/remote-lead.jpeg"
 ]},
 
-{name:"10 Core Wire (Per Meter)",category:"Arcade Box Accessories",price:50,weight:70,dimensions:[10,5,3],images:[
-"images/jpeg/10-core-wire.jpg"
-]},
+
 
 {name:"Generic 2.4G Wireless Double Gamepad - White (With USB Receiver)",category:"Gaming Accessories",price:869,weight:220,dimensions:[19,20,10],compatibility:"Generic 2.4G USB receiver included",images:[
 "images/jpeg/generic-2-4g-white-pair-receiver.jpg"
@@ -1980,19 +1966,15 @@ products.push(...[{"name": "4.8mm Handle Switch Connector Pin", "category": "Arc
 products.push({name:'Best HDMI Cable',category:'Cables',price:350,weight:0,dimensions:[],images:['images/jpeg/hdmicable.jpeg'],compatibility:'PS2 HDMI converter, PS3, PS4, PS5, PC and Laptop'});
 /* Automatic bulk/quantity pricing. Product names must match the catalogue. */
 const QUANTITY_PRICE_RULES={
- "Push Button":{min:50,price:35},
  "Black Switch Button":{min:50,price:20},
  "MD Switch Button":{min:50,price:60},
  "Coin Drop Switch Button":{min:50,price:60},
- "Zippy Coin Drop Switch":{min:50,price:99},
  "Rasila Handle (Without Switch)":{min:20,price:210},
  "Rasila Handle with 4 Black Switches":{min:20,price:290},
  "MD Handle (With Switch)":{min:20,price:550},
  "Acrylic Coin Machine":{min:20,price:200},
  "Acrylic Coin Machine with Switch":{min:20,price:260},
- "10 Core Wire (Per Meter)":{min:20,price:50},
  "Remote Lead":{min:20,price:95},
- "Remote Plate (White Colour)":{min:20,price:300},
  "Remote Plate (Red Colour)":{min:20,price:199},
  "Generic 2.4G Wireless Double Gamepad - White (With USB Receiver)":{min:10,price:869},
  "Generic 2.4G Wireless Double Gamepad - Black (With USB Receiver)":{min:10,price:799},
@@ -4377,5 +4359,5 @@ document.getElementById("optionalGameModal")?.addEventListener("click",function(
 
 
 
-<script src="storefront.js"></script><script src="setup-data.js"></script><script src="setup-engine.js?v=20261019-arcade-cpu"></script><script src="stock-rules.js?v=20261120-stock-order"></script><script src="stock-ui.js?v=20261120-stock-final"></script><script src="configured-cart.js?v=compact-final-v3"></script><script src="category-pages.js?v=20261120-photo-price-row"></script><script src="site-navigation.js?v=20261115-responsive-cards"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/ps2-style-footer.js?v=20261016-ps2-view"></script></body>
+<script src="storefront.js"></script><script src="setup-data.js"></script><script src="setup-engine.js?v=20261019-arcade-cpu"></script><script src="stock-rules.js?v=20261120-stock-order"></script><script src="stock-ui.js?v=20261120-stock-final"></script><script src="configured-cart.js?v=compact-final-v3"></script><script src="category-pages.js?v=20261120-gallery-clean"></script><script src="site-navigation.js?v=20261115-responsive-cards"></script><script src="https://gamesplanet13.github.io/arcade-accessories-/ps2-style-footer.js?v=20261016-ps2-view"></script></body>
 </html>

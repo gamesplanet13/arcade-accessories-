@@ -87,7 +87,7 @@ function gpzGamingShippingProfile(name,variant=''){
 }
 const prepare=GPShop.prepare;
 GPShop.prepare=function(products){
- // Separate 28mm 12V LED model: do not overwrite the existing BAO LIAN ₹46 button.
+ // Separate 28mm 12V LED model: do not overwrite the existing 28mm imported ₹46 button.
  if(!products.some(p=>p.name==='28mm Imported LED Illuminated Arcade Push Button')){
   const variants=['Blue','Red','Green'];
   const variantPhotos=Object.fromEntries(variants.map(color=>{
@@ -121,11 +121,17 @@ GPShop.prepare=function(products){
   });
  }
  prepare(products);
+ products.forEach(p=>{
+  if(p.name==='Coin Packet'){p.packLabel='100 coins per packet';p.features=['1 packet contains 100 coins','Heavy quality coins'];}
+  if(p.name==='Remote Plate (Red Colour)')p.features=['Best quality red remote plate','Supports PS1 and PS2','PS3 and PC supported with USB to PS2/PS3/PC Converter'];
+  if(p.name==='USB to PS2/PS3/PC Converter')p.features=['Connect PS2 controllers or PS2 arcade plates to supported USB systems','For PS3, desktop PC / CPU, laptop, compatible Game Boxes and Game Sticks'];
+  if(p.name==='10 Core Wire'||p.name==='10 Core Wire — ₹35 per Meter')p.features=['10 separate wires in different colours for connections','Approximately 2–3 meters used per arcade box','Sold per meter; quantity means total meter length'];
+ });
+
  // Keep archival H60/H54 data in the source and master database, not in customer listings.
  const gpBtnImg=name=>'images/approved/'+name+'.jpg';
  products.forEach(p=>{
-  if(p.name==='Push Button'){p.features=(p.features||[]).map(f=>/yellow out of stock/i.test(f)?'Colour: Red':f);}
-  if(p.name==='BAO LIAN Imported Arcade Push Button'){
+  if(p.name==='28mm Imported Arcade Push Button'){
    p.variants=[...new Set([...(p.variants||[]),'Pink (H54)'])];
    p.variantPrices={...(p.variantPrices||{}),'Pink (H54)':46};
    p.variantImages={Blue:gpBtnImg('baolian-blue'),Green:gpBtnImg('baolian-green'),Yellow:gpBtnImg('baolian-yellow'),Black:gpBtnImg('baolian-black'),'Pink (H54)':gpBtnImg('h54-pink')};
@@ -136,7 +142,7 @@ GPShop.prepare=function(products){
    p.price=46;p.weight=12;p.dimensions=[5,4,4];
    p.variantPrices={'Green (H60)':46,'Pink (H54)':46};
    p.variantStocks={'Green (H60)':0,'Pink (H54)':0};
-   p.stock=0;p.available=false;p.hiddenFromStore=true;p.aliasOf='BAO LIAN Imported Arcade Push Button';
+   p.stock=0;p.available=false;p.hiddenFromStore=true;p.aliasOf='28mm Imported Arcade Push Button';
   }
  });
  // Packed-console courier estimates include listed controller/cables and protective outer carton.
@@ -157,7 +163,6 @@ GPShop.prepare=function(products){
   p.features=Array.isArray(p.features)?p.features:[];
   if(!p.features.some(x=>x.includes('Estimated packed parcel')))p.features.push('Estimated packed parcel with included controller, cables and outer box: '+(p.weight/1000).toFixed(2)+' kg; '+p.dimensions.join(' × ')+' cm. Confirm actual parcel size and weight before dispatch.');
  });
- products.forEach(p=>{if(p.name==='Remote Plate (White Colour)')p.stock=0;});
  products.forEach(p=>{
   const shipping=gpzGamingShippingProfile(p.name);
   if(shipping){p.weight=shipping.weight;p.dimensions=shipping.dimensions;p.shippingWeightVerified=true;
@@ -199,9 +204,7 @@ GPShop.prepare=function(products){
   const gallery=[...(p.images||[]),...Object.values(p.variantImages||{})];
   p.photoUnavailable=gallery.every(src=>!src||src==='images/product-pending.svg'||/^images\/png\/p5-look-(blue|black)\.png$/.test(src));
  });
- products.forEach(p=>{if(p.name==='Old Rasila Push Button'){p.stock=0;p.available=false;p.hiddenFromStore=true;p.discontinued=true;}});
  products.forEach(p=>{
- if(p.name==='Push Button'||p.name==='Push Button — Red Only'){p.stock=0;p.available=false;p.hiddenFromStore=true;p.variantStocks={...(p.variantStocks||{}),Red:0};}
  if(p.name==='MD Handle (With Switch)'){p.variantStocks={...(p.variantStocks||{}),Black:4};p.unavailableVariants=(p.unavailableVariants||[]).filter(v=>v!=='Black');}
  if(p.name==='USB to PS2/PS3/PC Converter'){p.shopPage='arcade';p.shopPages=[...new Set([...(p.shopPages||[]),'arcade','ps2','ps3','pc','cpu'])];}
  });
@@ -209,6 +212,6 @@ GPShop.prepare=function(products){
  products.forEach(p=>{if(p.name==='PS4 Pro Console'&&pro>=0)p.aliasOf=pro;});
 };
 const migrate=GPShop.migrate;
-GPShop.migrate=function(state,products){products.forEach((p,i)=>{if(p.includedOnly)state[i]=0;});return migrate(state,products);};
+GPShop.migrate=function(state,products){if(localStorage.getItem("gp_catalog_revision")!=="20261120-clean"){state={};localStorage.setItem("gp_catalog_revision","20261120-clean");}products.forEach((p,i)=>{if(p.includedOnly)state[i]=0;});return migrate(state,products);};
 root.GPConsoleCatalog={hardware,pack,GAME_LIST,PS2};
 })(window);
