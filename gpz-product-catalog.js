@@ -251,12 +251,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "weight": 5,
     "size": "5 \u00d7 3 \u00d7 1 cm"
   },
-  {
-    "name": "Old Rasila Push Button",
-    "price": 13,
-    "weight": 0,
-    "size": ""
-  },
+  
   {
     "name": "Panasonic AAA Rechargeable Cells (2 Pack)",
     "price": 350,
