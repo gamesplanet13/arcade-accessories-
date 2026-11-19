@@ -352,7 +352,7 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
 /* Keep each photo with its price and quantity, without repeating variant photos. */
 (function(){
  const css=document.createElement('style');
- const scope='html body #products#products#products#products .product';
+ const scope='html body #products#products#products#products .product:not(.led-arcade-product)';
  css.textContent=[
   scope+'{display:flex!important;flex-direction:column!important;min-width:0!important}',
   scope+'>.product-title{order:-5!important}',
@@ -383,7 +383,7 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
  document.querySelectorAll('#products .product').forEach(card=>{
   const title=card.dataset.productName||card.querySelector('.product-title')?.textContent;
   const product=products.find(p=>p.name===title);
-  if(!product)return;
+  if(!product||card.classList.contains('led-arcade-product'))return;
   const info=card.querySelector(':scope > .info');
   const gallery=card.querySelector(':scope > .image-row');
   if(!info)return;
