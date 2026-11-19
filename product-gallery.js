@@ -55,7 +55,9 @@ ledLogo.className='gp-led-logo-replacement';
 ledLogo.src=logoSrc;
 ledLogo.alt='';
 ledLogo.hidden=true;
-modal.append(brand,link,ledLogo);
+// Branding overlays disabled.
+brand.remove();link.remove();ledLogo.remove();
+document.querySelectorAll('.gp-capture-watermark,.gp-product-watermark').forEach(node=>node.remove());
 const pointers=new Map();
 let zoom=1,x=0,y=0,start=null,pinch=null,usedPinch=false;
 const cap=(value,min,max)=>Math.max(min,Math.min(max,value));
