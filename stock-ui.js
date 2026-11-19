@@ -68,7 +68,7 @@ function updateVisibility(){
  }
 }
 const style=document.createElement('style');
-style.textContent='[data-stock-hidden="true"]{display:none!important}.qty button:disabled{cursor:not-allowed;opacity:.35}';
+style.textContent='html body #products#products#products .product .variant-label .gp-variant-stock{display:block!important;grid-column:2;font-size:9px!important;white-space:nowrap!important;color:#94a3b8!important}[data-stock-hidden="true"]{display:none!important}.qty button:disabled{cursor:not-allowed;opacity:.35}';
 document.head.append(style);
 window.GP_REFRESH_PRODUCT_VISIBILITY=updateVisibility;
 updateVisibility();
