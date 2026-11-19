@@ -1,4 +1,5 @@
 (function(root){function allowed(name,variant=''){
+ if(/^Old Rasila Push Button$/i.test(String(name).trim()))return false;
  if(name==='Imported Arcade Push Button H60 / H54')return false;
  if(variant==='Green (H60)')return false;
  if(/^PlayX\s.*controller$/i.test(name))return false;
