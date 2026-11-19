@@ -418,3 +418,5 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
   }
  });
 })();
+
+(function(){const s=document.createElement('style');s.textContent='html body #products#products#products#products .product .gp-photo-purchase-line>.info{grid-column:2!important;grid-row:1!important}html body #products#products#products#products .product .gp-photo-purchase-line>.image-row{grid-column:1!important;grid-row:1!important}';document.head.append(s)})();
