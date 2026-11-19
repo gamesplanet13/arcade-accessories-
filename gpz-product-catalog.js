@@ -391,12 +391,6 @@ window.GPZ_PRODUCT_CATALOG = [
     "size": ""
   },
   {
-    "name": "Push Button",
-    "price": 32,
-    "weight": 0,
-    "size": ""
-  },
-  {
     "name": "BAO LIAN Imported Arcade Push Button",
     "price": 46,
     "weight": 12,

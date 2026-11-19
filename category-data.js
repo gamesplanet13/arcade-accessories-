@@ -200,6 +200,11 @@ GPShop.prepare=function(products){
   p.photoUnavailable=gallery.every(src=>!src||src==='images/product-pending.svg'||/^images\/png\/p5-look-(blue|black)\.png$/.test(src));
  });
  products.forEach(p=>{if(p.name==='Old Rasila Push Button'){p.stock=0;p.available=false;p.hiddenFromStore=true;p.discontinued=true;}});
+ products.forEach(p=>{
+ if(p.name==='Push Button'||p.name==='Push Button — Red Only'){p.stock=0;p.available=false;p.hiddenFromStore=true;p.variantStocks={...(p.variantStocks||{}),Red:0};}
+ if(p.name==='MD Handle (With Switch)'){p.variantStocks={...(p.variantStocks||{}),Black:4};p.unavailableVariants=(p.unavailableVariants||[]).filter(v=>v!=='Black');}
+ if(p.name==='USB to PS2/PS3/PC Converter'){p.shopPage='arcade';p.shopPages=[...new Set([...(p.shopPages||[]),'arcade','ps2','ps3','pc','cpu'])];}
+ });
  const pro=products.findIndex(p=>p.name==='PS4 Pro 1TB Black');
  products.forEach(p=>{if(p.name==='PS4 Pro Console'&&pro>=0)p.aliasOf=pro;});
 };

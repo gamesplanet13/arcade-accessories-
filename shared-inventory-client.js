@@ -35,10 +35,11 @@ function updateBadges(){
   if(!name)continue;card.dataset.gpStockName=name;
   const m=records[norm(name)];
   const p=(typeof products!=='undefined'&&Array.isArray(products))?products.find(x=>x.name===name):null;
-  const count=m?Math.max(0,Number(m.stock??999)):Math.max(0,Number(p?.stock??999));
+  const selectedVariant=card.querySelector('#variantSelect')?.value;
+  const count=selectedVariant?Math.max(0,Number(m?.variants?.[selectedVariant]?.stock??p?.variantStocks?.[selectedVariant]??m?.stock??p?.stock??999)):(m?Math.max(0,Number(m.stock??999)):Math.max(0,Number(p?.stock??999)));
   const unavailable=(m?.hiddenFromStore===true||m?.available===false||count===0||p?.photoUnavailable===true||p?.hiddenFromStore===true||p?.available===false);
   card.hidden=unavailable;card.dataset.stockHidden=String(unavailable);
-  const specs=card.closest('#products.gp-responsive-catalog')?card.querySelector(':scope > .product-specs'):null;
+  const specs=card.querySelector(':scope > .gp-card-specs')||(card.closest('#products.gp-responsive-catalog')?card.querySelector(':scope > .product-specs'):null);
   let tag=specs?.querySelector('.gp-available')||card.querySelector(':scope > .gp-available')||card.querySelector('.product-purchase > .gp-available');
   if(unavailable){
    if(tag)tag.remove();
@@ -108,6 +109,7 @@ async function start(){
   document.dispatchEvent(new CustomEvent('gp:master-stock-ready',{detail:{updatedAt:json.updatedAt||null}}));
  }catch(e){console.warn('Games Planet central catalog unavailable, using displayed catalog.',e);}
 }
+document.addEventListener('change',event=>{if(event.target.id==='variantSelect')schedule();});
 window.GP_REFRESH_SHARED_INVENTORY=start;
 start();
 })();

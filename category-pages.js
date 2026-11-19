@@ -17,6 +17,8 @@ const links=()=>overviewPages.map(([slug,title])=>{
  return `<a href="${url}" ${!allView&&slug===page?'aria-current="page"':''}>${title}</a>`;
 }).join('')+`<a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''}>New Products</a><a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`;
 const nav=document.createElement('section');nav.className='gp-category-nav';nav.innerHTML=`<div class="gp-page-tools gp-compact-tools"><button type="button" id="gpCart">Cart & Checkout</button><a href="${prefix}arcade.html?view=new">New Arrivals</a></div><h1>${label}</h1><nav class="gp-category-links" aria-label="Product categories">${links()}</nav>`;
+const arcadeProductOrder=["BAO LIAN Imported Arcade Push Button", "28mm Imported LED Illuminated Arcade Push Button", "Female Push Button Crimp Socket — Pack of 10", "Rasila Handle (Without Switch)", "Rasila Handle with 4 Black Switches", "MD Handle (With Switch)", "MD Switch Button", "Black Switch Button", "ZING Crystal Switch", "4.8mm Handle Switch Connector Pin", "Acrylic Coin Machine", "Acrylic Coin Machine with Switch", "Coin Drop Switch Button", "Zippy Coin Drop Switch", "Coin Packet", "Remote Plate (Red Colour)", "Remote Lead", "USB to PS2/PS3/PC Converter", "10 Core Wire — ₹35 per Meter", "10 Core Wire"];
+function arcadeRank(name){const i=arcadeProductOrder.indexOf(name);return i<0?arcadeProductOrder.length:i;}
 const catalog=document.getElementById('products');catalog.before(nav);
 
 document.getElementById('gpCart').onclick=()=>scrollToOrderDetails();
@@ -27,7 +29,7 @@ function categoryProductAllowed(p){
  if(page==='ps2')return p.customType!=='ps2'&&p.category!=='Game Consoles';
  // PS3 Accessories must not contain PS2 cards, even if they are cross-tagged.
  // Genuine PS3 components have their own PS3 product category.
- if(page==='ps3')return p.category==='PS3';
+ if(page==='ps3')return p.category==='PS3'||p.name==='USB to PS2/PS3/PC Converter';
  return true;
 }
 function overviewGroup(p){
@@ -65,7 +67,13 @@ function arrangeOverview(){
  }));
  catalog.querySelectorAll('.product').forEach(card=>{
   const product=products.find(p=>p.name===card.querySelector('.product-title')?.textContent);
-  if(product)panels.get(overviewGroup(product))?.querySelector('.category-products').append(card);
+  if(!product)return;
+  const destinations=product.name==='USB to PS2/PS3/PC Converter'?['arcade','ps2','ps3','pc']:[overviewGroup(product)];
+  destinations.forEach((slug,index)=>{
+   const copy=index?card.cloneNode(true):card;
+   if(index)copy.querySelectorAll('[id]').forEach(el=>{if(el.matches('input'))el.dataset.gpQuantitySource=el.id;el.removeAttribute('id');});
+   panels.get(slug)?.querySelector('.category-products').append(copy);
+  });
  });
  original.forEach(panel=>panel.remove());
  catalog.append(...panels.values());
@@ -79,6 +87,19 @@ function openLinkedCategory(hash){
  }
 }
 
+function orderProductCards(){
+ catalog.querySelectorAll('.category-products').forEach(group=>{
+  const cards=[...group.querySelectorAll(':scope > .product')];
+  cards.sort((a,b)=>arcadeRank(a.dataset.productName||a.querySelector('.product-title')?.textContent)-arcadeRank(b.dataset.productName||b.querySelector('.product-title')?.textContent));
+  group.append(...cards);
+ });
+}
+const renderBeforeCategorySync=window.render;
+window.render=function(...args){
+ const result=renderBeforeCategorySync.apply(this,args);
+ catalog.querySelectorAll('[data-gp-quantity-source]').forEach(el=>{el.value=document.getElementById(el.dataset.gpQuantitySource)?.value||'0';});
+ return result;
+};
 function apply(){
  let count=0;
  const q=search?.value.toLowerCase().trim()||'';
@@ -149,6 +170,7 @@ if(allView){
 }else{
  arrangeConsoleGroups();
 }
+orderProductCards();
 apply();
 if(allView)openLinkedCategory(location.hash);
 window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.parse(localStorage.getItem('gp_cart')||'{}'),products)}catch(_){saved={}};Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,saved);products.forEach((p,i)=>{const el=document.getElementById('q'+i);if(el){const value=String(state[i]||0);if('value' in el)el.value=value;else el.textContent=value};for(const v of p.variants||[]){const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));if(el){const value=String(state['v_'+i+'_'+v]||0);if('value' in el)el.value=value;else el.textContent=value}}});render();apply();});
@@ -324,3 +346,5 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
 ;(function(){const s=document.createElement('script');s.src=(window.GP_ASSET_BASE||'')+'product-gallery.js?v=20261117-led-style';document.head.append(s);})();
 
 ;(function(){const style=document.createElement('style');style.textContent='#products#products .product .product-specs{display:flex!important}';document.head.appendChild(style)})();
+
+(function(){const style=document.createElement('style');style.textContent="html body #products#products#products .category-products > .product{display:flex!important;flex-direction:column!important}html body #products#products#products .product > .image-row{order:-5!important}html body #products#products#products .product > .product-title{order:-4!important}html body #products#products#products .product > .product-specs{order:-3!important}html body #products#products#products .product > .product-features{order:-2!important}html body #products#products#products .product > .product-extra-actions{order:-1!important}html body #products#products#products .product > .info{order:0!important}";document.head.append(style)})();

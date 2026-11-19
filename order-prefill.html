@@ -794,7 +794,17 @@ function selectedOfficeDetail(){
     : null;
 }
 
+function gpOwnerRuralDestination(){
+ const value=id=>String((document.getElementById(id)||document.querySelector('[name="'+id+'"]'))?.value||'').trim();
+ const pin=value('pincode')||value('pin_code')||value('pin');
+ if(['246762','141003','682007','683102','144005','416410','327001','326001'].includes(pin))return true;
+ const text=['city','district','address','postoffice','postOffice','postofficeSelect','postofficeManual'].map(value).join(' ').toLowerCase().replace(/[^a-z0-9\u0900-\u097f]+/g,' ');
+ if(/\b(?:bijnor|bijnour|amroha|kemri|kemari|kembri|dhampur|lalkua|lalkuan|lal kuan|milak|bilaspur|ernakulam|sangli|banswara|jhalawar)\b/.test(text))return true;
+ if(/बिजनौर|अमरोहा|केमरी|केम्बरी|धामपुर|लालकुआ|मिलक|बिलासपुर|एर्नाकुलम|सांगली|बांसवाड़ा|झालावाड़/.test(text))return true;
+ return /\bloni\b|लोनी/.test(text)&&(/\bghaziabad\b|गाजियाबाद/.test(text)||/^201102$/.test(pin));
+}
 function gpzIsRuralDestination(){
+ if(gpOwnerRuralDestination())return true;
   // A PIN is not solely Rural or Urban: one PIN can serve both kinds of offices.
   // The precise selected Branch Office takes precedence over a manual Urban choice.
   const office=selectedOfficeDetail();

@@ -7,6 +7,7 @@ window.updateQty=function(i,n){
 };
 if(typeof oldVariant==='function')window.updateVariantQty=function(i,v,n){
  if(n>0&&!rule.allowed(products[i]?.name,v)){return;}
+ if(n>0&&products[i]?.variantStocks?.[v]!=null&&(Number(state['v_'+i+'_'+v])||0)>=products[i].variantStocks[v])return;
  return oldVariant.apply(this,arguments);
 };
 function updateVisibility(){
@@ -17,6 +18,8 @@ function updateVisibility(){
   for(const v of p.variants||[]){
    const key='v_'+i+'_'+v;
    if(!rule.allowed(p.name,v)&&state[key]){state[key]=0;changed=true;}
+   const limit=p.variantStocks?.[v];
+   if(limit!=null&&state[key]>limit){state[key]=limit;changed=true;}
   }
  });
  document.querySelectorAll('#products .product').forEach(card=>{
@@ -40,9 +43,7 @@ function updateVisibility(){
     if(state[key]){state[key]=0;changed=true;}
    }
   });
-  if(p.name==='MD Handle (With Switch)'){
-   card.querySelectorAll('.image-row img').forEach(img=>{if(/md-handle-black/i.test(img.getAttribute('src')||''))img.remove()});
-  }
+
  });
  document.querySelectorAll('.latest-mini-card').forEach(card=>{
   const name=(card.querySelector('.latest-mini-name')?.textContent||'').trim();
