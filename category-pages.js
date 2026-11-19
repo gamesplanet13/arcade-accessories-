@@ -348,3 +348,73 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
 ;(function(){const style=document.createElement('style');style.textContent='#products#products .product .product-specs{display:flex!important}';document.head.appendChild(style)})();
 
 (function(){const style=document.createElement('style');style.textContent="html body #products#products#products .category-products > .product{display:flex!important;flex-direction:column!important}html body #products#products#products .product > .image-row{order:-5!important}html body #products#products#products .product > .product-title{order:-4!important}html body #products#products#products .product > .product-specs{order:-3!important}html body #products#products#products .product > .product-features{order:-2!important}html body #products#products#products .product > .product-extra-actions{order:-1!important}html body #products#products#products .product > .info{order:0!important}";document.head.append(style)})();
+
+/* Keep each photo with its price and quantity, without repeating variant photos. */
+(function(){
+ const css=document.createElement('style');
+ const scope='html body #products#products#products#products .product';
+ css.textContent=[
+  scope+'{display:flex!important;flex-direction:column!important;min-width:0!important}',
+  scope+'>.product-title{order:-5!important}',
+  scope+'>.gp-photo-purchase-line,'+scope+'.has-variants>.info{order:-4!important}',
+  scope+'>.product-specs{order:-3!important}',
+  scope+'>.product-features{order:-2!important}',
+  scope+'>.product-extra-actions{order:-1!important}',
+  scope+' .gp-photo-purchase-line{display:grid!important;grid-template-columns:minmax(64px,1fr) auto!important;align-items:center!important;gap:8px!important;min-width:0!important}',
+  scope+' .gp-photo-purchase-line>.info{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;gap:8px!important;margin:0!important;width:auto!important;min-width:0!important}',
+  scope+' .gp-photo-purchase-line>.info>div:first-child{display:block!important;width:auto!important;min-width:0!important}',
+  scope+' .gp-photo-purchase-line .info small{display:none!important}',
+  scope+' .gp-photo-purchase-line .image-row,'+scope+' .gp-row-photos{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;gap:6px!important;width:auto!important;min-width:0!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;margin:0!important;padding:0!important;grid-column:auto!important;grid-row:auto!important}',
+  scope+' .gp-photo-purchase-line .image-row img,'+scope+' .gp-row-photos img{display:block!important;flex:0 0 80px!important;width:80px!important;height:80px!important;min-width:80px!important;max-width:80px!important;max-height:80px!important;object-fit:contain!important;position:static!important;margin:0!important;transform:none!important}',
+  scope+'.has-variants>.info{display:block!important;margin:0!important;width:100%!important}',
+  scope+'.has-variants>.info>div:first-child:not(.variant-list){display:none!important}',
+  scope+' .variant-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;gap:8px!important}',
+  scope+' .variant-row{display:grid!important;grid-template-columns:minmax(64px,1fr) minmax(52px,auto) 92px!important;align-items:center!important;gap:6px!important;min-width:0!important;padding:4px 0!important}',
+  scope+' .variant-label{display:block!important;min-width:0!important;width:auto!important;margin:0!important;grid-column:auto!important;grid-row:auto!important;font-size:11px!important;line-height:1.25!important}',
+  scope+' .variant-label>span{font-size:11px!important;line-height:1.25!important}',
+  scope+' .qty{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;gap:2px!important;width:92px!important;min-width:92px!important;max-width:92px!important;flex:0 0 92px!important;margin:0!important}',
+  scope+' .qty button{width:28px!important;min-width:28px!important;max-width:28px!important;height:32px!important;min-height:32px!important;padding:0!important;font-size:18px!important}',
+  scope+' .qty input,'+scope+' .qty>span{width:30px!important;min-width:30px!important;max-width:30px!important;padding:0!important;text-align:center!important;font-size:13px!important}',
+  scope+' .price{font-size:15px!important;padding:4px 6px!important;white-space:nowrap!important;line-height:1.2!important;min-height:0!important}',
+  '@media(max-width:359px){'+scope+' .gp-photo-purchase-line .image-row img,'+scope+' .gp-row-photos img{width:64px!important;height:64px!important;min-width:64px!important;max-width:64px!important;max-height:64px!important;flex-basis:64px!important}'+scope+' .variant-row{grid-template-columns:minmax(64px,1fr) minmax(44px,auto) 92px!important;gap:4px!important}}'
+ ].join('');
+ document.head.append(css);
+ const absolute=src=>new URL(src,document.baseURI).href;
+ document.querySelectorAll('#products .product').forEach(card=>{
+  const title=card.dataset.productName||card.querySelector('.product-title')?.textContent;
+  const product=products.find(p=>p.name===title);
+  if(!product)return;
+  const info=card.querySelector(':scope > .info');
+  const gallery=card.querySelector(':scope > .image-row');
+  if(!info)return;
+  const rows=[...info.querySelectorAll('.variant-row')];
+  const seen=new Set();
+  if(rows.length){
+   const photoRows=rows.map((row,index)=>{
+    const strip=document.createElement('div');strip.className='gp-row-photos image-row';
+    const image=row.querySelector('.variant-thumb');
+    if(image&&!seen.has(absolute(image.src))){seen.add(absolute(image.src));strip.append(image);}
+    else image?.remove();
+    row.prepend(strip);
+    return {strip,variant:product.variants?.[index]||''};
+   });
+   for(const image of [...(gallery?.querySelectorAll('img')||[])]){
+    const src=absolute(image.src);
+    if(seen.has(src)){image.remove();continue;}
+    seen.add(src);
+    const target=photoRows.find(({variant})=>(product.variantPhotos?.[variant]||[]).some(photo=>absolute(photo)===src))
+     ||photoRows.find(({variant})=>variant&&src.toLowerCase().includes(variant.toLowerCase().split(' ')[0]))
+     ||photoRows[0];
+    target.strip.append(image);
+   }
+   gallery?.remove();
+  }else if(gallery){
+   gallery.querySelectorAll('img').forEach(image=>{
+    const src=absolute(image.src);
+    if(seen.has(src))image.remove();else seen.add(src);
+   });
+   const row=document.createElement('div');row.className='gp-photo-purchase-line';
+   card.insertBefore(row,gallery);row.append(gallery,info);
+  }
+ });
+})();
