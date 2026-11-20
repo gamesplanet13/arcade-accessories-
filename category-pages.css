@@ -280,3 +280,118 @@ html body #products#products#products.gp-responsive-catalog .gp-product-pack{
  color:inherit;
  opacity:.85;
 }
+
+.gp-catalog-banner {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 27%);
+  align-items: center;
+  gap: 14px 18px;
+  width: calc(100% - 16px);
+  max-width: 1100px;
+  margin: 8px auto 14px;
+  padding: clamp(12px, 2.5vw, 27px);
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(ellipse at 88% 55%, #4c1c68, transparent 45%),
+    radial-gradient(ellipse at 12% 88%, #163d88, transparent 55%),
+    #0b1630;
+  border: 1px solid #5666a3;
+  border-radius: 16px;
+  box-shadow: 0 8px 23px #080f2e26;
+}
+.gp-banner-heading {
+  grid-column: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 12px;
+  min-width: 0;
+  text-align: left;
+}
+.gp-catalog-banner .gp-banner-logo {
+  grid-row: span 2;
+  display: block;
+  width: clamp(56px, 8vw, 88px);
+  height: auto;
+  aspect-ratio: 1;
+}
+.gp-catalog-banner #gp-catalog-banner-title {
+  align-self: end;
+  margin: 0;
+  background: none;
+  color: #fff;
+  -webkit-text-fill-color: currentColor;
+  font: 850 clamp(24px, 4.3vw, 46px)/1.04 system-ui, sans-serif;
+  letter-spacing: -.035em;
+  text-align: left;
+  text-wrap: balance;
+}
+.gp-catalog-banner .gp-banner-contact {
+  align-self: start;
+  justify-self: start;
+  color: #c5f9de;
+  font: 700 clamp(11px, 1.6vw, 14px)/1.4 system-ui, sans-serif;
+  text-decoration: none;
+}
+.gp-banner-contact span { white-space: nowrap; }
+.gp-banner-contact:hover, .gp-banner-contact:focus-visible { text-decoration: underline; }
+.gp-catalog-banner .gp-banner-mascot {
+  grid-area: 1 / 2 / span 2;
+  align-self: end;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px #a26bdf55);
+}
+.gp-banner-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 89px), 1fr));
+  gap: 7px;
+  grid-column: 1;
+  min-width: 0;
+}
+.gp-banner-products:empty { display: none; }
+.gp-banner-products:has(> figure:only-child) { width: min(100%, 235px); }
+.gp-banner-products figure {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  margin: 0;
+  padding: 5px;
+  border: 1px solid #8b9ad26b;
+  border-radius: 9px;
+  background: #142450;
+}
+.gp-banner-products figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.25;
+  object-fit: contain;
+  background: #f8fafc;
+  border-radius: 5px;
+}
+.gp-banner-products figcaption {
+  align-self: center;
+  padding: 5px 2px 1px;
+  color: #f5f7ff;
+  font: 650 clamp(9px, 1.1vw, 12px)/1.2 system-ui, sans-serif;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 650px) {
+  .gp-catalog-banner {
+    grid-template-columns: minmax(0, 1fr) minmax(80px, 30%);
+    gap: 8px;
+  }
+  .gp-catalog-banner .gp-banner-mascot { grid-row: 1; align-self: center; }
+  .gp-banner-heading { gap: 4px 7px; }
+  .gp-catalog-banner #gp-catalog-banner-title { font-size: clamp(17px, 5vw, 28px); }
+  .gp-banner-products { grid-column: 1 / -1; }
+}
+@media print { .gp-catalog-banner { display: none; } }

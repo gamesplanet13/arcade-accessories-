@@ -100,6 +100,80 @@ window.render=function(...args){
  catalog.querySelectorAll('[data-gp-quantity-source]').forEach(el=>{el.value=document.getElementById(el.dataset.gpQuantitySource)?.value||'0';});
  return result;
 };
+function listedProduct(p){
+ if(!p||p.includedOnly||p.cpuAddonOnly||p.hiddenFromStore||p.available===false||p.stock===0||p.aliasOf)return false;
+ if(!GPStock.allowed(p.name)||(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name)))return false;
+ if(newView)return p.isNew;
+ if((allView||page==='arcade')&&(/xbox/i.test(p.name)||(/turbo/i.test(p.name)&&/controller|gamepad/i.test(p.name))))return false;
+ return allView||categoryProductAllowed(p);
+}
+
+const banner = document.createElement('section');
+banner.className = 'gp-catalog-banner';
+banner.setAttribute('aria-labelledby','gp-catalog-banner-title');
+banner.innerHTML = `<div class="gp-banner-heading">
+ <img class="gp-banner-logo" src="games-planet-icon-512.png" width="512" height="512" alt="Games Planet">
+ <a class="gp-banner-contact" href="https://wa.me/917983624797" aria-label="Games Planet on WhatsApp, 7983624797">WhatsApp <span>7983624797</span></a>
+</div>
+<div class="gp-banner-products"></div>
+<img class="gp-banner-mascot" src="images/games-planet-mascot.webp" width="520" height="520" alt="" decoding="async">`;
+const bannerTitle = nav.querySelector('h1');
+bannerTitle.id = 'gp-catalog-banner-title';
+banner.querySelector('.gp-banner-contact').before(bannerTitle);
+document.body.prepend(banner);
+const bannerProducts = banner.querySelector('.gp-banner-products');
+const arcadeBannerNames = [
+ '28mm Imported Arcade Push Button',
+ 'Rasila Handle (Without Switch)',
+ 'MD Handle (With Switch)',
+ 'Coin Drop Switch Button',
+ 'Remote Plate (Red Colour)',
+ 'USB Arcade PCB'
+];
+function photoOptions(product){
+ const variantPhotos = (product.variants||[])
+  .filter(variant=>GPStock.allowed(product.name,variant))
+  .map(variant=>product.variantImages?.[variant]);
+ return [...new Set([...variantPhotos,...(product.images||[])])]
+  .filter(src=>src&&!/pending|placeholder|^data:/i.test(src));
+}
+function renderBanner(){
+ const names = new Set([...catalog.querySelectorAll('.product')].map(card=>card.dataset.productName));
+ const candidates = new Map(products.filter(p=>names.has(p.name)&&listedProduct(p)).map(p=>[p.name,photoOptions(p)]));
+ const localPhotos = [...candidates.keys()].filter(name=>candidates.get(name).some(src=>!/^(?:https?:)?\/\//i.test(src)));
+ const featured = allView?['Arcade Box — Mini / Counter / Full Body',...arcadeBannerNames.filter(name=>name!=='Rasila Handle (Without Switch)')]
+  :!newView&&page==='arcade'?arcadeBannerNames:[];
+ const used = new Set();
+ const photos = [];
+ for(const name of new Set([...featured,...localPhotos,...candidates.keys()])){
+  const sources = (candidates.get(name)||[]).filter(src=>!used.has(src));
+  if(!sources.length)continue;
+  used.add(sources[0]);
+  photos.push({name,sources});
+  if(photos.length===6)break;
+ }
+ const signature = JSON.stringify(photos);
+ if(bannerProducts.dataset.photos===signature)return;
+ bannerProducts.dataset.photos=signature;
+ bannerProducts.replaceChildren();
+ for(const {name,sources} of photos){
+  const tile=document.createElement('figure');
+  const image=document.createElement('img');
+  image.alt='';
+  image.decoding='async';
+  const caption=document.createElement('figcaption');
+  caption.textContent=name;
+  let next=1;
+  image.addEventListener('error',()=>{
+   if(next<sources.length)image.src=sources[next++];
+   else tile.remove();
+  });
+  tile.append(image,caption);
+  image.src=sources[0];
+  bannerProducts.append(tile);
+ }
+}
+
 function apply(){
  let count=0;
  const q=search?.value.toLowerCase().trim()||'';
@@ -111,12 +185,7 @@ function apply(){
    const name=card.dataset.productName||(title?.textContent||'');
    card.dataset.productName=name;
    const p=products.find(x=>x.name===name);
-   const arcadeExcluded=p&&(allView||page==='arcade')&&(/xbox/i.test(p.name)||(/turbo/i.test(p.name)&&/controller|gamepad/i.test(p.name)));
-   const ok=p&&!p.includedOnly&&!p.cpuAddonOnly&&!p.hiddenFromStore&&p.available!==false&&p.stock!==0
-    &&(typeof GPStock==='undefined'||GPStock.allowed(p.name))&&(newView||!arcadeExcluded)
-    &&!(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name))
-    &&!p.aliasOf
-    &&(newView?p.isNew:allView||categoryProductAllowed(p))&&(!q||card.textContent.toLowerCase().includes(q));
+   const ok=listedProduct(p)&&(!q||card.textContent.toLowerCase().includes(q));
    card.hidden=!ok;
    card.style.display=ok?'':'none';
    if(p?.isNew){
@@ -172,6 +241,8 @@ if(allView){
 }
 orderProductCards();
 apply();
+renderBanner();
+document.addEventListener('gp:master-stock-ready',renderBanner);
 if(allView)openLinkedCategory(location.hash);
 window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.parse(localStorage.getItem('gp_cart')||'{}'),products)}catch(_){saved={}};Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,saved);products.forEach((p,i)=>{const el=document.getElementById('q'+i);if(el){const value=String(state[i]||0);if('value' in el)el.value=value;else el.textContent=value};for(const v of p.variants||[]){const el=document.getElementById('vq'+i+'_'+v.replace(/\s+/g,'_'));if(el){const value=String(state['v_'+i+'_'+v]||0);if('value' in el)el.value=value;else el.textContent=value}}});render();apply();});
 })();
