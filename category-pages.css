@@ -281,6 +281,8 @@ html body #products#products#products.gp-responsive-catalog .gp-product-pack{
  opacity:.85;
 }
 
+.catalog-controls[hidden] { display: none !important; }
+
 .gp-catalog-banner {
   --art-accent: #4dd8ff;
   position: relative;
@@ -402,14 +404,14 @@ html body #products#products#products.gp-responsive-catalog .gp-product-pack{
   mask-image: radial-gradient(ellipse closest-side at 50% 56%, #000 72%, transparent 100%);
 }
 .gp-banner-product[data-art="box"] {
-  left: 2%;
-  bottom: 4%;
-  width: min(59%, 480px);
+  left: 4%;
+  bottom: 0;
+  width: min(58%, 450px);
   height: auto;
 }
 .gp-banner-product[data-art="box"] img {
   height: auto;
-  clip-path: polygon(3% 49%, 15% 21%, 86% 21%, 98% 49%, 87% 81%, 13% 81%);
+  clip-path: polygon(3.1% 49%, 17.2% 26.3%, 17.5% 25.5%, 18.15% 24.7%, 19.2% 24.42%, 20.2% 24.8%, 20.95% 25.65%, 61.7% 25.5%, 62.28% 24.45%, 63.14% 23.73%, 64% 23.64%, 64.9% 24.15%, 65.4% 25.4%, 83.3% 25.45%, 97.98% 48.4%, 97.75% 49.75%, 87.05% 79.1%, 12.72% 79.39%);
 }
 .gp-banner-product[data-art="button"] {
   left: 9%;
@@ -446,10 +448,10 @@ html body #products#products#products.gp-responsive-catalog .gp-product-pack{
 .gp-catalog-banner[data-composition="button"] .gp-banner-product[data-art="handle"] { left: 27%; height: 62%; }
 .gp-catalog-banner[data-composition="button"] .gp-banner-product[data-art="switch"] { left: 44%; width: 18%; }
 .gp-banner-product[data-art="plate"] {
-  left: 2%;
-  bottom: 2%;
-  width: 17%;
-  height: 23%;
+  left: 3%;
+  bottom: 4%;
+  width: min(15%, 148px);
+  height: auto;
   transform: rotate(-9deg);
 }
 .gp-banner-product[data-art="plate"] img {
@@ -458,11 +460,11 @@ html body #products#products#products.gp-responsive-catalog .gp-product-pack{
 }
 .gp-banner-product[data-art="pcb"] {
   left: 46%;
-  bottom: 0;
+  bottom: 5%;
   width: 15%;
-  height: 23%;
+  height: 21%;
   mix-blend-mode: screen;
-  transform: rotate(8deg);
+  transform: rotate(4deg);
 }
 .gp-banner-product[data-art="wheel"] { left: 8%; width: 42%; height: 62%; }
 .gp-catalog-banner[data-composition="wheel"] .gp-banner-mascot {

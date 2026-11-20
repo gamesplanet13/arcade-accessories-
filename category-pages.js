@@ -138,11 +138,15 @@ banner.innerHTML = `<div class="gp-banner-heading">
  <a class="gp-banner-contact" href="https://wa.me/917983624797" aria-label="Games Planet on WhatsApp, 7983624797">WhatsApp <span>7983624797</span></a>
 </div>
 <div class="gp-banner-products"></div>
-<img class="gp-banner-mascot" src="images/games-planet-mascot.webp" width="520" height="520" alt="" decoding="async">`;
+<img class="gp-banner-mascot" src="images/catalog-mascot-${genre}.webp" width="520" height="520" alt="" decoding="async">`;
 const bannerTitle = nav.querySelector('h1');
 bannerTitle.id = 'gp-catalog-banner-title';
 banner.querySelector('.gp-banner-contact').before(bannerTitle);
 const mascot = banner.querySelector('.gp-banner-mascot');
+mascot.addEventListener('error',()=>{
+ const fallback='images/games-planet-mascot.webp';
+ if(mascot.getAttribute('src')!==fallback)mascot.src=fallback;
+});
 document.body.prepend(banner);
 const bannerProducts = banner.querySelector('.gp-banner-products');
 const arcadeBoxName = 'Arcade Box — Mini / Counter / Full Body';
@@ -194,7 +198,7 @@ function renderBanner(){
  bannerProducts.dataset.photos=signature;
  bannerProducts.replaceChildren();
  banner.dataset.composition = photos[0]?.art||'empty';
- const mascotSrc = photos[0]?.art==='wheel'?'images/catalog-mascot-racing-wheel.webp':'images/games-planet-mascot.webp';
+ const mascotSrc = photos[0]?.art==='wheel'?'images/catalog-mascot-racing-wheel.webp':'images/catalog-mascot-'+genre+'.webp';
  if(mascot.getAttribute('src')!==mascotSrc)mascot.src=mascotSrc;
  for(const {name,art,sources} of photos){
   const artLayer=document.createElement('span');
