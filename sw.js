@@ -1,8 +1,9 @@
-const CACHE_NAME="games-planet-catalog-banners-20261120-v6";
+const CACHE_NAME="games-planet-game-styles-20261120-v7";
 const APP_SHELL=[
   "./","./index.html","./layout-safety.css","./classic.html","./new.html","./store-navigation.js","./stock-rules.js","./stock-ui.js","./stock-checkout.js","./images/cpu-box-zebronics.png","./images/switch-pin-4-8mm.png","./configure.html","./configure.js","./configure.css","./setup-data.js","./setup-engine.js","./configured-cart.js","./setup-checkout.js","./game-selector.html","./selector-order.js","./Simple.html","./order-prefill.html","./bigship-rate-calculator.html","./delhivery-config.js","./invoice.html","./manifest.webmanifest",
-  "./assets/html2canvas.min.js","./images/games-planet-mascot.webp",
-  "./category-pages.js?v=20261120-catalog-banners","./category-pages.css?v=20261120-catalog-banners",
+  "./assets/html2canvas.min.js",
+  "./category-pages.js?v=20261120-game-styles","./category-pages.css?v=20261120-game-styles",
+  "./images/games-planet-mascot.webp","./images/catalog-genre-arcade.webp",
   "./games-planet-logo-transparent.png","./games-planet-icon-192.png","./games-planet-icon-512.png",
   "./NonGSTcurrentQR.jpg","./GSTcurrentQR.png","./pincode_merged_final.json"
 ];

@@ -282,41 +282,64 @@ html body #products#products#products.gp-responsive-catalog .gp-product-pack{
 }
 
 .gp-catalog-banner {
+  --art-accent: #4dd8ff;
   position: relative;
   isolation: isolate;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(180px, 27%);
-  align-items: center;
-  gap: 14px 18px;
   width: calc(100% - 16px);
+  min-height: clamp(245px, 34vw, 395px);
   max-width: 1100px;
   margin: 8px auto 14px;
-  padding: clamp(12px, 2.5vw, 27px);
   overflow: hidden;
   color: #fff;
-  background:
-    radial-gradient(ellipse at 88% 55%, #4c1c68, transparent 45%),
-    radial-gradient(ellipse at 12% 88%, #163d88, transparent 55%),
-    #0b1630;
-  border: 1px solid #5666a3;
+  background: radial-gradient(ellipse at 78% 72%, #304779, transparent 67%), #071029;
+  border: 1px solid #5b6d9d;
   border-radius: 16px;
-  box-shadow: 0 8px 23px #080f2e26;
+  box-shadow: 0 8px 23px #080f2e35;
+}
+.gp-catalog-banner[data-game-genre="arcade"],
+.gp-catalog-banner[data-game-genre="wrestling"] { --art-accent: #f4a0fe; }
+.gp-catalog-banner[data-game-genre="racing"],
+.gp-catalog-banner[data-game-genre="mythic"] { --art-accent: #ffd695; }
+.gp-catalog-banner::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background:
+    linear-gradient(115deg, #071029ec, #07102945 53%, #07102910 100%),
+    var(--gp-banner-scene, none) center / cover no-repeat;
+}
+.gp-catalog-banner::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 5%;
+  right: 4%;
+  bottom: -17%;
+  height: 59%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, color-mix(in srgb,var(--art-accent) 40%, transparent), transparent 67%);
+  transform: scaleY(.75);
+  pointer-events: none;
 }
 .gp-banner-heading {
-  grid-column: 1;
+  position: relative;
+  z-index: 4;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
-  gap: 2px 12px;
-  min-width: 0;
+  gap: 3px 12px;
+  width: min(65%, 690px);
+  padding: clamp(10px, 2.1vw, 28px) 0 0 clamp(10px, 2.1vw, 28px);
   text-align: left;
 }
 .gp-catalog-banner .gp-banner-logo {
-  grid-row: span 2;
   display: block;
-  width: clamp(56px, 8vw, 88px);
+  grid-row: span 2;
+  width: clamp(49px, 8vw, 87px);
   height: auto;
   aspect-ratio: 1;
+  filter: drop-shadow(0 2px 8px #0009);
 }
 .gp-catalog-banner #gp-catalog-banner-title {
   align-self: end;
@@ -324,74 +347,139 @@ html body #products#products#products.gp-responsive-catalog .gp-product-pack{
   background: none;
   color: #fff;
   -webkit-text-fill-color: currentColor;
-  font: 850 clamp(24px, 4.3vw, 46px)/1.04 system-ui, sans-serif;
-  letter-spacing: -.035em;
+  font: italic 950 clamp(18px, 4.9vw, 58px)/1.01 system-ui, sans-serif;
+  letter-spacing: -.048em;
+  text-transform: uppercase;
   text-align: left;
-  text-wrap: balance;
+  text-shadow: 0 2px 3px #000, 0 0 22px #091030;
 }
 .gp-catalog-banner .gp-banner-contact {
   align-self: start;
   justify-self: start;
-  color: #c5f9de;
-  font: 700 clamp(11px, 1.6vw, 14px)/1.4 system-ui, sans-serif;
+  color: #d3ffdf;
+  font: 760 clamp(10px, 1.55vw, 16px)/1.35 system-ui, sans-serif;
   text-decoration: none;
+  text-shadow: 0 1px 4px #000;
 }
 .gp-banner-contact span { white-space: nowrap; }
 .gp-banner-contact:hover, .gp-banner-contact:focus-visible { text-decoration: underline; }
 .gp-catalog-banner .gp-banner-mascot {
-  grid-area: 1 / 2 / span 2;
-  align-self: end;
+  position: absolute;
+  z-index: 2;
+  right: 1%;
+  bottom: 3%;
   display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
+  width: 44%;
+  height: 91%;
   object-fit: contain;
-  filter: drop-shadow(0 0 20px #a26bdf55);
+  object-position: 65% 100%;
+  filter: drop-shadow(0 4px 4px #0207168c) drop-shadow(0 0 18px #9c74d235);
 }
 .gp-banner-products {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 89px), 1fr));
-  gap: 7px;
-  grid-column: 1;
-  min-width: 0;
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
 }
-.gp-banner-products:empty { display: none; }
-.gp-banner-products:has(> figure:only-child) { width: min(100%, 235px); }
-.gp-banner-products figure {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  min-width: 0;
-  margin: 0;
-  padding: 5px;
-  border: 1px solid #8b9ad26b;
-  border-radius: 9px;
-  background: #142450;
+.gp-banner-product {
+  position: absolute;
+  left: 7%;
+  bottom: 5%;
+  display: block;
+  width: 45%;
+  height: 63%;
+  filter: drop-shadow(0 12px 9px #040717a8);
 }
-.gp-banner-products figure img {
+.gp-banner-product img {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1.25;
+  height: 100%;
   object-fit: contain;
-  background: #f8fafc;
-  border-radius: 5px;
+  object-position: 50% 100%;
 }
-.gp-banner-products figcaption {
-  align-self: center;
-  padding: 5px 2px 1px;
-  color: #f5f7ff;
-  font: 650 clamp(9px, 1.1vw, 12px)/1.2 system-ui, sans-serif;
-  text-align: center;
-  overflow-wrap: anywhere;
+.gp-banner-product[data-art="product"] img,
+.gp-banner-product[data-art="cpu"] img {
+  mask-image: radial-gradient(ellipse closest-side at 50% 56%, #000 72%, transparent 100%);
 }
-@media (max-width: 650px) {
-  .gp-catalog-banner {
-    grid-template-columns: minmax(0, 1fr) minmax(80px, 30%);
-    gap: 8px;
-  }
-  .gp-catalog-banner .gp-banner-mascot { grid-row: 1; align-self: center; }
-  .gp-banner-heading { gap: 4px 7px; }
-  .gp-catalog-banner #gp-catalog-banner-title { font-size: clamp(17px, 5vw, 28px); }
-  .gp-banner-products { grid-column: 1 / -1; }
+.gp-banner-product[data-art="box"] {
+  left: 2%;
+  bottom: 4%;
+  width: min(59%, 480px);
+  height: auto;
+}
+.gp-banner-product[data-art="box"] img {
+  height: auto;
+  clip-path: polygon(3% 49%, 15% 21%, 86% 21%, 98% 49%, 87% 81%, 13% 81%);
+}
+.gp-banner-product[data-art="button"] {
+  left: 9%;
+  bottom: 2%;
+  width: 22%;
+  height: 32%;
+}
+.gp-banner-product[data-art="button"] img {
+  height: auto;
+  clip-path: polygon(10% 33%, 10% 23%, 16% 13%, 26% 7%, 55% 1%, 68% 5%, 74% 13%, 74% 29%, 66% 37%, 48% 49%, 32% 54%, 21% 51%);
+}
+.gp-banner-product[data-art="handle"] {
+  left: 28%;
+  bottom: 1%;
+  width: 20%;
+  height: 50%;
+}
+.gp-banner-product[data-art="switch"] {
+  left: 45%;
+  bottom: 3%;
+  width: 16%;
+  height: 23%;
+}
+.gp-banner-product[data-art="switch"] img {
+  height: auto;
+  clip-path: polygon(2% 33%, 97% 4%, 97% 7%, 35% 33%, 35% 67%, 33% 95%, 30% 95%, 30% 67%, 23% 67%, 23% 95%, 19% 95%, 19% 67%, 13% 67%, 13% 95%, 9% 95%, 9% 68%, 2% 62%);
+}
+.gp-catalog-banner[data-composition="button"] .gp-banner-product[data-art="button"] {
+  left: 5%;
+  width: 33%;
+  height: 51%;
+  bottom: -3%;
+}
+.gp-catalog-banner[data-composition="button"] .gp-banner-product[data-art="handle"] { left: 27%; height: 62%; }
+.gp-catalog-banner[data-composition="button"] .gp-banner-product[data-art="switch"] { left: 44%; width: 18%; }
+.gp-banner-product[data-art="plate"] {
+  left: 2%;
+  bottom: 2%;
+  width: 17%;
+  height: 23%;
+  transform: rotate(-9deg);
+}
+.gp-banner-product[data-art="plate"] img {
+  height: auto;
+  clip-path: inset(1% 7% 2% 7% round 3px);
+}
+.gp-banner-product[data-art="pcb"] {
+  left: 46%;
+  bottom: 0;
+  width: 15%;
+  height: 23%;
+  mix-blend-mode: screen;
+  transform: rotate(8deg);
+}
+.gp-banner-product[data-art="wheel"] { left: 8%; width: 42%; height: 62%; }
+.gp-catalog-banner[data-composition="wheel"] .gp-banner-mascot {
+  right: 1%;
+  width: auto;
+  max-width: 54%;
+  height: 94%;
+  aspect-ratio: 1;
+  object-position: center;
+  clip-path: polygon(24% 0, 70% 0, 72% 27%, 79% 35%, 83% 50%, 81% 63%, 89% 80%, 96% 84%, 97% 95%, 91% 100%, 5% 100%, 0 96%, 0 80%, 11% 74%, 11% 53%, 18% 46%, 19% 37%, 32% 32%, 29% 15%);
+}
+@media (max-width:650px) {
+  .gp-catalog-banner { min-height: clamp(194px, 56vw, 315px); }
+  .gp-banner-heading { gap: 3px 7px; width: 68%; }
+  .gp-catalog-banner .gp-banner-logo { width: clamp(35px, 11vw, 58px); }
+  .gp-catalog-banner #gp-catalog-banner-title { font-size: clamp(16px, 5vw, 32px); }
+  .gp-catalog-banner .gp-banner-mascot { width: 45%; height: 79%; right: 0; }
+  .gp-catalog-banner[data-composition="wheel"] .gp-banner-mascot { height: auto; width: 53%; right: 1%; }
 }
 @media print { .gp-catalog-banner { display: none; } }
