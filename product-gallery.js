@@ -5,13 +5,13 @@ const style=document.createElement('style');style.textContent=`
 
 .gp-lightbox{padding:98px 12px 82px;box-sizing:border-box}
 .gp-photo-brand,.gp-photo-link{position:absolute;z-index:1;user-select:none}
-.gp-photo-brand{top:16px;left:max(12px,calc((100% - 1200px)/2));display:flex;align-items:center;gap:9px;text-align:left;font-family:system-ui,sans-serif;text-shadow:0 1px 3px #000;line-height:1.1}
+.gp-photo-brand{top:0;left:0;max-width:calc(100% - 76px);display:flex;align-items:center;gap:9px;text-align:left;font-family:system-ui,sans-serif;text-shadow:0 1px 3px #000;line-height:1.1;pointer-events:none}
 .gp-photo-brand img{display:block;width:44px;height:44px;flex:0 0 44px;object-fit:contain}
 .gp-photo-brand strong{display:block;font-size:clamp(13px,3.6vw,18px);font-style:italic;font-weight:900;letter-spacing:.02em;color:#fff}
 .gp-photo-brand em{color:#52cfff;font-style:inherit}
 .gp-photo-brand small{display:block;margin-top:4px;font-size:11px;font-weight:650;color:#fff}
 .gp-photo-brand small::before{content:"";display:inline-block;width:6px;height:6px;margin:0 4px 1px 0;border-radius:50%;background:#36dc7b}
-.gp-photo-link{bottom:48px;left:55px;right:55px;margin:0;text-align:center;color:#e1edff;font:600 clamp(9px,2.5vw,12px)/1.3 system-ui,sans-serif;overflow-wrap:anywhere;text-shadow:0 1px 3px #000}
+.gp-photo-link{top:0;left:0;right:auto;bottom:auto;margin:0;text-align:center;color:#e1edff;font:600 clamp(9px,2.5vw,12px)/1.3 system-ui,sans-serif;overflow-wrap:anywhere;text-shadow:0 1px 3px #000;pointer-events:none}
 .gp-lightbox .gp-lightbox-frame img{cursor:zoom-in;transform-origin:center;user-select:none;-webkit-user-drag:none}
 .gp-lightbox .gp-lightbox-frame.gp-is-zoomed img{cursor:grab}
 .gp-lightbox .gp-lightbox-frame.gp-is-zoomed img:active{cursor:grabbing}
@@ -52,6 +52,32 @@ document.querySelectorAll('.gp-capture-watermark,.gp-product-watermark').forEach
 const pointers=new Map();
 let zoom=1,x=0,y=0,start=null,pinch=null,usedPinch=false;
 const cap=(value,min,max)=>Math.max(min,Math.min(max,value));
+// Anchor both labels to the actual fitted image, not to the screen edges.
+// Keep the labels outside the image whenever the photo has enough surrounding space.
+function placePreviewBranding(){
+ if(modal.hidden||!photo.complete||!photo.naturalWidth)return;
+ const modalRect=modal.getBoundingClientRect();
+ const frameRect=frame.getBoundingClientRect();
+ if(!frameRect.width||!frameRect.height)return;
+ const fit=fittedSize(photo,frameRect.width,frameRect.height);
+ const imageLeft=frameRect.left-modalRect.left+(frameRect.width-fit.width)/2;
+ const imageTop=frameRect.top-modalRect.top+(frameRect.height-fit.height)/2;
+ const imageBottom=imageTop+fit.height;
+ const margin=8;
+ const labelHeight=brand.getBoundingClientRect().height||49;
+ const brandOutside=imageTop-labelHeight-margin>=8;
+ const brandTop=brandOutside?imageTop-labelHeight-margin:imageTop+margin;
+ const brandLeft=cap(imageLeft+margin,8,Math.max(8,modalRect.width-76));
+ brand.style.top=Math.round(brandTop)+'px';
+ brand.style.left=Math.round(brandLeft)+'px';
+ brand.style.maxWidth=Math.max(100,Math.min(fit.width-2*margin,modalRect.width-brandLeft-60))+'px';
+ const linkHeight=link.getBoundingClientRect().height||18;
+ const linkOutside=imageBottom+margin+linkHeight<=modalRect.height-64;
+ const linkTop=linkOutside?imageBottom+margin:imageBottom-linkHeight-margin;
+ link.style.top=Math.round(linkTop)+'px';
+ link.style.left=Math.round(imageLeft+margin)+'px';
+ link.style.width=Math.max(80,fit.width-2*margin)+'px';
+}
 function drawZoom(){
  const fit=fittedSize(photo,frame.clientWidth,frame.clientHeight);
  const maxX=Math.max(0,(fit.width*zoom-frame.clientWidth)/2);
@@ -60,8 +86,7 @@ function drawZoom(){
  y=cap(y,-maxY,maxY);
  photo.style.transform='translate('+x+'px,'+y+'px) scale('+zoom+')';
  frame.classList.toggle('gp-is-zoomed',zoom>1);
- const rect=frame.getBoundingClientRect();
-
+ placePreviewBranding();
 }
 function zoomAt(next,point,oldPoint=point){
  const rect=frame.getBoundingClientRect();
@@ -144,6 +169,7 @@ function open(list,src){
   try{history.pushState({...history.state,gpProductGalleryOpen:true},'',location.href);hasHistory=true;}catch(_){hasHistory=false;}
  }
  paint();
+ requestAnimationFrame(placePreviewBranding);
  modal.querySelector('.gp-close').focus();
 }
 function close(fromBack=false){
