@@ -136,10 +136,10 @@ GPShop.prepare=function(products){
    p.variantPrices={...(p.variantPrices||{}),'Pink (H54)':46};
    p.variantImages={Blue:gpBtnImg('baolian-blue'),Green:gpBtnImg('baolian-green'),Yellow:gpBtnImg('baolian-yellow'),Black:gpBtnImg('baolian-black'),'Pink (H54)':gpBtnImg('h54-pink')};
    p.variantStocks={...(p.variantStocks||{}),'Pink (H54)':999};
-   p.images=Object.values(p.variantImages);p.price=46;p.weight=12;p.dimensions=[5,4,4];
+   p.images=Object.values(p.variantImages);p.price=46;p.weight=15;p.dimensions=[5,4,4];
   }else if(p.name==='Imported Arcade Push Button H60 / H54'){
    p.variantImages={'Green (H60)':gpBtnImg('h60-green'),'Pink (H54)':gpBtnImg('h54-pink')};
-   p.price=46;p.weight=12;p.dimensions=[5,4,4];
+   p.price=46;p.weight=15;p.dimensions=[5,4,4];
    p.variantPrices={'Green (H60)':46,'Pink (H54)':46};
    p.variantStocks={'Green (H60)':0,'Pink (H54)':0};
    p.stock=0;p.available=false;p.hiddenFromStore=true;p.aliasOf='28mm Imported Arcade Push Button';

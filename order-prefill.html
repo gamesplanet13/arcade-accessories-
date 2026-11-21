@@ -1226,6 +1226,20 @@ function gpzGamingShippingProfile(name,variant=''){
  }
  return null;
 }
+const gpzArcadeUnitWeights = {
+  "Coin Drop Switch Button": 25,
+  "Coin Packet": 630,
+  "Acrylic Coin Machine": 165,
+  "Coin Acrylic Machine": 165,
+  "Acrylic Coin Machine with Switch": 170,
+  "Coin Acrylic Machine with Switch": 170,
+  "Rasila Handle (Without Switch)": 300,
+  "Rasila Handle (With Switch)": 320,
+  "Rasila Handle with 4 Black Switches": 320,
+  "28mm Imported Arcade Push Button": 15,
+  "Push Button (Imported)": 15,
+  "BAO LIAN Imported Arcade Push Button": 15
+};
 function gpzNormalizeIncomingItem(i){
   const quantity=Math.max(1,Number(i?.quantity)||1);
   const unitPrice=Number(i?.unitPrice)||0;
@@ -1233,12 +1247,15 @@ function gpzNormalizeIncomingItem(i){
   const variant=String(i?.variant||"").trim();
   const name=String(i?.name||((variant&&variant!=="PS2")? `${product} — ${variant}`:product)||"PS2 Product");
   const shipping=(i?.cpuBuild||i?.arcadeBuild||i?.shippingIgnoreDimensions)?null:gpzGamingShippingProfile(product||name,variant);
-  const unitWeight=shipping?.weight??(Number.isFinite(Number(i?.unitWeight))?Math.max(0,Number(i.unitWeight)):gpzInferWeight(product||name,variant));
+  const wire = /^10 Core Wire(?:$| (?:\(Per Meter\)|— ₹35 per Meter)$)/i.test(product||name);
+  const arcadeWeight = i?.cpuBuild || i?.arcadeBuild || !Object.hasOwn(gpzArcadeUnitWeights,product||name) ? undefined : gpzArcadeUnitWeights[product||name];
+  const unitWeight=shipping?.weight??(wire?37.5:arcadeWeight)??(Number.isFinite(Number(i?.unitWeight))?Math.max(0,Number(i.unitWeight)):gpzInferWeight(product||name,variant));
   return {
     ...i,name,product,variant,pack:String(i?.pack||""),quantity,unitPrice,
     lineTotal:Number(i?.lineTotal)||(unitPrice*quantity),
     unitWeight,lineWeight:unitWeight*quantity,
-    dimensions:shipping?.dimensions||i?.dimensions||i?.unitDimensions||i?.size||""
+    ...(wire?{dimensionsPerMeters:2,shippingPackages:[{dimensions:[7,7,2],quantity:Math.ceil(quantity/2)}]}:{}),
+    dimensions:wire?[7,7,2]:shipping?.dimensions||i?.dimensions||i?.unitDimensions||i?.size||""
   };
 }
 
@@ -1262,7 +1279,7 @@ function gpzInferWeight(product,variant){
 function gpzItemDimensions(item){
   if(item?.shippingIgnoreDimensions&&!(item?.dimensions?.length))return "Mounted inside Full Body Arcade — no separate TV carton";
   if(item&&item.dimensions){
-    if(Array.isArray(item.dimensions)) return item.dimensions.join(" × ")+" cm";
+    if(Array.isArray(item.dimensions)) return item.dimensions.join(" × ")+" cm"+(item.dimensionsPerMeters?" per "+item.dimensionsPerMeters+" m":"");
     return String(item.dimensions);
   }
   const w=Number(item?.unitWeight)||0;
@@ -1614,13 +1631,13 @@ function computeTotals(){
     if(i.product&&i.product!==i.name) details.push(`Product: <b>${gpzEscape(i.product)}</b>`);
     if(i.variant) details.push(`Variant: <b>${gpzEscape(i.variant)}</b>`);
     if(i.pack) details.push(`Pack: <b>${gpzEscape(i.pack)}</b>`);
-    details.push(`Quantity: <b>${i.quantity}</b>`);
+    details.push(`Quantity: <b>${i.quantity}${i.dimensionsPerMeters?" m":""}</b>`);
     details.push(`Price: ${gpzMoney(i.unitPrice)} × ${i.quantity} = <b>${gpzMoney(i.lineTotal)}</b>`);
     const dims=Array.isArray(i.dimensions)&&i.dimensions.length===3&&i.dimensions.every(x=>Number(x)>0)?i.dimensions.map(Number):null;
-    details.push(`Unit weight: <b>${i.unitWeight>0?gpzEscape(i.unitWeight)+' g':'Not available'}</b>`);
+    details.push(`Unit weight: <b>${i.unitWeight>0?gpzEscape(i.unitWeight)+' g'+(i.dimensionsPerMeters?' per m':''):'Not available'}</b>`);
     details.push(`Weight × ${i.quantity}: <b>${i.unitWeight>0?gpzEscape(i.lineWeight)+' g':'Not available'}</b>`);
-    details.push(`Unit dimensions: <b>${dims?gpzEscape(dims.join(' × '))+' cm':'Not available'}</b>`);
-    if(dims){const volume=dims.reduce((a,b)=>a*b,1);details.push(`Volume × ${i.quantity}: <b>${gpzEscape(Number((volume*i.quantity).toFixed(2)))} cm³</b> (item volume; final box size may differ)`);}
+    details.push(`${i.dimensionsPerMeters?`Dimensions per ${i.dimensionsPerMeters} m`:"Unit dimensions"}: <b>${dims?gpzEscape(gpzItemDimensions(i).replace(/ per \d+ m$/,"")):"Not available"}</b>`);
+    if(dims&&!i.dimensionsPerMeters){const volume=dims.reduce((a,b)=>a*b,1);details.push(`Volume × ${i.quantity}: <b>${gpzEscape(Number((volume*i.quantity).toFixed(2)))} cm³</b> (item volume; final box size may differ)`);}
     return `<div class="breakdown-item"><b>${n+1}. ${gpzEscape(i.name)}</b><br>${details.join("<br>")}</div>`;
   }).join("");
   const values={sumProducts:gpzMoney(productTotal),sumDiscount:appliedDiscount?"-"+gpzMoney(appliedDiscount):gpzMoney(0),sumProductGst:(m88Offer&&invoiceIncluded?'Included: ':'')+gpzMoney(productGst),sumWeight:totalWeight+"g",sumPacked:packedWeight+"g",

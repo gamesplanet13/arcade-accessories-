@@ -81,19 +81,19 @@ window.GPZ_PRODUCT_CATALOG = [
   {
     "name": "Acrylic Coin Machine",
     "price": 200,
-    "weight": 0,
+    "weight": 165,
     "size": ""
   },
   {
     "name": "Acrylic Coin Machine with Switch",
     "price": 260,
-    "weight": 0,
+    "weight": 170,
     "size": ""
   },
   {
     "name": "Coin Drop Switch Button",
     "price": 60,
-    "weight": 0,
+    "weight": 25,
     "size": ""
   },
   
@@ -124,7 +124,7 @@ window.GPZ_PRODUCT_CATALOG = [
   {
     "name": "Coin Packet",
     "price": 210,
-    "weight": 0,
+    "weight": 630,
     "size": ""
   },
   {
@@ -383,7 +383,7 @@ window.GPZ_PRODUCT_CATALOG = [
   {
     "name": "28mm Imported Arcade Push Button",
     "price": 46,
-    "weight": 12,
+    "weight": 15,
     "size": "5 × 4 × 4 cm"
   },
   {
@@ -392,7 +392,7 @@ window.GPZ_PRODUCT_CATALOG = [
     "available": false,
     "hiddenFromStore": true,
     "stock": 0,
-    "weight": 12,
+    "weight": 15,
     "size": "5 × 4 × 4 cm"
   },
   {
@@ -428,13 +428,13 @@ window.GPZ_PRODUCT_CATALOG = [
   {
     "name": "Rasila Handle with 4 Black Switches",
     "price": 290,
-    "weight": 0,
+    "weight": 320,
     "size": ""
   },
   {
     "name": "Rasila Handle (Without Switch)",
     "price": 210,
-    "weight": 0,
+    "weight": 300,
     "size": ""
   },
   {
