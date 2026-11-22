@@ -1,8 +1,8 @@
-const CACHE_NAME="games-planet-shared-catalog-20261122";
+const CACHE_NAME="games-planet-category-thumbnails-20261122";
 const APP_SHELL=[
   "./","./index.html","./layout-safety.css","./classic.html","./new.html","./store-navigation.js","./stock-rules.js","./stock-ui.js","./stock-checkout.js","./images/cpu-box-zebronics.png","./images/switch-pin-4-8mm.png","./configure.html","./configure.js","./configure.css","./setup-data.js","./setup-engine.js","./configured-cart.js","./setup-checkout.js","./game-selector.html","./selector-order.js","./Simple.html","./order-prefill.html","./bigship-rate-calculator.html","./delhivery-config.js","./invoice.html","./manifest.webmanifest",
   "./assets/html2canvas.min.js",
-  "./category-pages.js?v=20261120-product-ads","./category-pages.css?v=20261120-product-ads",
+  "./category-pages.js?v=20261122-thumbnails","./catalog-ad.js?v=20261122-thumbnails","./catalog-ad.css?v=20261122-thumbnails","./category-pages.css?v=20261120-product-ads",
   "./images/catalog-mascot-arcade.webp","./images/catalog-genre-arcade.webp","./images/arcade-box-mini.png","./images/arcade-box-counter.png","./images/arcade-box-full-32inch.png",
   "./games-planet-logo-transparent.png","./games-planet-icon-192.png","./games-planet-icon-512.png",
   "./NonGSTcurrentQR.jpg","./GSTcurrentQR.png","./pincode_merged_final.json"

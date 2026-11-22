@@ -109,114 +109,20 @@ function listedProduct(p){
  return allView||categoryProductAllowed(p);
 }
 
-const categoryBannerGenres = {
- arcade: 'arcade',
- 'arcade-box': 'fighting',
- ps2: 'fighting',
- ps3: 'wrestling',
- ps4: 'mythic',
- ps5: 'racing',
- consoles: 'fighting',
- cpu: 'mission',
- 'usb-storage': 'mission',
- gamebox: 'flying',
- gaming: 'racing',
- mobile: 'flying',
- coolers: 'flying',
- cables: 'mission',
- electrical: 'mission',
- batteries: 'racing',
- decoration: 'arcade'
-};
-const genre = newView?'racing':allView?'arcade':categoryBannerGenres[page]||'arcade';
-const banner = document.createElement('section');
-banner.className = 'gp-catalog-banner';
-banner.dataset.gameGenre = genre;
-banner.style.setProperty('--gp-banner-scene', `url("images/catalog-genre-${genre}.webp")`);
-banner.setAttribute('aria-labelledby','gp-catalog-banner-title');
-banner.innerHTML = `<div class="gp-banner-heading">
- <img class="gp-banner-logo" src="games-planet-icon-512.png" width="512" height="512" alt="Games Planet">
- <a class="gp-banner-contact" href="https://wa.me/917983624797" aria-label="Games Planet on WhatsApp, 7983624797">WhatsApp <span>7983624797</span></a>
-</div>
-<div class="gp-banner-products"></div>
-<img class="gp-banner-mascot" src="images/catalog-mascot-${genre}.webp" width="520" height="520" alt="" decoding="async">`;
-const bannerTitle = nav.querySelector('h1');
-bannerTitle.id = 'gp-catalog-banner-title';
-banner.querySelector('.gp-banner-contact').before(bannerTitle);
-const mascot = banner.querySelector('.gp-banner-mascot');
-mascot.addEventListener('error',()=>{
- const fallback='images/games-planet-mascot.webp';
- if(mascot.getAttribute('src')!==fallback)mascot.src=fallback;
-});
-document.body.prepend(banner);
-const bannerProducts = banner.querySelector('.gp-banner-products');
-const arcadeBoxName = 'Arcade Box — Mini / Counter / Full Body';
-const racingWheelName = 'PXN V3 Pro Steering Wheel and Pedal Set';
-const arcadeBannerNames = [
- '28mm Imported Arcade Push Button',
- 'MD Handle (With Switch)',
- 'Coin Drop Switch Button',
- 'Remote Plate (Red Colour)',
- 'USB Arcade PCB'
-];
-const scenePhotos = new Map([
- [arcadeBoxName, ['box','images/arcade-box-mini.png']],
- ['28mm Imported Arcade Push Button', ['button','images/approved/baolian-blue.jpg','Blue']],
- ['MD Handle (With Switch)', ['handle','images/png/md-handle-black.png','Black']],
- ['Coin Drop Switch Button', ['switch','images/coin-drop-switch-current.png']],
- [racingWheelName, ['wheel','images/png/pxn-v3-pro-black.png']],
- ['Remote Plate (Red Colour)', ['plate','images/jpeg/red-arcade-plate.jpg']],
- ['USB Arcade PCB', ['pcb','images/png/usb-arcade-pcb.png']],
- ['CPU Box — 6 Configurations', ['cpu','images/cpu-box-zebronics.png']]
-]);
-function photoOptions(product){
- const variantPhotos = (product.variants||[])
-  .filter(variant=>GPStock.allowed(product.name,variant))
-  .map(variant=>product.variantImages?.[variant]);
- return [...new Set([...variantPhotos,...(product.images||[])])]
-  .filter(src=>src&&!/pending|placeholder|^data:/i.test(src));
-}
+const bannerCategory = newView ? 'new' : allView ? 'arcade' : page;
+const bannerHeading = nav.querySelector('h1');
 function renderBanner(){
- const names = new Set([...catalog.querySelectorAll('.product')].map(card=>card.dataset.productName));
- const candidates = new Map(products.filter(p=>names.has(p.name)&&listedProduct(p)).map(p=>[p.name,photoOptions(p)]));
- const localPhotos = [...candidates.keys()].filter(name=>candidates.get(name).some(src=>!/^(?:https?:)?\/\//i.test(src)));
- const featured = allView?[arcadeBoxName,...arcadeBannerNames]
-  :!newView&&page==='arcade'?arcadeBannerNames
-  :!newView&&page==='gaming'?[racingWheelName]
-  :!newView&&page==='cpu'?['CPU Box — 6 Configurations']:[];
- const choices = [...new Set([...featured,...localPhotos,...candidates.keys()])];
- const photos = [];
- for(const name of choices){
-  const sources = candidates.get(name)||[];
-  if(!sources.length)continue;
-  const scenePhoto = scenePhotos.get(name);
-  const [art,src] = scenePhoto&&(!scenePhoto[2]||GPStock.allowed(name,scenePhoto[2]))?scenePhoto:['product',sources[0]];
-  photos.push({name,art,sources:[...new Set([src,...sources])]});
-  if(photos.length>=(featured.length>1?featured.length:1))break;
- }
- const signature = JSON.stringify(photos);
- if(bannerProducts.dataset.photos===signature)return;
- bannerProducts.dataset.photos=signature;
- bannerProducts.replaceChildren();
- banner.dataset.composition = photos[0]?.art||'empty';
- const mascotSrc = photos[0]?.art==='wheel'?'images/catalog-mascot-racing-wheel.webp':'images/catalog-mascot-'+genre+'.webp';
- if(mascot.getAttribute('src')!==mascotSrc)mascot.src=mascotSrc;
- for(const {name,art,sources} of photos){
-  const artLayer=document.createElement('span');
-  artLayer.className='gp-banner-product';
-  artLayer.dataset.art=art;
-  const image=document.createElement('img');
-  image.alt=name;
-  image.decoding='async';
-  let next=1;
-  image.addEventListener('error',()=>{
-   if(next<sources.length)image.src=sources[next++];
-   else artLayer.remove();
-  });
-  artLayer.append(image);
-  image.src=sources[0];
-  bannerProducts.append(artLayer);
- }
+ const ad=window.GPProductAd;
+ if(!ad)return;
+ const eligible=products.filter(listedProduct);
+ ad.mount(document.body,{title:label,category:bannerCategory,eligible,heading:bannerHeading,before:document.body.firstElementChild});
+}
+if(window.GPProductAd)renderBanner();
+else {
+ const adScript=document.createElement('script');
+ adScript.src='catalog-ad.js?v=20261122-thumbnails';
+ adScript.addEventListener('load',renderBanner,{once:true});
+ document.head.append(adScript);
 }
 
 function apply(){
