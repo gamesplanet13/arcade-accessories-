@@ -3,30 +3,26 @@
 function init(){
  if(document.getElementById('gp-global-navigation'))return;
  const base='https://gamesplanet13.github.io/',shop=base+'arcade-accessories-/';
+ const games=base+'Gamesplanet_in/';
+ const browse=slug=>games+'#shop/'+slug;
  const groups=[
- ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'order-prefill.html?source=cart&shared=1']]],
- ['Consoles & Game Systems',[
- ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
- ['Game Consoles · PS4','https://gamesplanet13.github.io/Gamesplanet_in/#shop/consoles'],
- ['PS2 Console',base+'ps2/'],
- ['PS2 FMCB & USB',base+'ps2fmcb/Simple.html'],
- ['CPU Models / CPU Box',shop+'cpu-setup.html'],
- ['Arcade Box',shop+'arcade-box.html']]],
- ['Parts & Accessories',[
- ['New Products / नए प्रोडक्ट',shop+'arcade.html?view=new'],
- ['Arcade Accessories',shop],
- ['PS2 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps2'],['PS3 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps3'],
- ['PS4 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps4'],['PS5 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps5'],
- ['Gaming Accessories',shop+'gaming.html'],['Computer Parts & Services',shop+'cpu.html'],['USB Storage — Batocera',shop+'usb-storage.html']]],
- ['Mobile & Electronics',[
- ['Mobile & Audio',shop+'mobile.html'],['Mobile Phone Coolers',shop+'coolers.html'],
- ['Cables',shop+'cables.html'],['Electrical Items',shop+'electrical.html'],
- ['Batteries & Chargers',shop+'batteries.html'],['Decoration',shop+'decoration.html']]],
- ['Game Selectors',[
- ['PS2 Game Selector',base+'ps2gameselector/'],['Game Selector',base+'gameselector/']]]
+  ['Your Account',[['Customer Login / My Orders',games+'customer.html'],['Shared Cart / Checkout',games+'#cart']]],
+  ['Consoles & Game Systems',[
+   ['Game Consoles',browse('consoles')],['PS2 Console',browse('ps2-consoles')],
+   ['PS2 FMCB & USB',browse('ps2-fmcb')],['Game Stick, Game Box & Handheld Consoles',browse('gamebox')],
+   ['CPU Models / CPU Box',games+'cpu-setup.html'],['Arcade Box',browse('arcade-box')]]],
+  ['Parts & Accessories',[
+   ['New Products / नए प्रोडक्ट',browse('new')],['Arcade Accessories',browse('arcade')],
+   ['PS2 Consoles & Accessories',browse('ps2')],['PS3 Consoles & Accessories',browse('ps3')],
+   ['PS4 Consoles & Accessories',browse('ps4')],['PS5 Consoles & Accessories',browse('ps5')],
+   ['Gaming Accessories',browse('gaming')],['Computer Parts & Services',browse('cpu')],
+   ['USB Storage — Batocera',browse('usb-storage')]]],
+  ['Mobile & Electronics',[
+   ['Mobile & Audio',browse('mobile')],['Mobile Phone Coolers',browse('coolers')],['Cables',browse('cables')],
+   ['Electrical Items',browse('electrical')],['Batteries & Chargers',browse('batteries')],['Decoration',browse('decoration')]]],
+  ['Game Selectors',[['PS2 Game Selector',games+'#selector/ps2'],['Game Selector',games+'#selector/games']]]
  ];
- const current=location.pathname.replace(/\/$/,'/index.html');
- const link=([label,url])=>'<a href="'+url+'"'+(new URL(url).pathname.replace(/\/$/,'/index.html')===current?' aria-current="page"':'')+'>'+label+'<span aria-hidden="true">›</span></a>';
+ const link=([label,url])=>'<a href="'+url+'">'+label+'<span aria-hidden="true">›</span></a>';
  const css=document.createElement('style');css.id='gp-drawer-style';css.textContent=
  '#gp-global-navigation,#gp-site-drawer,#gp-menu-shade{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,sans-serif;letter-spacing:normal}'+
  '#gp-global-navigation *,#gp-site-drawer *{box-sizing:border-box}'+
@@ -53,7 +49,14 @@ function init(){
  const shade=document.createElement('div');shade.id='gp-menu-shade';shade.hidden=true;
  const drawer=document.createElement('aside');drawer.id='gp-site-drawer';drawer.hidden=true;drawer.setAttribute('role','dialog');drawer.setAttribute('aria-modal','true');drawer.setAttribute('aria-labelledby','gp-drawer-title');
  drawer.innerHTML='<div class="gp-drawer-head"><div><h2 id="gp-drawer-title">Browse Pages</h2><p>अपनी कैटेगरी चुनें</p></div><button type="button" id="gp-menu-close" aria-label="Close menu">×</button></div><nav aria-label="Product pages">'+groups.map(([title,items])=>'<section><h3>'+title+'</h3>'+items.map(link).join('')+'</section>').join('')+'</nav>';
- const account=document.createElement('a');account.id='gp-account-link';account.href=shop+'customer-orders.html';account.textContent='Login / My Orders';header.insertBefore(account,header.lastElementChild);document.body.prepend(header);document.body.append(shade,drawer);document.body.classList.add('gp-site-navigation');
+ const account=document.createElement('a');account.id='gp-account-link';account.href=games+'customer.html';account.textContent='Login / My Orders';header.insertBefore(account,header.lastElementChild);document.body.prepend(header);document.body.append(shade,drawer);document.body.classList.add('gp-site-navigation');
+ const catalogCart=document.getElementById('gpCart');
+ if(catalogCart){
+  catalogCart.classList.add('gp-header-cart');
+  const catalogTools=catalogCart.parentElement;
+  header.insertBefore(catalogCart,header.lastElementChild);
+  if(!catalogTools.children.length)catalogTools.remove();
+ }
  
  const repo=location.pathname.split('/')[1]?.toLowerCase(),file=location.pathname.split('/').pop()||'index.html';
  const productRepo=['arcade-accessories-','arcadeaccessories-','ps2','ps2fmcb','fmcbusb','products','renewedconsole','arcadebox','ps2now'].includes(repo);

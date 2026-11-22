@@ -11,10 +11,17 @@ const categoryLabel=key=>specialCategories[key]||overviewPages.find(row=>row[0]=
 const label=newView?'New Arrivals':allView?'Arcade Accessories':specialCategories[page]||GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';
 if(allView)document.body.classList.add('gp-all-categories');
 sessionStorage.setItem('gp_store_view',modern?'new.html':'index.html');sessionStorage.setItem('gp_category_page',page);
-const consoleCategories=new Set(['consoles','ps2','ps3','ps4','ps5']);
+const gamesPages=new Set(['consoles','ps2','ps2-consoles','ps2-fmcb','ps3','ps4','ps5','gamebox','gaming','mobile','coolers']);
+const movedPages=new Set(['consoles','ps2-consoles','ps2-fmcb','gamebox','gaming','mobile','coolers']);
 const gamesPlanet='https://gamesplanet13.github.io/Gamesplanet_in/';
-const href=slug=>consoleCategories.has(slug)?gamesPlanet+'#shop/'+slug:(['arcade-box','consoles'].includes(slug)?slug+'.html':prefix+slug+'.html')+(slug==='arcade'?'?view=category':'');
+const href=slug=>gamesPages.has(slug)?gamesPlanet+'#shop/'+slug:(['arcade-box','consoles'].includes(slug)?slug+'.html':prefix+slug+'.html')+(slug==='arcade'?'?view=category':'');
 const allHref=prefix+'arcade.html?view=all';
+const redirectCategory=slug=>{
+ if(!movedPages.has(slug))return false;
+ location.replace(href(slug));
+ return true;
+};
+if(redirectCategory(allView?location.hash.replace(/^#gp-category-/, ''):page))return;
 const overviewPages=[
  ['arcade','Arcade Accessories'],['ps2','PS2 Accessories'],['ps3','PS3 Accessories'],
  ['pc','PC Accessories'],['electrical','Electrical Items'],['cables','Cables'],
@@ -23,17 +30,38 @@ const overviewPages=[
 ];
 const overviewHref=slug=>allHref+'#gp-category-'+slug;
 const links=()=>overviewPages.map(([slug,title])=>{
- const url=consoleCategories.has(slug)?href(slug):allView?'#gp-category-'+slug:slug==='pc'?overviewHref(slug):href(slug);
+ const url=gamesPages.has(slug)?href(slug):allView?'#gp-category-'+slug:slug==='pc'?overviewHref(slug):href(slug);
  return `<a href="${url}" ${!allView&&slug===page?'aria-current="page"':''}>${title}</a>`;
 }).join('')+Object.entries(specialCategories).map(([slug,title])=>
- `<a href="arcade.html?view=category&category=${slug}" ${slug===page?'aria-current="page"':''}>${title}</a>`
+ `<a href="${href(slug)}" ${slug===page?'aria-current="page"':''}>${title}</a>`
 ).join('')+`<a href="cpu-setup.html">Gaming CPU Builds</a><a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''}>New Products</a><a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`;
 const nav=document.createElement('section');nav.className='gp-category-nav';nav.innerHTML=`<div class="gp-page-tools gp-compact-tools"><button type="button" id="gpCart">Cart & Checkout</button><a href="${prefix}arcade.html?view=new">New Arrivals</a></div><h1>${label}</h1><nav class="gp-category-links" aria-label="Product categories">${links()}</nav>`;
 const arcadeProductOrder=["28mm Imported Arcade Push Button", "28mm Imported LED Illuminated Arcade Push Button", "Female Push Button Crimp Socket — Pack of 10", "Rasila Handle (Without Switch)", "Rasila Handle with 4 Black Switches", "MD Handle (With Switch)", "MD Switch Button", "Black Switch Button", "ZING Crystal Switch", "4.8mm Handle Switch Connector Pin", "Acrylic Coin Machine", "Acrylic Coin Machine with Switch", "Coin Drop Switch Button", "Coin Packet", "Remote Plate (Red Colour)", "Remote Lead", "USB to PS2/PS3/PC Converter", "10 Core Wire — ₹35 per Meter", "10 Core Wire"];
 function arcadeRank(name){const i=arcadeProductOrder.indexOf(name);return i<0?arcadeProductOrder.length:i;}
 const catalog=document.getElementById('products');catalog.before(nav);
+catalog.querySelector('.catalog-updated-badge')?.remove();
 
 document.getElementById('gpCart').onclick=()=>scrollToOrderDetails();
+document.body.classList.add('gp-arcade-catalog');
+const catalogStyle=document.createElement('style');
+catalogStyle.textContent=`
+ .gp-arcade-catalog #products .product .product-title > .gp-catalog-product-link{color:#fff!important;text-decoration:none}
+ .gp-arcade-catalog #products .product .product-title > .gp-catalog-product-link:hover{text-decoration:underline}
+ .gp-arcade-catalog #products .product .product-title > .gp-catalog-product-link:focus-visible{outline:2px solid #ffa94d;outline-offset:3px}
+ html body.gp-arcade-catalog #floatingSummary:has(.cart-bar-checkout:disabled){display:none!important}
+ .gp-header-cart{display:inline-flex;align-items:center;justify-content:center;min-height:42px;margin-left:auto;padding:6px 10px;color:#17324c;background:#f3f7fb;border:1px solid #dce4ee;border-radius:10px;white-space:nowrap;font:700 13px/1.2 system-ui;cursor:pointer}
+ .gp-compact-tools:empty{display:none!important}
+ @media(max-width:700px){
+  body.gp-arcade-catalog:has(.gp-header-cart) .gp-category-nav{display:none!important}
+  body.gp-arcade-catalog #gp-global-navigation{gap:8px}
+  body.gp-arcade-catalog #gp-global-navigation .gp-menu-brand{font-size:14px}
+  .gp-header-cart{min-height:40px;font-size:12px;padding-inline:8px}
+ }
+ @media(max-width:340px){
+  body.gp-arcade-catalog #gp-global-navigation .gp-menu-brand{font-size:12px}
+  body.gp-arcade-catalog #products .category-products{min-width:0}
+ }`;
+document.head.append(catalogStyle);
 const search=document.getElementById('storeSearch');
 function categoryProductAllowed(p){
  if(page==='ps2-consoles')return p.customType==='ps2'||p.consoleOrder===2;
@@ -95,6 +123,7 @@ function arrangeOverview(){
 }
 
 function openLinkedCategory(hash){
+ if(hash.startsWith('#gp-category-')&&redirectCategory(hash.slice('#gp-category-'.length)))return;
  const panel=hash.startsWith('#gp-category-')?document.getElementById(hash.slice(1)):null;
  if(panel&&!panel.hidden){
   panel.dataset.expanded='true';
@@ -118,6 +147,7 @@ window.render=function(...args){
 };
 function listedProduct(p){
  if(!p||p.includedOnly||p.cpuAddonOnly||p.hiddenFromStore||p.available===false||p.stock===0||p.aliasOf)return false;
+ if(window.GPSharedCatalog?.isGamesOnly?.(p))return false;
  if(!GPStock.allowed(p.name)||(/xbox/i.test(p.name)&&/controller|gamepad/i.test(p.name)))return false;
  if(newView)return p.isNew;
  if((allView||page==='arcade')&&(/xbox/i.test(p.name)||(/turbo/i.test(p.name)&&/controller|gamepad/i.test(p.name))))return false;
@@ -133,7 +163,7 @@ function showOverviewBanner(slug){
 }
 function renderBanner(){
  const title=allView?categoryLabel(bannerCategory):label;
- window.GPProductAd?.mount(document.body,{title,category:bannerCategory,heading:bannerHeading,before:document.body.firstElementChild});
+ window.GPProductAd?.mount(document.body,{title,category:bannerCategory,heading:bannerHeading,before:nav});
 }
 if(window.GPProductAd)renderBanner();
 else {
@@ -154,6 +184,13 @@ function apply(){
    const name=card.dataset.productName||(title?.textContent||'');
    card.dataset.productName=name;
    const p=products.find(x=>x.name===name);
+   if(p?.id&&title&&!title.querySelector('.gp-catalog-product-link')){
+    const link=document.createElement('a');
+    link.className='gp-catalog-product-link';
+    link.href=gamesPlanet+'#product/'+encodeURIComponent(p.id);
+    link.textContent=title.textContent;
+    title.replaceChildren(link);
+   }
    const ok=listedProduct(p)&&(!q||card.textContent.toLowerCase().includes(q));
    card.hidden=!ok;
    card.style.display=ok?'':'none';
@@ -268,17 +305,6 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
    setup.href='configure.html?type=arcade';
    setup.textContent='Choose your arcade setup →';
    card.append(setup);
-  }
-  if(p.shopPages?.includes('consoles')||['ps2','ps3','ps4','ps5'].includes(p.shopPage)){
-   const gamesPlanet='https://gamesplanet13.github.io/Gamesplanet_in/';
-   const target=p.customType==='ps2'?gamesPlanet+'#shop/ps2':gamesPlanet+'#product/'+encodeURIComponent(p.id);
-   const title=card.querySelector('.product-title');
-   if(title){
-    const link=document.createElement('a');
-    link.href=target;link.textContent=title.textContent;
-    title.replaceChildren(link);
-   }
-   if(p.customType==='ps2')card.querySelectorAll('a[href*="configure.html"]').forEach(a=>{a.href=target;a.textContent='PS2 Console Only / Complete / Manual Setup →';});
   }
   if(!p.includedGames)return;
   const box=document.createElement('div');box.className='gp-free-games';box.style.cssText='grid-column:1/-1;grid-row:6;font-size:12px;padding:8px;border:1px solid #3a9467;border-radius:8px';
