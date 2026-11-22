@@ -7,7 +7,7 @@ function init(){
  ['Your Account',[[ 'Customer Login / My Orders',shop+'customer-orders.html'],['Shared Cart / Checkout',shop+'order-prefill.html?source=cart&shared=1']]],
  ['Consoles & Game Systems',[
  ['Game Stick, Game Box & Handheld Consoles',shop+'gamebox.html'],
- ['Game Consoles · PS4',shop+'consoles.html'],
+ ['Game Consoles · PS4','https://gamesplanet13.github.io/Gamesplanet_in/#shop/consoles'],
  ['PS2 Console',base+'ps2/'],
  ['PS2 FMCB & USB',base+'ps2fmcb/Simple.html'],
  ['CPU Models / CPU Box',shop+'cpu-setup.html'],
@@ -15,8 +15,8 @@ function init(){
  ['Parts & Accessories',[
  ['New Products / नए प्रोडक्ट',shop+'arcade.html?view=new'],
  ['Arcade Accessories',shop],
- ['PS2 Accessories',shop+'ps2.html'],['PS3 Accessories',shop+'ps3.html'],
- ['PS4 Accessories',shop+'ps4.html'],['PS5 Accessories',shop+'ps5.html'],
+ ['PS2 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps2'],['PS3 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps3'],
+ ['PS4 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps4'],['PS5 Accessories','https://gamesplanet13.github.io/Gamesplanet_in/#shop/ps5'],
  ['Gaming Accessories',shop+'gaming.html'],['Computer Parts & Services',shop+'cpu.html'],['USB Storage — Batocera',shop+'usb-storage.html']]],
  ['Mobile & Electronics',[
  ['Mobile & Audio',shop+'mobile.html'],['Mobile Phone Coolers',shop+'coolers.html'],

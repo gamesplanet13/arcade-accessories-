@@ -1,9 +1,10 @@
 (function(){'use strict';
 const modern=location.pathname.split('/').pop().startsWith('new'),prefix=modern?'new-':'';
 const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&view!=='new'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const newView=view==='new';const label=newView?'New Arrivals':allView?'Arcade Accessories':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
-// PS2 Accessories must remain in this store. PS2 consoles use the separate Buy PS2 link.
 sessionStorage.setItem('gp_store_view',modern?'new.html':'index.html');sessionStorage.setItem('gp_category_page',page);
-const href=slug=>(['arcade-box','consoles'].includes(slug)?slug+'.html':prefix+slug+'.html')+(slug==='arcade'?'?view=category':'');
+const consoleCategories=new Set(['consoles','ps2','ps3','ps4','ps5']);
+const gamesPlanet='https://gamesplanet13.github.io/Gamesplanet_in/';
+const href=slug=>consoleCategories.has(slug)?gamesPlanet+'#shop/'+slug:(['arcade-box','consoles'].includes(slug)?slug+'.html':prefix+slug+'.html')+(slug==='arcade'?'?view=category':'');
 const allHref=prefix+'arcade.html?view=all';
 const overviewPages=[
  ['arcade','Arcade Accessories'],['ps2','PS2 Accessories'],['ps3','PS3 Accessories'],
@@ -13,7 +14,7 @@ const overviewPages=[
 ];
 const overviewHref=slug=>allHref+'#gp-category-'+slug;
 const links=()=>overviewPages.map(([slug,title])=>{
- const url=allView?'#gp-category-'+slug:slug==='pc'?overviewHref(slug):href(slug);
+ const url=consoleCategories.has(slug)?href(slug):allView?'#gp-category-'+slug:slug==='pc'?overviewHref(slug):href(slug);
  return `<a href="${url}" ${!allView&&slug===page?'aria-current="page"':''}>${title}</a>`;
 }).join('')+`<a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''}>New Products</a><a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`;
 const nav=document.createElement('section');nav.className='gp-category-nav';nav.innerHTML=`<div class="gp-page-tools gp-compact-tools"><button type="button" id="gpCart">Cart & Checkout</button><a href="${prefix}arcade.html?view=new">New Arrivals</a></div><h1>${label}</h1><nav class="gp-category-links" aria-label="Product categories">${links()}</nav>`;
@@ -268,7 +269,7 @@ for(const name of ['updateQty','updateVariantQty']){const old=window[name];windo
 
 function arrangeConsoleGroups(){
  if(!['consoles','ps4'].includes(page))return;
- const names=['PS4 Consoles','PS4 Accessories','PS2 Console — Original Complete Setup','PS2 Accessories'];
+ const names=['PS4 Consoles','PS4 Accessories','PS2 Console — Original Complete Setup','PS2 Accessories','PS3 Consoles'];
  const groups=names.map((name,index)=>{const panel=document.createElement('section');panel.className='category-panel is-open';panel.dataset.consoleGroup=String(index);const title=document.createElement('h2');title.className='category-toggle';title.textContent=name;panel.append(title);const items=document.createElement('div');items.className='category-products';panel.append(items);return panel;});
  document.querySelectorAll('#products .product').forEach(card=>{const name=card.dataset.productName||card.querySelector('.product-title')?.textContent;const p=products.find(p=>p.name===name);if(p?.shopPages.includes('consoles')&&!p.includedOnly&&p.consoleOrder!==undefined)groups[p.consoleOrder].querySelector('.category-products').append(card);});
  catalog.prepend(...groups);
@@ -337,7 +338,23 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
  document.querySelectorAll('#products .product').forEach(card=>{
   const name=card.dataset.productName||card.querySelector('.product-title')?.textContent;
   const p=products.find(p=>p.name===name);if(!p)return;
-  if(p.customType==='ps2')card.querySelectorAll('a[href*="configure.html"]').forEach(a=>{a.href=GPConsoleCatalog.PS2;a.textContent='PS2 Console Only / Complete / Manual Setup →';});
+  if(p.arcadeType){
+   const setup=document.createElement('a');
+   setup.className='game-action-btn top-games-btn';
+   setup.href='configure.html?type=arcade';
+   setup.textContent='Choose your arcade setup →';
+   card.append(setup);
+  }
+  if(p.shopPages?.includes('consoles')||consoleCategories.has(p.shopPage)){
+   const target=p.customType==='ps2'?gamesPlanet+'#shop/ps2':gamesPlanet+'#product/'+encodeURIComponent(p.id);
+   const title=card.querySelector('.product-title');
+   if(title){
+    const link=document.createElement('a');
+    link.href=target;link.textContent=title.textContent;
+    title.replaceChildren(link);
+   }
+   if(p.customType==='ps2')card.querySelectorAll('a[href*="configure.html"]').forEach(a=>{a.href=target;a.textContent='PS2 Console Only / Complete / Manual Setup →';});
+  }
   if(!p.includedGames)return;
   const box=document.createElement('div');box.className='gp-free-games';box.style.cssText='grid-column:1/-1;grid-row:6;font-size:12px;padding:8px;border:1px solid #3a9467;border-radius:8px';
   const line=document.createElement('strong');line.textContent=p.includedGames.storage+': '+p.includedGames.count+' top digital offline games — FREE';box.append(line,document.createElement('br'));const note=document.createElement('p');note.textContent='No physical disc — only free digital offline games';box.append(note);const poster=document.createElement('img');poster.src=p.includedGames.poster;poster.alt=p.includedGames.storage+' free digital offline games — no physical disc';poster.loading='lazy';poster.style.cssText='display:block;width:100%;max-width:300px;height:auto;border-radius:8px;margin:8px 0';box.append(poster);

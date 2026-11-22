@@ -3,19 +3,21 @@
 const MASTER='https://gamesplanet13.github.io/arcade-accessories-/data/master-products.json';
 const norm=n=>String(n||'').trim().toLowerCase().replace(/[‐‑–—−]/g,'-').replace(/\s+/g,' ');
 let master=null,scheduled=false;
+const stockFor=(records,p)=>window.GPSharedCatalog?.findStock(records,p)||records[norm(p.name)]||records[norm(p.legacyName)];
 const normalizeRecords=records=>Object.fromEntries(Object.entries(records||{}).map(([key,value])=>[norm(key),value]));
 function applyToProducts(arr,records){
  if(!Array.isArray(arr))return;
  for(const p of arr){
-  const m=records[norm(p.name)]||records[norm(p.legacyName)];
+  if(window.GPSharedCatalog){window.GPSharedCatalog.applyStock(records,p);continue;}
+  const m=stockFor(records,p);
   p.stock=m?Math.max(0,Number(m.stock??999)):Math.max(0,Number(p.stock??999));
   p.variantStocks={...(p.variantStocks||{})};
   if(m){
-   p.hiddenFromStore=Boolean(m.hiddenFromStore||m.available===false);
+   p.hiddenFromStore=Boolean(p.hiddenFromStore||m.hiddenFromStore||m.available===false);
    p.available=m.available===false?false:p.available;
   }
   if(!m)continue;
-  if(Number.isFinite(Number(m.price)))p.price=Number(m.price);
+  if(m.price!=null&&Number.isFinite(Number(m.price)))p.price=Number(m.price);
   for(const v of p.variants||[]){
    const info=m.variants?.[v];
    if(info){
@@ -33,8 +35,8 @@ function updateBadges(){
   const title=card.querySelector('.product-title')||card.querySelector('.product-purchase h1');
   const name=card.dataset.gpStockName||(title?.textContent||'').trim();
   if(!name)continue;card.dataset.gpStockName=name;
-  const m=records[norm(name)];
   const p=(typeof products!=='undefined'&&Array.isArray(products))?products.find(x=>x.name===name):null;
+  const m=stockFor(records,p||{name});
   const selectedVariant=card.querySelector('#variantSelect')?.value;
   const count=selectedVariant?Math.max(0,Number(m?.variants?.[selectedVariant]?.stock??p?.variantStocks?.[selectedVariant]??m?.stock??p?.stock??999)):(m?Math.max(0,Number(m.stock??999)):Math.max(0,Number(p?.stock??999)));
   const unavailable=(m?.hiddenFromStore===true||m?.available===false||count===0||p?.photoUnavailable===true||p?.hiddenFromStore===true||p?.available===false);
