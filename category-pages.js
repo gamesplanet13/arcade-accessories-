@@ -163,7 +163,9 @@ function showOverviewBanner(slug){
 }
 function renderBanner(){
  const title=allView?categoryLabel(bannerCategory):label;
- window.GPProductAd?.mount(document.body,{title,category:bannerCategory,heading:bannerHeading,before:nav});
+ const banner=window.GPProductAd?.mount(document.body,{title,category:bannerCategory,heading:bannerHeading,before:nav});
+ const header=document.getElementById('gp-global-navigation');
+ if(banner&&header&&header.nextElementSibling!==banner)header.after(banner);
 }
 if(window.GPProductAd)renderBanner();
 else {
