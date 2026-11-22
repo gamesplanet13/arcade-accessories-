@@ -1,8 +1,8 @@
 (function(root){function allowed(name,variant=''){
- if(name==='Imported Arcade Push Button H60 / H54')return false;
- if(variant==='Green (H60)')return false;
- if(/^PlayX\s.*controller$/i.test(name))return false;
+ if(root.GPSharedCatalog?.retiredProduct?.(name)||variant==='Green (H60)')return false;
+ if(!root.GPSharedCatalog&&(/^PlayX\b.*controller\b/i.test(name)||name==='Imported Arcade Push Button H60 / H54'))return false;
  const p=typeof products!=='undefined'&&Array.isArray(products)?products.find(item=>item.name===name):null;
  if(p?.cpuAddonOnly===true||p?.photoUnavailable===true||p?.hiddenFromStore===true||p?.available===false||p?.active===false||p?.stock===0||p?.status==='unavailable')return false;
+ if(p&&(root.GPSharedCatalog?.missingCatalogPhoto?.(p)||root.GPSharedCatalog?.unavailableCatalogStatus?.(p.status)))return false;
  if(variant&&(p?.variantStocks?.[variant]===0||p?.unavailableVariants?.includes(variant)))return false;
  if(!variant&&p?.variants?.length&&p.variants.every(v=>p.variantStocks?.[v]===0||p.unavailableVariants?.includes(v)))return false;if(/PS4 (?:500GB|1TB) Games Pack/i.test(name))return false;if(/xbox/i.test(name)&&/controller|gamepad/i.test(name))return false;if(/^Ucom PC USB Controller|^PC Controller$/.test(name))return true;return true}function price(name,current){if(name==='Coin Packet')return 220;return current}function clean(items){return items.filter(x=>allowed(x.name||x.product,x.variant||'')).map(x=>{const p=price(x.name||x.product,x.unitPrice??x.price),qty=x.quantity??x.qty??1;return {...x,unitPrice:p,price:p,baseUnitPrice:p,lineTotal:p*qty}})}root.GPStock={allowed,price,clean};if(typeof module!=='undefined')module.exports=root.GPStock})(typeof window!=='undefined'?window:globalThis);
