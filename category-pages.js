@@ -1,6 +1,15 @@
 (function(){'use strict';
 const modern=location.pathname.split('/').pop().startsWith('new'),prefix=modern?'new-':'';
-const page=document.body.dataset.shopPage||'arcade';const file=location.pathname.split('/').pop()||'index.html',view=new URLSearchParams(location.search).get('view');const allView=view==='all'||(view!=='category'&&view!=='new'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));const newView=view==='new';const label=newView?'New Arrivals':allView?'Arcade Accessories':GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';if(allView)document.body.classList.add('gp-all-categories');
+const specialCategories={'ps2-consoles':'PS2 Consoles','ps2-fmcb':'PS2 FMCB & USB'};
+const params=new URLSearchParams(location.search);
+const requestedCategory=params.get('category');
+const page=Object.hasOwn(specialCategories,requestedCategory)?requestedCategory:document.body.dataset.shopPage||'arcade';
+const file=location.pathname.split('/').pop()||'index.html',view=params.get('view');
+const allView=view==='all'||(view!=='category'&&view!=='new'&&['index.html','classic.html','new.html','arcade.html','new-arcade.html'].includes(file));
+const newView=view==='new';
+const categoryLabel=key=>specialCategories[key]||overviewPages.find(row=>row[0]===key)?.[1]||'Arcade Accessories';
+const label=newView?'New Arrivals':allView?'Arcade Accessories':specialCategories[page]||GPShop.pages.find(x=>x[0]===page)?.[1]||'Arcade Accessories';
+if(allView)document.body.classList.add('gp-all-categories');
 sessionStorage.setItem('gp_store_view',modern?'new.html':'index.html');sessionStorage.setItem('gp_category_page',page);
 const consoleCategories=new Set(['consoles','ps2','ps3','ps4','ps5']);
 const gamesPlanet='https://gamesplanet13.github.io/Gamesplanet_in/';
@@ -16,7 +25,9 @@ const overviewHref=slug=>allHref+'#gp-category-'+slug;
 const links=()=>overviewPages.map(([slug,title])=>{
  const url=consoleCategories.has(slug)?href(slug):allView?'#gp-category-'+slug:slug==='pc'?overviewHref(slug):href(slug);
  return `<a href="${url}" ${!allView&&slug===page?'aria-current="page"':''}>${title}</a>`;
-}).join('')+`<a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''}>New Products</a><a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`;
+}).join('')+Object.entries(specialCategories).map(([slug,title])=>
+ `<a href="arcade.html?view=category&category=${slug}" ${slug===page?'aria-current="page"':''}>${title}</a>`
+).join('')+`<a href="cpu-setup.html">Gaming CPU Builds</a><a href="${prefix}arcade.html?view=new" ${newView?'aria-current="page"':''}>New Products</a><a href="${allHref}" ${allView?'aria-current="page"':''}>Accessories & Electronics</a>`;
 const nav=document.createElement('section');nav.className='gp-category-nav';nav.innerHTML=`<div class="gp-page-tools gp-compact-tools"><button type="button" id="gpCart">Cart & Checkout</button><a href="${prefix}arcade.html?view=new">New Arrivals</a></div><h1>${label}</h1><nav class="gp-category-links" aria-label="Product categories">${links()}</nav>`;
 const arcadeProductOrder=["28mm Imported Arcade Push Button", "28mm Imported LED Illuminated Arcade Push Button", "Female Push Button Crimp Socket — Pack of 10", "Rasila Handle (Without Switch)", "Rasila Handle with 4 Black Switches", "MD Handle (With Switch)", "MD Switch Button", "Black Switch Button", "ZING Crystal Switch", "4.8mm Handle Switch Connector Pin", "Acrylic Coin Machine", "Acrylic Coin Machine with Switch", "Coin Drop Switch Button", "Coin Packet", "Remote Plate (Red Colour)", "Remote Lead", "USB to PS2/PS3/PC Converter", "10 Core Wire — ₹35 per Meter", "10 Core Wire"];
 function arcadeRank(name){const i=arcadeProductOrder.indexOf(name);return i<0?arcadeProductOrder.length:i;}
@@ -25,6 +36,8 @@ const catalog=document.getElementById('products');catalog.before(nav);
 document.getElementById('gpCart').onclick=()=>scrollToOrderDetails();
 const search=document.getElementById('storeSearch');
 function categoryProductAllowed(p){
+ if(page==='ps2-consoles')return p.customType==='ps2'||p.consoleOrder===2;
+ if(page==='ps2-fmcb')return p.shopPage==='ps2'&&/\b(?:FMCB|FunTuna|memory card|USB)\b/i.test(p.name);
  if(!p?.shopPages?.includes(page))return false;
  // Console setup is separate: do not put PS2 console in PS2 spare parts.
  if(page==='ps2')return p.customType!=='ps2'&&p.category!=='Game Consoles';
@@ -63,6 +76,7 @@ function arrangeOverview(){
    const open=!panel.classList.contains('is-open');
    panel.dataset.expanded=String(open);
    setCategoryOpen(panel,open);
+   if(open)showOverviewBanner(slug);
   });
   return [slug,panel];
  }));
@@ -85,6 +99,7 @@ function openLinkedCategory(hash){
  if(panel&&!panel.hidden){
   panel.dataset.expanded='true';
   setCategoryOpen(panel,true);
+  showOverviewBanner(panel.id.slice('gp-category-'.length));
  }
 }
 
@@ -109,18 +124,21 @@ function listedProduct(p){
  return allView||categoryProductAllowed(p);
 }
 
-const bannerCategory = newView ? 'new' : allView ? 'arcade' : page;
-const bannerHeading = nav.querySelector('h1');
+let bannerCategory=newView?'new':allView?'arcade':page;
+const bannerHeading=nav.querySelector('h1');
+function showOverviewBanner(slug){
+ if(!allView)return;
+ bannerCategory=slug;
+ renderBanner();
+}
 function renderBanner(){
- const ad=window.GPProductAd;
- if(!ad)return;
- const eligible=products.filter(listedProduct);
- ad.mount(document.body,{title:label,category:bannerCategory,eligible,heading:bannerHeading,before:document.body.firstElementChild});
+ const title=allView?categoryLabel(bannerCategory):label;
+ window.GPProductAd?.mount(document.body,{title,category:bannerCategory,heading:bannerHeading,before:document.body.firstElementChild});
 }
 if(window.GPProductAd)renderBanner();
 else {
  const adScript=document.createElement('script');
- adScript.src='catalog-ad.js?v=20261122-thumbnails';
+ adScript.src='catalog-ad.js?v=20261123-approved-banners';
  adScript.addEventListener('load',renderBanner,{once:true});
  document.head.append(adScript);
 }
