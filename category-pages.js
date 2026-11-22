@@ -34,7 +34,7 @@ function categoryProductAllowed(p){
  return true;
 }
 function overviewGroup(p){
- if(p.customType==='ps2')return 'consoles';
+ if(p.customType==='ps2'||(p.shopPages?.includes('consoles')&&[0,2,4].includes(p.consoleOrder)))return 'consoles';
  if(p.category==='Computer & Network Accessories'){
   return /\bcables?\b|\bpatch cord\b/i.test(p.name)?'cables':'pc';
  }
@@ -345,7 +345,8 @@ window.addEventListener('pageshow',()=>{let saved;try{saved=GPShop.migrate(JSON.
    setup.textContent='Choose your arcade setup →';
    card.append(setup);
   }
-  if(p.shopPages?.includes('consoles')||consoleCategories.has(p.shopPage)){
+  if(p.shopPages?.includes('consoles')||['ps2','ps3','ps4','ps5'].includes(p.shopPage)){
+   const gamesPlanet='https://gamesplanet13.github.io/Gamesplanet_in/';
    const target=p.customType==='ps2'?gamesPlanet+'#shop/ps2':gamesPlanet+'#product/'+encodeURIComponent(p.id);
    const title=card.querySelector('.product-title');
    if(title){
